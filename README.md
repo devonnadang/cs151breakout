@@ -7,7 +7,7 @@
 >   * Click green button on right hand corner (click upside down triangle)
 >   * Go to HTTPS link
 >   * Go to your terminal on ur computer 
->   * Type: 'git clone --recursive <HTTPS link>'
+>   * Type: 'git clone --recursive <'HTTPSlink'>'
 >   * (This should be set up, if not you may have to add upstream)
 > * 2) Make your own branch
 >   * On your own computer now (own terminal)
