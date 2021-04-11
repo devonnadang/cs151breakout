@@ -11,8 +11,8 @@
 >   * (This should be set up, if not you may have to add upstream)
 > * 2) Make your own branch
 >   * On your own computer now (own terminal)
->   * Type: 'git branch <yourname>/cs151breakout'
->   * Type: 'git checkout <yourname>/cs151breakout'
+>   * Type: 'git branch <'your-username'>/cs151breakout'
+>   * Type: 'git checkout <'your-username'>/cs151breakout'
 >   * Type: 'git push --set-upstream origin <yourname>/cs151breakout'
 >   * Now you're all done! 
 >   * Important!: When you're working, make sure you are ALWAYS on your branch. Only push onto master when everything is working. 
