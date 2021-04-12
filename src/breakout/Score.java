@@ -1,5 +1,7 @@
 package breakout;
 
-public class Score {
+// This Class keeps track of the user's score
 
+public class Score {
+	
 }
