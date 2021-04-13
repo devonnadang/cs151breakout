@@ -2,6 +2,9 @@ package breakout;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Test;
 
 class BreakoutTest {
@@ -10,7 +13,19 @@ class BreakoutTest {
 	//All the blocks are cleared from board.
 	@Test
 	void winGameTest() {
+		boolean expected = true;
+		boolean actual = false;
+		Board board = new Board();
 
+		//set all blocks to destroyed
+		for (int i = 0; i < board.getRows(); i++) {
+			for (int j = 0; j < board.getColumns(); j++){
+				board.blocks[i][j].setDestroyed(true);
+			}
+		}
+		actual = board.bricksAreCleared();
+
+		assertEquals(expected, actual);
 	}
 
 	//User loses all lives
@@ -68,6 +83,36 @@ class BreakoutTest {
 	@Test
 	void saveScoreTest(){
 
+	}
+
+	@Test
+	void compareScoreTest(){
+		ArrayList<Score> scores = new ArrayList<>();
+		Score s1 = new Score();
+		Score s2 = new Score();
+		Score s3 = new Score();
+		Score s4 = new Score();
+		s1.setScore(100);
+		s1.setUsername("C");
+		s2.setScore(500);
+		s2.setUsername("C");
+		s3.setScore(5);
+		s3.setUsername("B");
+		s4.setScore(500);
+		s4.setUsername("A");
+		scores.add(s1);
+		scores.add(s2);
+		scores.add(s3);
+		scores.add(s4);
+		Collections.sort(scores);
+
+		ArrayList<Score> expectedScores = new ArrayList<>();
+		expectedScores.add(s4);
+		expectedScores.add(s2);
+		expectedScores.add(s1);
+		expectedScores.add(s3);
+
+		assertEquals(expectedScores, scores);
 	}
 
 	@Test

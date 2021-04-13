@@ -19,6 +19,10 @@ public class Score implements Comparable<Score> {
 	public String getUsername() {
 		return username;
 	}
+
+	public void setScore(int score) {
+		currentScore = score;
+	}
 	
 	public int getScore() {
 		return currentScore;
@@ -42,16 +46,24 @@ public class Score implements Comparable<Score> {
 
 	
 	@Override
-	// compare by score, then time?, then username?
-	// maybe don't need
+	/**
+	 * This method sorts score from highest to lowest, then by username. 
+
+	 	@param Score to compare with
+		@return position of Score. A higher score will be placed before. 
+	 */
 	public int compareTo(Score other) {
-		if (this.getScore() > other.getScore())
-			return 1;
-		else if (this.getScore() > other.getScore())
+		if (this.getScore() > other.getScore()) //this.score is higher
 			return -1;
-		// else compare time? compare username?
-			
-		return 0;
+		else if (this.getScore() < other.getScore()) //this.score is lower
+			return 1;
+		else 
+			return this.getUsername().compareTo(other.getUsername());
+	}
+
+	public boolean equals(Object obj) {
+		Score that = (Score) obj;
+		return this.compareTo(that) == 0;
 	}
 	
 }
