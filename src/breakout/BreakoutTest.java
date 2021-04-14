@@ -172,6 +172,11 @@ class BreakoutTest {
     void lifeLostTest() {
 
     }
+    
+    @Test
+    void paddleMoveTest() {
+    	
+    }
 
 
 }
