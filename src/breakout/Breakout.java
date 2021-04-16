@@ -9,12 +9,12 @@ import javax.swing.JFrame;
 public class Breakout {
 
     private Board board;
-    // I guess update the status using a String every once in a while?
-    private String status;
     private JFrame frame;
 
+    /**
+     * Initializes Breakout and the main JFrame that will display everything.
+     */
     public Breakout() {
-        status = "SYSTEM_INITIALIZED";
         // Swing stuff
         frame = new JFrame();
         frame.setPreferredSize(new Dimension(300, 600));
@@ -37,7 +37,7 @@ public class Breakout {
     }
 
     /**
-     * Ends Breakout.
+     * Ends Breakout. Breakout should end when there are no lives left or when there are no blocks left.
      */
     public void endGame() {
         // Should Breakout check for lives?
@@ -45,12 +45,5 @@ public class Breakout {
 //        if (!isAlive() || board.bricksAreCleared()) {
 //            // Go to the leaderboard page
 //        }
-    }
-
-    /**
-     * What is this?
-     */
-    public void notifyPlayerGameStatus() {
-        // Print out or show game status?
     }
 }

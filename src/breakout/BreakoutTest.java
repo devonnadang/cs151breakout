@@ -44,6 +44,10 @@ class BreakoutTest {
         assertEquals(expected, actual);
     }
 
+    /**
+     * Checking if isAlive() method works correctly. The method should be true
+     * when all the lives aren't lost and be false when all lives are lost.
+     */
     @Test
     void isAliveTest() {
         // Should be alive at beginning of game
@@ -66,6 +70,9 @@ class BreakoutTest {
         assertEquals(expected, actual);
     }
 
+    /**
+     * Checking if startGame() works correctly. It should not cause any errors or exceptions.
+     */
     @Test
     void startGameTest() {
         // GUI pops up for like a split second; Should I make the system wait? But it gave
@@ -77,6 +84,9 @@ class BreakoutTest {
         assertNotNull(breakout);
     }
 
+    /**
+     * Checking if the game can restart correctly after having finished. There should be no errors or exceptions.
+     */
     @Test
     void resetGameTest() {
 
