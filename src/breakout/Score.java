@@ -1,42 +1,80 @@
 package breakout;
 
-// This Class keeps track of the user's score
-// game start: no username & score set to 0
-// game ends: set name if want to add to leaderboard
 
-// *should score also store time?
+/**
+ * Keeps track of the user's score.
+ * 
+ */
 
+//maybe later: score also store time
 public class Score implements Comparable<Score> {
+	
 	private String username;
 	private int currentScore;
 	
 	
+	/**
+	 * Constructs a Score object with an empty username and currentScore of zero.
+	 * A Breakout game starts with no username and score set to zero.
+	 */
 	public Score() {
 		username = "";
 		currentScore = 0;
 	}
 	
+
+	/**
+	 * Gets the String username of this Score
+	 * 
+	 * @return String username of this Score
+	 */
 	public String getUsername() {
 		return username;
 	}
 
-	public void setScore(int score) {
-		currentScore = score;
-	}
 	
+	/**
+	 * Sets int new score of this Score
+	 * 
+	 * @param int newScore to set as currentScore  
+	 */
+	public void setScore(int newScore) {
+		currentScore = newScore;
+	}
+
+	
+	/**
+	 * Gets the currentScore.
+	 * 
+	 * @return int currentScore.
+	 */
 	public int getScore() {
 		return currentScore;
 	}
 	
-	// make boolean??? like if newUsername = "" or " " then return false username is not accepted/added
-	public void setUsername(String newUsername) {
-		
-		username = newUsername;
+	
+	/**
+	 * Sets the username and returns true if newUsername is not empty or only has white spaces.
+	 * 
+	 * @param newUsername the new username to set
+	 * @return True if String newUsername is not empty or only has white spaces. Else, return false.
+	 */
+	public boolean setUsername(String newUsername) {
+		if (!newUsername.isBlank()) {
+			username = newUsername;
+			return true;
+		}
+		return false;
 	}
 	
+	
+	/**
+	 * Increments the Score by 5.
+	 */
 	public void incrementScore() {
-		currentScore += 5; // may change, depends on points per block
+		currentScore += 5; // 5 points per block destroyed
 	}
+	
 	
 	// might need to change after implementing view
 	// for junit test
@@ -47,23 +85,34 @@ public class Score implements Comparable<Score> {
 	
 	@Override
 	/**
-	 * This method sorts score from highest to lowest, then by username. 
-
-	 	@param Score to compare with
-		@return position of Score. A higher score will be placed before. 
+	 * Compares this Score with the specified Score from highest to lowest, then by username from A to Z.
+	 * 
+	 * @param Score to be compared
+	 * @return a negative integer, zero, or a positive integer if this Score is greater than, equal to, or less than the specified Score 
 	 */
 	public int compareTo(Score other) {
-		if (this.getScore() > other.getScore()) //this.score is higher
+		if (this.getScore() > other.getScore()) // this.score is higher
 			return -1;
-		else if (this.getScore() < other.getScore()) //this.score is lower
+		else if (this.getScore() < other.getScore()) // this.score is lower
 			return 1;
 		else 
 			return this.getUsername().compareTo(other.getUsername());
 	}
 
+	
+	@Override
+	/**
+	 * Checks if the specified Score is equal to this Score.
+	 * 
+	 * @param Score to be compared
+	 * @return true if this Score and the specified Score is equal.
+	 */
 	public boolean equals(Object obj) {
-		Score that = (Score) obj;
-		return this.compareTo(that) == 0;
+		if (obj instanceof Score) {
+			Score other = (Score) obj;
+			return this.compareTo(other) == 0;
+		}
+		return false;
 	}
 	
 }
