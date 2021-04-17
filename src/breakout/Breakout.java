@@ -26,10 +26,9 @@ public class Breakout {
     }
 
     /**
-     * Starts Breakout. Initializes Board and any other variable that needs to be initialized.
+     * Starts Breakout. Initializes Board and any other objects that need to be initialized.
      */
     public void startGame() {
-        status = "GAME_STARTED";
         // What's supposed be in here????????
         // Who's gonna be the JFrame?
         board = new Board();
@@ -37,7 +36,8 @@ public class Breakout {
     }
 
     /**
-     * Ends Breakout. Breakout should end when there are no lives left or when there are no blocks left.
+     * Ends Breakout when there are no lives left or when there are no blocks
+     * left.
      */
     public void endGame() {
         // Should Breakout check for lives?

@@ -45,8 +45,8 @@ class BreakoutTest {
     }
 
     /**
-     * Checking if isAlive() method works correctly. The method should be true
-     * when all the lives aren't lost and be false when all lives are lost.
+     * Checking if isAlive() method works correctly. The method should be true when all the lives
+     * aren't lost and be false when all lives are lost.
      */
     @Test
     void isAliveTest() {
@@ -85,7 +85,8 @@ class BreakoutTest {
     }
 
     /**
-     * Checking if the game can restart correctly after having finished. There should be no errors or exceptions.
+     * Checking if the game can restart correctly after having finished. There should be no errors
+     * or exceptions.
      */
     @Test
     void resetGameTest() {
@@ -168,9 +169,17 @@ class BreakoutTest {
 
     }
 
+    /**
+     * Checking if board can reset properly. There should be no errors or exceptions.
+     */
     @Test
     void resetBoardTest() {
+        // How to reset board? There no method to access Board's data except how many rows/columns
+        // it has.
+        Board board = new Board();
+        board = new Board();
 
+        assertNotNull(board);
     }
 
     @Test
@@ -178,14 +187,30 @@ class BreakoutTest {
 
     }
 
+    /**
+     * Checking if life is lost. Should give no errors or exception, and one life should be lost
+     * everytime subtractLife() is called.
+     */
     @Test
     void lifeLostTest() {
+        int expected = 3;
+        int actual;
 
+        Life lives = new Life();
+
+        // Subtracting all three lives and checking each time if life is subtracted correctly.
+        for (int i = 0; i < 3; i++) {
+            expected--;
+            lives.subtractLife();
+            actual = lives.getLives();
+
+            assertEquals(expected, actual);
+        }
     }
-    
+
     @Test
     void paddleMoveTest() {
-    	
+
     }
 
 
