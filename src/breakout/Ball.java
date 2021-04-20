@@ -12,32 +12,50 @@ public class Ball {
 	/**
 	 * This is the constructor which initializes x & y to its starting positions.
 	 */
-	public Ball()
+	public Ball(int x, int y)
 	{
-		//temp starting coordinates, change if needed
-		//this.x = 1;
-		//this.y = 0; 
+		setCoordinates(x, y);
 	}
 	
-	//get x-coor
+	/**
+	 * @return x coordinate
+	 */
 	public int getX()
 	{
 		return x;
 	}
 	
-	//get y-coor
+	/**
+	 * @return y coordinate
+	 */
 	public int getY()
 	{
 		return y;
 	}
+
+	/**
+	 * Set the placement for Block.
+	 * @param x determines the x coordinate
+	 * @param y determines the x coordinate
+	 */
+	public void setCoordinates(int x, int y){
+		setX(x);
+		setY(y);
+	}
 	
-	//set x-coor
+	/**
+	 * Set the x coordinate
+	 * @param x determines the x coordinate
+	 */
 	public void setX(int x)
 	{
 		this.x = x;
 	}
 	
-	//set y-coor
+	/**
+	 * Set the y coordinate
+	 * @param y determines the x coordinate
+	 */
 	public void setY(int y)
 	{
 		this.y = y;
@@ -71,16 +89,11 @@ public class Ball {
 	}
 	
 	/**
-	 * Destroys blocks
+	 * Destroys the given block by setting the Block's boolean destoryed variable to true
 	 */
-	public void destroyBlock()
+	public void destroyBlock(Block block)
 	{
-		/*
-		if(ball in contact with block)
-		{
-			//that block.setDestroyed(true);
-		}
-		*/
+		block.setDestroyed(true);
 	}
 	
 	/**

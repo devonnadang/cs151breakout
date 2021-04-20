@@ -8,8 +8,8 @@ public class Paddle {
 	private int y; //y coordinate of the paddle object
 	
 	//dimensions of paddle
-	private static final int PADDLE_WIDTH = 5;
-	private static final int PADDLE_HEIGHT = 3;
+	private static final int PADDLE_WIDTH = 50;
+	private static final int PADDLE_HEIGHT = 10;
 	
 	public Paddle()
 	{

@@ -110,7 +110,8 @@ class BreakoutTest {
 
     @Test
     void createBoardTest() {
-
+        Board board = new Board();
+        System.out.println(board.toString());
     }
 
     @Test
@@ -166,7 +167,16 @@ class BreakoutTest {
 
     @Test
     void destroyBlockTest() {
+        Board board = new Board();
+        int expectedBlockCounter = board.getRows()*board.getColumns() - 1;
+        board.getBall().setCoordinates(30, 35);
 
+        Block testBlock = new Block(30, 30);
+        if (board.checkClash()){ 
+            board.getBall().destroyBlock(testBlock);
+        }
+        int actualBlockCounter = board.getBlockCounter();
+        assertEquals(expectedBlockCounter, actualBlockCounter);
     }
 
     /**
