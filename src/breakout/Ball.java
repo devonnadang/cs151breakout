@@ -2,7 +2,7 @@ package breakout;
 //Ball Class
 public class Ball {
 
-	private static final int BALL_RADIUS = 5;
+	private static final int BALL_RADIUS = 10;
 	private int speed = 60; //remove if not needed
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
@@ -14,6 +14,10 @@ public class Ball {
 	 */
 	public Ball(int x, int y)
 	{
+		//this.x = (Board.getBoardWidth()/2) - getBallRadius();
+		//this.y = (Board.getBoardHeight()/2) - getBallRadius();
+		this.x = x;
+		this.y = y;
 		setCoordinates(x, y);
 	}
 	
@@ -31,6 +35,11 @@ public class Ball {
 	public int getY()
 	{
 		return y;
+	}
+
+	public int getBallRadius()
+	{
+		return BALL_RADIUS;
 	}
 
 	/**
@@ -61,19 +70,12 @@ public class Ball {
 		this.y = y;
 	}
 	
-	//remove if not needed
-	public void setSpeed(int s)
-	{
-		this.speed = s;
-	}
-	
 	/**
 	 * In charge of the ball movement.
 	 */
 	public void move()
 	{
 		//change x & y coord
-		//should x & y be increased here or somewhere else?
 		
 		/*
 		if(x is #) //out of bound 
@@ -89,7 +91,8 @@ public class Ball {
 	}
 	
 	/**
-	 * Destroys the given block by setting the Block's boolean destoryed variable to true
+	 * Destroys the given block by setting the Block's boolean destroyed variable to true
+	 * @param block the block that should be destroyed
 	 */
 	public void destroyBlock(Block block)
 	{
@@ -98,6 +101,7 @@ public class Ball {
 	
 	/**
 	 * Resets the position of the ball
+	 * @param r value indicating whether reset of ball should occur
 	 */
 	public void reset(boolean r)
 	{

@@ -114,9 +114,12 @@ class BreakoutTest {
         System.out.println(board.toString());
     }
 
+    /**
+     * Checks to see if ball can be created. No errors should occur.
+     */
     @Test
     void createBallTest() {
-
+    	//Ball ball = new Ball();
     }
 
     @Test
@@ -124,9 +127,12 @@ class BreakoutTest {
 
     }
 
+    /**
+     * Checks to see if paddle can be created. No errors should occur.
+     */
     @Test
     void createPaddleTest() {
-
+    	Paddle paddle = new Paddle();
     }
 
     //Check if score is saved in leaderboard
@@ -192,6 +198,9 @@ class BreakoutTest {
         assertNotNull(board);
     }
 
+    /**
+     * Checks to see whether ball can move properly.
+     */
     @Test
     void ballMoveTest() {
 
@@ -218,6 +227,9 @@ class BreakoutTest {
         }
     }
 
+    /**
+     * Checks to see whether paddle can move properly.
+     */
     @Test
     void paddleMoveTest() {
 
