@@ -1,5 +1,5 @@
 package breakout;
-//Ball Class
+//The Ball Class
 public class Ball {
 
 	private static final int BALL_RADIUS = 10;
