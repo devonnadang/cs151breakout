@@ -110,12 +110,16 @@ class BreakoutTest {
 
     @Test
     void createBoardTest() {
-
+        Board board = new Board();
+        System.out.println(board.toString());
     }
 
+    /**
+     * Checks to see if ball can be created. No errors should occur.
+     */
     @Test
     void createBallTest() {
-
+    	//Ball ball = new Ball();
     }
 
     @Test
@@ -123,9 +127,12 @@ class BreakoutTest {
 
     }
 
+    /**
+     * Checks to see if paddle can be created. No errors should occur.
+     */
     @Test
     void createPaddleTest() {
-
+    	Paddle paddle = new Paddle();
     }
 
     //Check if score is saved in leaderboard
@@ -166,7 +173,16 @@ class BreakoutTest {
 
     @Test
     void destroyBlockTest() {
+        Board board = new Board();
+        int expectedBlockCounter = board.getRows()*board.getColumns() - 1;
+        board.getBall().setCoordinates(30, 35);
 
+        Block testBlock = new Block(30, 30);
+        if (board.checkClash()){ 
+            board.getBall().destroyBlock(testBlock);
+        }
+        int actualBlockCounter = board.getBlockCounter();
+        assertEquals(expectedBlockCounter, actualBlockCounter);
     }
 
     /**
@@ -182,6 +198,9 @@ class BreakoutTest {
         assertNotNull(board);
     }
 
+    /**
+     * Checks to see whether ball can move properly.
+     */
     @Test
     void ballMoveTest() {
 
@@ -208,6 +227,9 @@ class BreakoutTest {
         }
     }
 
+    /**
+     * Checks to see whether paddle can move properly.
+     */
     @Test
     void paddleMoveTest() {
 

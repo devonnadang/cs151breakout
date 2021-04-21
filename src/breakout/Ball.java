@@ -1,8 +1,8 @@
 package breakout;
-//Ball Class
+//The Ball Class
 public class Ball {
 
-	private static final int BALL_RADIUS = 5;
+	private static final int BALL_RADIUS = 10;
 	private int speed = 60; //remove if not needed
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
@@ -12,41 +12,62 @@ public class Ball {
 	/**
 	 * This is the constructor which initializes x & y to its starting positions.
 	 */
-	public Ball()
+	public Ball(int x, int y)
 	{
-		//temp starting coordinates, change if needed
-		//this.x = 1;
-		//this.y = 0; 
+		//this.x = (Board.getBoardWidth()/2) - getBallRadius();
+		//this.y = (Board.getBoardHeight()/2) - getBallRadius();
+		this.x = x;
+		this.y = y;
+		setCoordinates(x, y);
 	}
 	
-	//get x-coor
+	/**
+	 * @return x coordinate
+	 */
 	public int getX()
 	{
 		return x;
 	}
 	
-	//get y-coor
+	/**
+	 * @return y coordinate
+	 */
 	public int getY()
 	{
 		return y;
 	}
+
+	public int getBallRadius()
+	{
+		return BALL_RADIUS;
+	}
+
+	/**
+	 * Set the placement for Block.
+	 * @param x determines the x coordinate
+	 * @param y determines the x coordinate
+	 */
+	public void setCoordinates(int x, int y){
+		setX(x);
+		setY(y);
+	}
 	
-	//set x-coor
+	/**
+	 * Set the x coordinate
+	 * @param x determines the x coordinate
+	 */
 	public void setX(int x)
 	{
 		this.x = x;
 	}
 	
-	//set y-coor
+	/**
+	 * Set the y coordinate
+	 * @param y determines the x coordinate
+	 */
 	public void setY(int y)
 	{
 		this.y = y;
-	}
-	
-	//remove if not needed
-	public void setSpeed(int s)
-	{
-		this.speed = s;
 	}
 	
 	/**
@@ -55,7 +76,6 @@ public class Ball {
 	public void move()
 	{
 		//change x & y coord
-		//should x & y be increased here or somewhere else?
 		
 		/*
 		if(x is #) //out of bound 
@@ -71,20 +91,17 @@ public class Ball {
 	}
 	
 	/**
-	 * Destroys blocks
+	 * Destroys the given block by setting the Block's boolean destroyed variable to true
+	 * @param block the block that should be destroyed
 	 */
-	public void destroyBlock()
+	public void destroyBlock(Block block)
 	{
-		/*
-		if(ball in contact with block)
-		{
-			//that block.setDestroyed(true);
-		}
-		*/
+		block.setDestroyed(true);
 	}
 	
 	/**
 	 * Resets the position of the ball
+	 * @param r value indicating whether reset of ball should occur
 	 */
 	public void reset(boolean r)
 	{
