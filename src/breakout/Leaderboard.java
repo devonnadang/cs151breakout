@@ -55,4 +55,9 @@ public class Leaderboard {
 			top10Score.add(highScores.get(i));
 		return top10Score;
 	}
+
+
+	public ArrayList<Score> getHighScores() {
+		return highScores;
+	}
 }
