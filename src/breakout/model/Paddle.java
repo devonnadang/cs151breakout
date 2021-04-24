@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 //Paddle Class
 public class Paddle {
 	private int x; //x coordinate of the paddle object

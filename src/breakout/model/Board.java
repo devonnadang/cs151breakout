@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 
 //This class is the board class
 public class Board {
