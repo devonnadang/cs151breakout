@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 
 /**
  * An object to keep track of lives. Always starts with three lives.
@@ -26,7 +26,7 @@ public class Life {
     /**
      * Subtracts one life.
      */
-    public void subtractLife() {
+    protected void subtractLife() {
         lives--;
     }
 

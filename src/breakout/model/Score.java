@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 
 // Testing push
 /**

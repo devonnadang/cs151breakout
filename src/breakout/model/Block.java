@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 
 //This is the Block class
 public class Block {
