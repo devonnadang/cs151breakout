@@ -93,19 +93,129 @@ class BreakoutTest {
 
     }
 
-    @Test
+    @Test // get score based on how many blocks are left
     void checkScoreTest() {
-
+    	// Board boardTest = new Board();
+    	// int blocksDestroyed = getRows() * getColumns() - getBlockCounter() = // how many blocks are out
     }
 
-    @Test
+    @Test // only get 10 highest score
     void get10HighestScores() {
+    	Score s1 = new Score();
+        s1.setScore(65);
+        s1.setUsername("A");
+        
+        Score s2 = new Score();
+        s2.setScore(10);
+        s2.setUsername("B");
+        
+        Score s3 = new Score();
+        s3.setScore(55);
+        s3.setUsername("C");
+        
+        Score s4 = new Score();
+        s4.setScore(200);
+        s4.setUsername("D");
+        
+        Score s5 = new Score();
+        s5.setScore(250);
+        s5.setUsername("E");
+        
+        Score s6 = new Score();
+        s6.setScore(65);
+        s6.setUsername("F");
+        
+        Score s7 = new Score();
+        s7.setScore(65);
+        s7.setUsername("G");
+        
+        Score s8 = new Score();
+        s8.setScore(15);
+        s8.setUsername("H");
+        
+        Score s9 = new Score();
+        s9.setScore(0);
+        s9.setUsername("I");
+        
+        Score s10 = new Score();
+        s10.setScore(70);
+        s10.setUsername("J");
+        
+        Score s11 = new Score();
+        s11.setScore(40);
+        s11.setUsername("K");
+        
+        Score s12 = new Score();
+        s12.setScore(250);
+        s12.setUsername("L");
+        
+        Leaderboard scores = new Leaderboard();
+        scores.addNewScore(s1);
+        scores.addNewScore(s2);
+        scores.addNewScore(s3);
+        scores.addNewScore(s4);
+        scores.addNewScore(s5);
+        scores.addNewScore(s6);
+        scores.addNewScore(s7);
+        scores.addNewScore(s8);
+        scores.addNewScore(s9);
+        scores.addNewScore(s10);
+        scores.addNewScore(s11);
+        scores.addNewScore(s12);
+        
+        ArrayList<Score> expectedScores = new ArrayList<>();
+        expectedScores.add(s5);
+        expectedScores.add(s12);
+        expectedScores.add(s4);
+        expectedScores.add(s10);
+        expectedScores.add(s1);
+        expectedScores.add(s6);
+        expectedScores.add(s7);
+        expectedScores.add(s3);
+        expectedScores.add(s11);
+        expectedScores.add(s8);
+
+        assertEquals(expectedScores, scores.getTop10Score());
 
     }
 
-    @Test
+    @Test // make sure all scores are added and in order
     void addScoreTest() {
+    	Score s1 = new Score();
+        s1.setScore(65);
+        s1.setUsername("A");
+        
+        Score s2 = new Score();
+        s2.setScore(100);
+        s2.setUsername("B");
+        
+        Score s3 = new Score();
+        s3.setScore(5);
+        s3.setUsername("C");
+        
+        Score s4 = new Score();
+        s4.setScore(20);
+        s4.setUsername("D");
+        
+        Score s5 = new Score();
+        s5.setScore(100);
+        s5.setUsername("E");
+        
+        Leaderboard scores = new Leaderboard();
+        scores.addNewScore(s1);
+        scores.addNewScore(s2);
+        scores.addNewScore(s3);
+        scores.addNewScore(s4);
+        scores.addNewScore(s5);
 
+        ArrayList<Score> expectedScores = new ArrayList<>();
+        expectedScores.add(s2);
+        expectedScores.add(s5);
+        expectedScores.add(s1);
+        expectedScores.add(s4);
+        expectedScores.add(s3);
+
+        assertEquals(expectedScores, scores.getHighScores());
     }
 
     @Test
@@ -135,11 +245,6 @@ class BreakoutTest {
     	Paddle paddle = new Paddle();
     }
 
-    //Check if score is saved in leaderboard
-    @Test
-    void saveScoreTest() {
-
-    }
 
     @Test
     void compareScoreTest() {
