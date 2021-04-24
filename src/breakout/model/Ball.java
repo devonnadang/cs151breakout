@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 //The Ball Class
 public class Ball {
 

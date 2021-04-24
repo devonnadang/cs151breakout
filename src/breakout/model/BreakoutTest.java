@@ -1,4 +1,4 @@
-package breakout;
+package breakout.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -225,13 +225,29 @@ class BreakoutTest {
     }
 
     /**
+     * Checks to see if JFrame can be created. 
+     * WIDTH = 300;
+     * HEIGHT = 600;
+     * Use Java Swing for visualization.
+     */
+    void createJFrameTest() {
+
+    }
+
+    /**
      * Checks to see if ball can be created. No errors should occur.
+     * Starting location of ball -> half the width, on top of paddle 
+     * Use Java Swing for visualization.
      */
     @Test
     void createBallTest() {
     	//Ball ball = new Ball();
     }
 
+    /**
+     * Checks to see if block can be created. No errors should occur.
+     * Use Java Swing for visualization.
+     */
     @Test
     void createBlockTest() {
 
@@ -239,6 +255,8 @@ class BreakoutTest {
 
     /**
      * Checks to see if paddle can be created. No errors should occur.
+     * Toward the bottom of the board. Start at the center
+     * Use Java Swing for visualization.
      */
     @Test
     void createPaddleTest() {
