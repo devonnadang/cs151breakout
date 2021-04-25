@@ -7,6 +7,9 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
+import breakout.controller.Breakout;
+import breakout.view.View;
+
 class BreakoutTest {
 
 
@@ -77,7 +80,7 @@ class BreakoutTest {
     void startGameTest() {
         // GUI pops up for like a split second; Should I make the system wait? But it gave
         // some errors...
-        Breakout breakout = new Breakout();
+        Breakout breakout = new Breakout(new View());
         breakout.startGame();
 
         // How should I test this? Should this even be a test?
