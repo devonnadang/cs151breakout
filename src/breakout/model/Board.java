@@ -1,9 +1,17 @@
 package breakout.model;
 
-//This class is the board class
+import java.util.ArrayList;
+
+import breakout.view.View;
+
+/**
+ * The Board class aggregates block, ball, and paddle. 
+ * Responsible for communicating with the View class.
+ */
 public class Board {
     Block [][] blocks;
     Ball ball;
+    Paddle paddle;
     int blockCounter;
     private static final int ROWS = 5;
     private static final int COLUMNS = 10;
@@ -20,16 +28,29 @@ public class Board {
     }
 
     /**
-     * Creates the ball that will destory blocks
+     * TODO method
+     * Will notify view of changes. 
+     * @param view
+     */
+    public void notify(View view) {
+        
+    }
+
+    /**
+     * Creates the ball that will destory blocks.
      */
     private void createBall(){
-        ball = new Ball(280, 550);
+        ball = new Ball(280, 550); //Ball(x coordinate, y coordinate)
     }
 
     public Ball getBall(){
         return ball;
     }
 
+    /**
+     * 
+     * @return the coordinates of each block in the Block[][] blocks
+     */
     public String toString(){
         String str = new String();
         for(int i = 0; i < ROWS; i++) {
@@ -68,8 +89,7 @@ public class Board {
     }
 
     /**
-     * 
-     * @return whether there are any bricks left
+     * @return if there are any bricks left
      */
     public boolean bricksAreCleared(){
         if (blockCounter == 0){
