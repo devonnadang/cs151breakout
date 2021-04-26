@@ -13,7 +13,7 @@ public class Leaderboard {
 	
 	
 	/**
-	 * Class constructor.
+	 * Creates the arraylist to the for the 10 highest scores.
 	 */
 	public Leaderboard() {
 		highScores = new ArrayList<>();
@@ -48,7 +48,6 @@ public class Leaderboard {
 	 * 
 	 * @return 10 highest Score objects saved.
 	 */
-	// for unit testing?
 	public ArrayList<Score> getTop10Score() {
 		ArrayList<Score> top10Score = new ArrayList<>();
 		for(int i = 0; i < 10; i++)
