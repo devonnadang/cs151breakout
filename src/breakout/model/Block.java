@@ -1,6 +1,8 @@
 package breakout.model;
 
-//This is the Block class
+/**
+ * The Block class can be destroyed by the Ball.
+ */
 public class Block {
 	private boolean destroyed;
 	private int x;
@@ -13,8 +15,8 @@ public class Block {
 	}
 	 
 	/**
-	 * 
-	 * @param d indcate
+	 * Indcate whether Block is destoryed or not
+	 * @param d ]
 	 */
 	public void setDestroyed(boolean d) {
 		destroyed = d;
@@ -30,10 +32,16 @@ public class Block {
 		setY(y);
 	}
 
+	/**
+	 * @return x coordinate
+	 */
 	public int getXCoordinate(){
 		return x;
 	}
 
+	/**
+	 * @return y coordinate
+	 */
 	public int getYCoordinate(){
 		return y;
 	}
