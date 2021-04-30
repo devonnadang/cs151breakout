@@ -1,5 +1,10 @@
 package breakout.model;
-//The Ball Class
+
+
+/**
+ * The Ball is a class that moves and destroys blocks.
+ * It's control of ball movements.
+ */
 public class Ball {
 
 	private static final int BALL_RADIUS = 10;
@@ -37,6 +42,9 @@ public class Ball {
 		return y;
 	}
 
+	/**
+	 * @return ball radius
+	 */
 	public int getBallRadius()
 	{
 		return BALL_RADIUS;
