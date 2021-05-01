@@ -203,7 +203,7 @@ public class BoardView extends JPanel {
 
         public MoveAction(int direction) {
             // This line is for moving the paddle WITH the message system. Uncomment if you want to use message system.
-           this.direction = direction + paddleCoordinates[0];
+           this.direction = direction;
            // This line is for moving the paddle WITHOUT the message system. Uncomment if you want to not use message system.
         //    this.direction = direction;
         }
@@ -218,15 +218,14 @@ public class BoardView extends JPanel {
             // Uncomment this code block and Line 163 to use the message system and comment the other block 
             // (Lines 186 - 191) below this one and comment Line 164.
             // This println below is to see what happens to the direction variable when this method is called.
-           System.out.println(direction);
            try {
-               queue.put(new MoveMessage(direction));
+               queue.put(new MoveMessage(direction + paddleCoordinates[0]));
            } catch (InterruptedException exception) {
                exception.printStackTrace();
            }
 
             // This code works in moving the paddle, but this doesn't use the message
-            // system and doesn't interact with Breaout, the controller.
+            // system and doesn't interact with Breakout, the controller.
             // If you want to see how the program works without the message system, uncomment this code block and Line 164.
             // If you want to see how the program work with the message system, comment this code block and uncomment the 
             // code block above this

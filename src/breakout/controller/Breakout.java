@@ -45,7 +45,6 @@ public class Breakout {
             }
             // Figure out what message it is and do correct action
             if (message.getClass() == MoveMessage.class) {
-                System.out.println("Move!");
                 MoveMessage moveMessage = (MoveMessage) message;
                 
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
