@@ -97,17 +97,6 @@ public class Board {
         } else {
             return false;
         }
-
-        /*
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLUMNS; j++) {
-                if (blocks[i][j].getDestroyed() != true) {
-                    return false;
-                }
-            }
-        }
-        return true;
-        */
     }
 
     public int getRows(){
