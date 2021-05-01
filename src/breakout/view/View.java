@@ -9,12 +9,14 @@ import javax.swing.JFrame;
  */
 public class View extends JFrame{
 
+    ViewPanel panel;
     /**
      * Constructs the main view of Breakout.
      */
     public View() {
         // Swing stuff
-        setPreferredSize(new Dimension(500, 600));
+        panel = new ViewPanel();
+        this.add(panel);
         setResizable(true);
         setTitle("Breakout");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
