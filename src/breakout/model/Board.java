@@ -13,13 +13,13 @@ public class Board {
     Ball ball;
     Paddle paddle;
     int blockCounter;
-    private static final int ROWS = 5;
-    private static final int COLUMNS = 8;
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 600;
+    private static final int ROWS = Constants.getRows();
+    private static final int COLUMNS = Constants.getColumns();
+    private static final int WIDTH = Constants.getPanelWidth();
+    private static final int HEIGHT = Constants.getPanelHeight();
     private static final int BLOCK_START = WIDTH/10; //30
-    private static final int BLOCK_WIDTH = Block.getBlockWidth();
-    private static final int BLOCK_HEIGHT = Block.getBlockWidth();
+    private static final int BLOCK_WIDTH = Constants.getBlockWidth();
+    private static final int BLOCK_HEIGHT = Constants.getBlockWidth();
     private static final int BLOCK_SEP = 2;
 
     public Board(){

@@ -7,8 +7,8 @@ public class Block {
 	private boolean destroyed;
 	private int x;
 	private int y;
-	private final static int BLOCK_HEIGHT = 20;
-	private final static int BLOCK_WIDTH = 40;
+	private final static int BLOCK_HEIGHT = Constants.getBlockHeight();
+	private final static int BLOCK_WIDTH = Constants.getBlockWidth();
 
 
 	 public Block(int x, int y) {

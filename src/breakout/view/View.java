@@ -14,15 +14,15 @@ public class View extends JFrame{
     private BoardView boardView;
     private BlockingQueue<Message> queue;
 
-    ViewPanel panel;
+    //ViewPanel panel;
     /**
      * Constructs the main view of Breakout.
      */
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
         // Swing stuff
-        panel = new ViewPanel();
-         this.add(panel);
+        //panel = new ViewPanel();
+         //this.add(panel);
          this.setPreferredSize(new Dimension (Board.getBoardWidth(),Board.getBoardHeight()));
          setResizable(true);
          setTitle("Breakout");

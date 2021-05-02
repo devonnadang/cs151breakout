@@ -10,8 +10,8 @@ public class Paddle {
 	private int y; //y coordinate of the paddle object
 	
 	//dimensions of paddle
-	private static final int PADDLE_WIDTH = 50;
-	private static final int PADDLE_HEIGHT = 10;
+	private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
+	private static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
 	
 	/**
 	 * This is the constructor which initializes paddle location.
