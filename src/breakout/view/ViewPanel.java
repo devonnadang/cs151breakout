@@ -2,6 +2,7 @@ package breakout.view;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import breakout.model.Ball;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -10,21 +11,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
-
 public class ViewPanel extends JPanel implements ActionListener{
     final int PANEL_WIDTH = 500;
     final int PANEL_HEIGHT = 600;
-    final int BALL_HEIGHT= 20;
-    final int BALL_WIDTH= 20;
-
+    final int BALL_HEIGHT= new Ball(0,0).getBallRadius()*2;
+    final int BALL_WIDTH= new Ball(0,0).getBallRadius()*2;
     int xBallCoord = 0;
     int yBallCoord = 0;
     
     int xVelocity = 10;
     int yVelocity = 10;
-
-    Timer timer; 
     
+    Timer timer; 
+
     Ellipse2D.Double ball;
 
     ViewPanel() {
@@ -40,7 +39,8 @@ public class ViewPanel extends JPanel implements ActionListener{
         /* create blue ball */
 		ball = new  Ellipse2D.Double(xBallCoord, yBallCoord, BALL_WIDTH, BALL_HEIGHT);
 		g2D.setColor(Color.BLUE);
-		g2D.fill(ball);
+        g2D.fill(ball);
+              
     }
     
     @Override
