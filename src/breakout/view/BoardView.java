@@ -4,10 +4,15 @@ import breakout.controller.Message;
 import breakout.controller.MoveMessage;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Ellipse2D.Double;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -26,9 +31,17 @@ public class BoardView extends JPanel {
     public static final int PADDLE_HEIGHT = 15;
     public static final int BOARD_WIDTH = 484;
     public static final int BOARD_HEIGHT = 561;
+
+    private Rectangle2D paddle;
+    private Ellipse2D ball;
+    private Rectangle2D ballHitbox;
+
     private int[] ballCoordinates;
     private int[] ballVelocity;
     private int[] paddleCoordinates;
+    private Rectangle2D[] blocks;
+    private boolean[] isDestroyed;
+
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
@@ -51,7 +64,19 @@ public class BoardView extends JPanel {
             repaint();
         });
 
+        blocks = new Rectangle2D[5];
+        for (int i = 0; i < 5; i++) {
+            blocks[i] = new Rectangle2D.Double();
+        }
+
         this.queue = queue;
+
+        ballHitbox = new Rectangle2D.Double();
+        paddle = new Rectangle2D.Double();
+        ball = new Ellipse2D.Double();
+
+        isDestroyed = new boolean[blocks.length];
+
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new int[2];
 
@@ -93,12 +118,34 @@ public class BoardView extends JPanel {
 
     @Override
     public void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+
         super.paintComponent(g);
         // Draws the paddle
-        g.fillRect(paddleCoordinates[0], paddleCoordinates[1], PADDLE_WIDTH, PADDLE_HEIGHT);
+        paddle.setFrame(paddleCoordinates[0], paddleCoordinates[1], PADDLE_WIDTH, PADDLE_HEIGHT);
+        g2d.fill(paddle);
 
         // Draws the ball above the paddle
-        g.fillOval(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
+        ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
+        g2d.fill(ball);
+        Rectangle2D bounds = ball.getBounds2D();
+
+        // I guess it has to be greater than 5 for each side?
+        ballHitbox.setFrame(bounds.getX() - 15, bounds.getY() - 15, bounds.getWidth() + 30, bounds.getHeight() + 30);
+//        g2d.fill(ballHitbox);
+
+        // Drawing the blocks
+        int x = 20;
+        for (int i = 0; i < blocks.length; i++) {
+            Rectangle2D block = blocks[i];
+            if (isDestroyed[i]) {
+                block.setFrame(0,0,0,0);
+            } else {
+                block.setFrame(x, 20, 50, 10);
+            }
+            g2d.fill(block);
+            x += 60;
+        }
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
@@ -128,12 +175,26 @@ public class BoardView extends JPanel {
         }
 
         // Should only call this method if ball and paddle collide.
-        if (ballCoordinates[0] >= paddleCoordinates[0]
-                && ballCoordinates[0] <= paddleCoordinates[0] + PADDLE_WIDTH
-                && ballCoordinates[1] >= paddleCoordinates[1] - BALL_HEIGHT
-                && ballCoordinates[1] <= paddleCoordinates[1] + PADDLE_HEIGHT) {
+//        if (ballCoordinates[0] >= paddleCoordinates[0]
+//                && ballCoordinates[0] <= paddleCoordinates[0] + PADDLE_WIDTH
+//                && ballCoordinates[1] >= paddleCoordinates[1] - BALL_HEIGHT
+//                && ballCoordinates[1] <= paddleCoordinates[1] + PADDLE_HEIGHT) {
+//            ballAndPaddleCollision();
+//        }
+        // The intersects method doesn't work as great :(
+        if (ballHitbox.intersects(paddle)) {
             ballAndPaddleCollision();
         }
+
+        // If ball and block collide, call this method.
+
+        for (Rectangle2D block : blocks) {
+            if (ballHitbox.intersects(block)) {
+                System.out.println("Intersection!");
+            }
+            break;
+        }
+
     }
 
     /**
