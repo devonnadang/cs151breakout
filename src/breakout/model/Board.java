@@ -25,6 +25,7 @@ public class Board {
         blockCounter = ROWS*COLUMNS;
         createBlocks();
         createBall();
+        createPaddle();
     }
 
     /**
@@ -37,7 +38,7 @@ public class Board {
     }
 
     /**
-     * Creates the ball that will destory blocks.
+     * Creates the ball that will destroy blocks.
      */
     private void createBall(){
         ball = new Ball(280, 550); //Ball(x coordinate, y coordinate)
@@ -45,6 +46,12 @@ public class Board {
 
     public Ball getBall(){
         return ball;
+    }
+    
+    private void createPaddle()
+    {
+    	paddle = new Paddle(this.getBoardWidth(), this.getBoardHeight());
+		
     }
 
     /**
