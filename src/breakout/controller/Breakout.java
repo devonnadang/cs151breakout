@@ -1,23 +1,28 @@
 package breakout.controller;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import breakout.model.Board;
 import breakout.model.Life;
 import breakout.view.View;
 
 /**
- * The main system of this game. Helps control interaction between the views and models.
+ * The main system/controller of this game. Helps control interaction between the views and models.
  */
 public class Breakout {
 
     private Board board;
     private View view;
     private Life lives;
+    private BlockingQueue<Message> queue;
 
     /**
      * Initializes Breakout and the main JFrame that will display everything.
      */
-    public Breakout(View view) {
+    public Breakout(View view, BlockingQueue<Message> queue) {
         this.view = view;
+        this.queue = queue;
     }
 
     /**
@@ -27,15 +32,27 @@ public class Breakout {
         lives = new Life();
         // Also should probably add lives into Board constructor?
         board = new Board();
-        // Component representing the board
-        // view.add(board);
-        // While loop at the end of this method after everything is initialized
-        // while (board.isDisplayable()) {
+        view.createBoardView();
+
+        // While for the message system. I did not implement valves yet.
+        while (view.isDisplayable()) {
             // Take from queue
+            Message message = null;
+            try {
+                message = queue.take();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             // Figure out what message it is and do correct action
-            // If it is an endgame message, then set board to not display, so that
-            // the while loop ends
-        // }
+            if (message.getClass() == MoveMessage.class) {
+                MoveMessage moveMessage = (MoveMessage) message;
+                
+                // The moveMessage will contain the new x coordinate for the paddle and give it to the
+                // main view for it to update the BoardView and for the BoardView to update the paddle.
+                view.updateBoardView(moveMessage.getNewCoordinate());
+            }
+        }
+
         // Calling endgame after while loop ends
         endGame();
     }
@@ -49,11 +66,14 @@ public class Breakout {
     }
 
     /**
-     * Initializes and starts Breakout.
+     * Initializes and starts Breakout. Right now if you run it, the program will be using the message system, but if you want
+     * to see how I set it up without using the message system, then go to my comments in BoardView's private MoveAction class
+     * to see which lines to comment and which lines to uncomment.
      */
     public static void main(String[] args) {
-        View view = new View();
-        Breakout breakout = new Breakout(view);
+        BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+        View view = new View(queue);
+        Breakout breakout = new Breakout(view, queue);
         breakout.startGame();
     }
 }
