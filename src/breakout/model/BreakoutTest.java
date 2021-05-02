@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import java.util.concurrent.LinkedBlockingQueue;
 import org.junit.jupiter.api.Test;
 
 import breakout.controller.Breakout;
@@ -80,7 +81,7 @@ class BreakoutTest {
     void startGameTest() {
         // GUI pops up for like a split second; Should I make the system wait? But it gave
         // some errors...
-        Breakout breakout = new Breakout(new View());
+        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()), new LinkedBlockingQueue<>());
         breakout.startGame();
 
         // How should I test this? Should this even be a test?
@@ -227,46 +228,6 @@ class BreakoutTest {
         System.out.println(board.toString());
     }
 
-    /**
-     * Checks to see if JFrame can be created. 
-     * WIDTH = 300;
-     * HEIGHT = 600;
-     * Use Java Swing for visualization.
-     */
-    void createJFrameTest() {
-
-    }
-
-    /**
-     * Checks to see if ball can be created. No errors should occur.
-     * Starting location of ball -> half the width, on top of paddle 
-     * Use Java Swing for visualization.
-     */
-    @Test
-    void createBallTest() {
-    	//Ball ball = new Ball();
-    }
-
-    /**
-     * Checks to see if block can be created. No errors should occur.
-     * Use Java Swing for visualization.
-     */
-    @Test
-    void createBlockTest() {
-
-    }
-
-    /**
-     * Checks to see if paddle can be created. No errors should occur.
-     * Toward the bottom of the board. Start at the center
-     * Use Java Swing for visualization.
-     */
-    @Test
-    void createPaddleTest() {
-    	Paddle paddle = new Paddle();
-    }
-
-
     @Test
     void compareScoreTest() {
         ArrayList<Score> scores = new ArrayList<>();
@@ -329,7 +290,8 @@ class BreakoutTest {
      */
     @Test
     void ballMoveTest() {
-
+        //make sure ball does not move indefinitely out of the border
+        //check top, right, left border
     }
 
     /**
