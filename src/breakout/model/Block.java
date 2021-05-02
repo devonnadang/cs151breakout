@@ -7,6 +7,8 @@ public class Block {
 	private boolean destroyed;
 	private int x;
 	private int y;
+	private final static int BLOCK_HEIGHT = 20;
+	private final static int BLOCK_WIDTH = 40;
 
 
 	 public Block(int x, int y) {
@@ -86,13 +88,13 @@ public class Block {
 		return destroyed;
 	}
 
-	/*
-	public int getBlockWidth() {
+	
+	public static int getBlockWidth() {
 		return BLOCK_WIDTH;
 	}
 
-	public int getBlockHeight() {
+	public static int getBlockHeight() {
 		return BLOCK_HEIGHT;
 	}
-	*/
+	
 }

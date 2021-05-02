@@ -45,7 +45,7 @@ public class Ball {
 	/**
 	 * @return ball radius
 	 */
-	public int getBallRadius()
+	public static int getBallRadius()
 	{
 		return BALL_RADIUS;
 	}

@@ -3,6 +3,9 @@ package breakout.view;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import breakout.model.Ball;
+import breakout.model.Block;
+import breakout.model.Board;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -10,12 +13,18 @@ import java.awt.event.ActionListener;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
+
 
 public class ViewPanel extends JPanel implements ActionListener{
     final int PANEL_WIDTH = 500;
     final int PANEL_HEIGHT = 600;
-    final int BALL_HEIGHT= new Ball(0,0).getBallRadius()*2;
-    final int BALL_WIDTH= new Ball(0,0).getBallRadius()*2;
+    final int BALL_HEIGHT= Ball.getBallRadius()*2;
+    final int BALL_WIDTH= Ball.getBallRadius()*2;
+    final int BLOCK_HEIGHT= Block.getBlockHeight();
+    final int BLOCK_WIDTH= Block.getBlockWidth();
+    final int BLOCK_SEP = Board.getBlockSep();
+    
     int xBallCoord = 0;
     int yBallCoord = 0;
     
@@ -40,7 +49,16 @@ public class ViewPanel extends JPanel implements ActionListener{
 		ball = new  Ellipse2D.Double(xBallCoord, yBallCoord, BALL_WIDTH, BALL_HEIGHT);
 		g2D.setColor(Color.BLUE);
         g2D.fill(ball);
-              
+
+        /* create blocks */
+        for (int i = 0; i < Board.getRows(); i++) {
+            for(int j = 0; j < Board.getColumns(); j++) {
+                int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
+                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
+                g2D.setColor(Color.RED);
+                g2D.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
+            }
+        }      
     }
     
     @Override

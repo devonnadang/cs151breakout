@@ -3,6 +3,8 @@ package breakout.view;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
+
+import breakout.model.Board;
 /**
  * Serves as the main view for Breakout. All other views will be within this one.
  */
@@ -16,7 +18,7 @@ public class View extends JFrame{
         // Swing stuff
         panel = new ViewPanel();
          this.add(panel);
-         this.setPreferredSize(new Dimension (500,600));
+         this.setPreferredSize(new Dimension (Board.getBoardWidth(),Board.getBoardHeight()));
          setResizable(true);
          setTitle("Breakout");
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
