@@ -7,6 +7,7 @@ import breakout.model.Constants;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Color;
 
 import java.awt.Rectangle;
@@ -84,7 +85,12 @@ public class BoardView extends JPanel {
         ball = new Ellipse2D.Double();
 
         isDestroyed = new boolean[Constants.getRows()][Constants.getColumns()];
-
+        for (int i = 0; i < Constants.getRows(); i++) {
+            for (int j = 0; j < Constants.getColumns(); j++) {
+                isDestroyed[i][j] = false;
+            }
+        }
+        
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new int[2];
 
@@ -160,8 +166,11 @@ public class BoardView extends JPanel {
             for(int j = 0; j < Constants.getColumns(); j++) {
                 int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
                 int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
-                g2d.setColor(Color.RED);
-                g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
+                if(isDestroyed[i][j] == false)
+                {
+                	g2d.setColor(Color.RED);
+                    g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
+                }
             }
         }  
     }
@@ -208,10 +217,79 @@ public class BoardView extends JPanel {
 
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
-                if (ballHitbox.intersects(blocks[i][j])) {
-                    System.out.println("Intersection!");
-                }
-                break;
+            	int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
+                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
+            	Rectangle blockHitbox = new Rectangle(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+            	//Rectangle ballHitbox2 =  new Rectangle(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
+//            	int blockLeft = x;
+//        		int blockMidLeft =  blockLeft + BLOCK_WIDTH / 2;
+//        		int blockMidRight = blockLeft + BLOCK_WIDTH / 2;
+//        		int blockRight = x + BLOCK_WIDTH;
+//        		int blockTop = y - BLOCK_HEIGHT;
+//        		int blockBottom = y + BLOCK_HEIGHT;
+        		
+            	if(ballHitbox.intersects(blockHitbox)) //ballHitbox2.intersects(blockHitbox)
+            	{
+            		//We need the ball to change directions after it has destroyed a block
+            		Point topOfBall = new Point(ballCoordinates[0], ballCoordinates[1] - 1);
+            		Point bottomOfBall = new Point(ballCoordinates[0], ballCoordinates[1] + BALL_HEIGHT + 1);
+            		Point leftOfBall = new Point(ballCoordinates[0] - 1, ballCoordinates[1]);
+            		Point rightOfBall = new Point(ballCoordinates[0] + BALL_WIDTH + 1, ballCoordinates[1]);
+            		
+            		if(isDestroyed[i][j] == false)
+                    {
+            			if(blockHitbox.contains(topOfBall)) //top of the ball is in contact with the block
+            			{
+            				ballVelocity[1] = 1; //if ball hits block's bottom side, it bounces down
+            			}
+            			else if(blockHitbox.contains(bottomOfBall)) //bottom of the ball is in contact with the block
+            			{
+            				ballVelocity[1] = -1; //if ball hits block's top side, it bounces up
+            			}
+            			
+            			if(blockHitbox.contains(leftOfBall)) //left of the ball is in contact with the block
+            			{
+            				ballVelocity[0] = 1; //if ball hits block's right side, it bounces right
+            			}
+            			else if(blockHitbox.contains(rightOfBall)) //right of the ball is in contact with the block
+            			{
+            				ballVelocity[0] = -1; //if ball hits block's left side, it bounces left
+            			}
+            			
+            			
+            			
+//            			if (ballCoordinates[0] >= blockLeft && ballCoordinates[0] < blockMidLeft
+//            	                && ballCoordinates[1] >= blockTop && ballCoordinates[1] <= blockBottom) {
+//            	            if (ballVelocity[0] > 0) {
+//            	                ballVelocity[0] *= 1;
+//            	            }
+//            	            ballVelocity[1] *= 1;
+//            	        } else if (ballCoordinates[0] >= blockMidLeft && ballCoordinates[0] <= blockMidRight
+//            	                && ballCoordinates[1] >= blockTop && ballCoordinates[1] <= blockBottom) {
+//            	            ballVelocity[0] = 0;
+//            	            ballVelocity[1] *= 1;
+//            	        } else if (ballCoordinates[0] > blockMidRight && ballCoordinates[0] <= blockRight
+//            	                && ballCoordinates[1] >= blockTop && ballCoordinates[1] <= blockBottom) {
+//            	            if (ballVelocity[0] < 0) {
+//            	                ballVelocity[0] *= 1;
+//            	            }
+//            	            ballVelocity[1] *= 1;
+//            	        }
+                    	
+            			isDestroyed[i][j] = true;
+                    }
+            	}
+            	
+            	
+            	
+            	
+            	
+            	
+//                if (ballHitbox.intersects(blocks[i][j])) {
+//                    System.out.println("Intersection!");
+//                }
+//            	  break;
+                
             }
         }
         
