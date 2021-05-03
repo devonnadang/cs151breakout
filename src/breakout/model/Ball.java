@@ -7,7 +7,7 @@ package breakout.model;
  */
 public class Ball {
 
-	private static final int BALL_RADIUS = 10;
+	private static final int BALL_RADIUS = Constants.getBallRadius();
 	private int speed = 60; //remove if not needed
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
@@ -45,7 +45,7 @@ public class Ball {
 	/**
 	 * @return ball radius
 	 */
-	public int getBallRadius()
+	public static int getBallRadius()
 	{
 		return BALL_RADIUS;
 	}

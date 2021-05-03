@@ -8,19 +8,23 @@ package breakout.model;
 public class Paddle {
 	private int x; //x coordinate of the paddle object
 	private int y; //y coordinate of the paddle object
+	int boardWidth;
+	int boardHeight;
 	
 	//dimensions of paddle
-	private static final int PADDLE_WIDTH = 50;
-	private static final int PADDLE_HEIGHT = 10;
+	private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
+	private static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
 	
 	/**
 	 * This is the constructor which initializes paddle location.
 	 */
-	public Paddle()
+	public Paddle(int boardWidth, int boardHeight)
 	{
+		this.boardWidth = boardWidth;
+		this.boardHeight = boardHeight;
 		//initialize paddle location
-		//this.x = (Board.getBoardWidth()/2) - (this.getPaddleWidth()/2);
-		//this.y = Board.getBoardHeight() - this.getPaddleHeight();
+		this.x = (boardWidth/2) - (this.getPaddleWidth()/2);
+		this.y = boardHeight - this.getPaddleHeight();
 	}
 	
 	/**
@@ -39,6 +43,15 @@ public class Paddle {
 	public int getX()
 	{
 		return x;
+	}
+	
+	/**
+	 * Gets the y value of the paddle
+	 * @param y the y coordinate
+	 */
+	public int getY()
+	{
+		return y;
 	}
 
 	/**
@@ -75,8 +88,8 @@ public class Paddle {
 		if(r)
 		{
 			//reset to paddle's starting location
-			//this.x = (Board.getBoardWidth()/2) - (this.getPaddleWidth()/2);
-			//this.y = Board.getBoardHeight() - this.getPaddleHeight();
+			this.x = (boardWidth/2) - (this.getPaddleWidth()/2);
+			this.y = boardHeight - this.getPaddleHeight();
 		}
 	}
 }
