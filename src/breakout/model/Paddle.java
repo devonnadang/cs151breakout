@@ -19,8 +19,45 @@ public class Paddle {
 	public Paddle()
 	{
 		//initialize paddle location
-		//this.x = (Board.getBoardWidth()/2) - (this.getPaddleWidth()/2);
-		//this.y = Board.getBoardHeight() - this.getPaddleHeight();
+		this.x = (Constants.getPanelWidth()/2) - (Constants.getPaddleWidth() / 2);
+		this.y = Constants.getPanelHeight() - Constants.getPaddleHeight() - Constants.getPaddleOffSet();
+	}
+
+	public void setCoordinates(int x, int y){
+		setX(x);
+		setY(y);
+	}
+
+	/**
+	 * In charge of paddle movement given that paddle moves only left and right
+	 */
+	public void move(int direction)
+	{
+		if (direction == Constants.getPaddleMoveLeftUnit()){
+			moveLeft();
+		} else {
+			moveRight();
+		}
+	}
+
+	public void moveLeft(){
+		x += Constants.getPaddleMoveLeftUnit();
+	}
+
+	public void moveRight(){
+		x += Constants.getPaddleMoveRightUnit();
+	}
+	
+	/**
+	 * Resets the position of the paddle
+	 * @param r value indicating whether reset of ball should occur
+	 */
+	public void reset()
+	{
+		setCoordinates(Constants.getPaddleXReset(),Constants.getPaddleYReset());
+	}
+	public void setY(int y){
+		this.y = y;
 	}
 	
 	/**
@@ -42,6 +79,14 @@ public class Paddle {
 	}
 
 	/**
+	 * Gets the y value of the paddle
+	 * @param y the y coordinate
+	 */
+	public int getY(){
+		return y;
+	}
+
+	/**
 	 * Gets the width of the paddle
 	 */
 	public int getPaddleWidth()
@@ -57,26 +102,4 @@ public class Paddle {
 		return PADDLE_HEIGHT;
 	}
 
-	/**
-	 * In charge of paddle movement given that paddle moves only left and right
-	 */
-	public void move()
-	{
-		//will need to use swing in order to observe direction changes through arrow keys
-		//setX(#) accordingly
-	}
-	
-	/**
-	 * Resets the position of the paddle
-	 * @param r value indicating whether reset of ball should occur
-	 */
-	public void reset(boolean r)
-	{
-		if(r)
-		{
-			//reset to paddle's starting location
-			//this.x = (Board.getBoardWidth()/2) - (this.getPaddleWidth()/2);
-			//this.y = Board.getBoardHeight() - this.getPaddleHeight();
-		}
-	}
 }

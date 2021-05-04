@@ -25,27 +25,16 @@ public class Board {
     public Board(){
         blockCounter = ROWS*COLUMNS;
         createBlocks();
-        createBall();
-    }
-
-    /**
-     * TODO method
-     * Will notify view of changes. 
-     * @param view
-     */
-    public void notify(View view) {
-        
-    }
-
-    /**
-     * Creates the ball that will destory blocks.
-     */
-    private void createBall(){
-        ball = new Ball(280, 550); //Ball(x coordinate, y coordinate)
+        ball = new Ball();
+        paddle = new Paddle();
     }
 
     public Ball getBall(){
         return ball;
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
     }
 
     /**

@@ -1,7 +1,9 @@
 package breakout.view;
 
+import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
+import breakout.model.Board;
 import breakout.model.Constants;
 
 import java.awt.Dimension;
@@ -96,10 +98,10 @@ public class BoardView extends JPanel {
         paddleCoordinates = new int[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
-        paddleCoordinates[0] = BOARD_WIDTH / 2 - PADDLE_WIDTH / 2;
-        paddleCoordinates[1] = BOARD_HEIGHT - PADDLE_HEIGHT - Constants.getPaddleOffSet();
-        ballCoordinates[0] = BOARD_WIDTH / 2 - BALL_WIDTH / 2;
-        ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
+        paddleCoordinates[0] = Constants.getPaddleXReset();
+        paddleCoordinates[1] = Constants.getPaddleYReset();
+        ballCoordinates[0] = Constants.getBallXReset();
+        ballCoordinates[1] = Constants.getBallYReset();
 
         // This maps the left and right arrow keys to different actions.
         // I used key bindings instead of ActionListener because sometimes the panel becomes out of focus and the inputs do nothing,
@@ -118,8 +120,8 @@ public class BoardView extends JPanel {
         // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
-        am.put("pressed.left", new MoveAction(-5));
-        am.put("pressed.right", new MoveAction(5));
+        am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit()));
+        am.put("pressed.right", new MoveAction(Constants.getPaddleMoveRightUnit()));
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
     }
@@ -302,6 +304,7 @@ public class BoardView extends JPanel {
             // This println below is to see what happens to the direction variable when this method is called.
            try {
                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+               //queue.put(new MoveMessage(direction));
            } catch (InterruptedException exception) {
                exception.printStackTrace();
            }

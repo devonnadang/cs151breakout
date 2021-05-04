@@ -320,7 +320,12 @@ class BreakoutTest {
      */
     @Test
     void paddleMoveTest() {
-
+        Paddle paddle = new Paddle();
+        paddle.moveLeft();
+        paddle.moveLeft();
+        int xExpected = Constants.getPaddleXReset() + Constants.getPaddleMoveLeftUnit() + Constants.getPaddleMoveLeftUnit();
+        int xActual = paddle.getX();
+        assertEquals(xExpected, xActual);
     }
 
 

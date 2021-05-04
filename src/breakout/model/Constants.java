@@ -12,6 +12,13 @@ public class Constants {
     private static final int PADDLE_WIDTH = 80;
     private static final int PADDLE_HEIGHT = 15;
     private static final int PADDLE_OFFSET = 40;
+    private static final int PADDLE_X_RESET = PANEL_WIDTH / 2 - PADDLE_WIDTH / 2;
+    private static final int PADDLE_Y_RESET = PANEL_HEIGHT - PADDLE_HEIGHT - PADDLE_OFFSET;
+    private static final int BALL_X_RESET = PANEL_WIDTH / 2 - ((BALL_RADIUS*2)/2);
+    private static final int BALL_Y_RESET = PADDLE_Y_RESET - (BALL_RADIUS*2);
+    private static final int PADDLE_MOVE_RIGHT_UNIT = 5;
+    private static final int PADDLE_MOVE_LEFT_UNIT = -5;
+    private static final int BALL_VELOCITY = -5;
 
     public static int getBallRadius(){
         return BALL_RADIUS;
@@ -55,6 +62,34 @@ public class Constants {
     
     public static int getPaddleOffSet(){
         return PADDLE_OFFSET;
+    }
+    
+    public static int getPaddleXReset() {
+        return PADDLE_X_RESET;
+    }
+
+    public static int getPaddleYReset() {
+        return PADDLE_Y_RESET;
+    }
+
+    public static int getBallXReset() {
+        return BALL_X_RESET;
+    }
+
+    public static int getBallYReset(){
+        return BALL_Y_RESET;
+    }
+
+    public static int getPaddleMoveRightUnit(){
+        return PADDLE_MOVE_RIGHT_UNIT;
+    }
+
+    public static int getPaddleMoveLeftUnit(){
+        return PADDLE_MOVE_LEFT_UNIT;
+    }
+
+    public static int getBallVelocity(){
+        return BALL_VELOCITY;
     }
 }
 
