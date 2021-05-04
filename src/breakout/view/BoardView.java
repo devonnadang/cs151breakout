@@ -1,12 +1,15 @@
 package breakout.view;
 
+import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
+import breakout.model.Board;
 import breakout.model.Constants;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Color;
 
 import java.awt.Insets;
@@ -22,6 +25,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -59,6 +63,8 @@ public class BoardView extends JPanel {
     private double circleToBoxLength;
     private double[] closestPointToCircle;
 
+    private JButton leaderboardButton;
+
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
 
         // This code is NOT related to using the message system. It's just to see if JIcon would work or not.
@@ -92,7 +98,12 @@ public class BoardView extends JPanel {
         ball = new Ellipse2D.Double();
 
         isDestroyed = new boolean[Constants.getRows()][Constants.getColumns()];
-
+        for (int i = 0; i < Constants.getRows(); i++) {
+            for (int j = 0; j < Constants.getColumns(); j++) {
+                isDestroyed[i][j] = false;
+            }
+        }
+        
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
@@ -113,6 +124,10 @@ public class BoardView extends JPanel {
                         .getPaddleOffSet();
         ballCoordinates[0] = BOARD_WIDTH / 2 - BALL_WIDTH / 2;
         ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
+        // paddleCoordinates[0] = Constants.getPaddleXReset();
+        // paddleCoordinates[1] = Constants.getPaddleYReset();
+        // ballCoordinates[0] = Constants.getBallXReset();
+        // ballCoordinates[1] = Constants.getBallYReset();
 
         // This maps the left and right arrow keys to different actions.
         // I used key bindings instead of ActionListener because sometimes the panel becomes out of focus and the inputs do nothing,
@@ -131,15 +146,25 @@ public class BoardView extends JPanel {
         // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
-        am.put("pressed.left", new MoveAction(-7));
-        am.put("pressed.right", new MoveAction(7));
-        am.put("released.left", new MoveAction(0));
-        am.put("released.right", new MoveAction(0));
 
 //        am.put("pressed.left", new MoveAction(true, false));
 //        am.put("pressed.right", new MoveAction(false, true));
 //        am.put("released.left", new MoveAction(false, false));
 //        am.put("released.right", new MoveAction(false, false));
+        am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit()));
+        am.put("pressed.right", new MoveAction(Constants.getPaddleMoveRightUnit()));
+        am.put("released.left", new MoveAction(0));
+        am.put("released.right", new MoveAction(0));
+        
+        // button to open new window to see leaderboard and scores
+        leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
+        leaderboardButton.addActionListener(e -> {
+        	LeaderboardWindow lw = new LeaderboardWindow();
+        });
+        
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
     }
 
     @Override
@@ -176,24 +201,32 @@ public class BoardView extends JPanel {
         } */
 
         for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                Rectangle2D block = blocks[i][j];
-                if (isDestroyed[i][j]) {
-                    block.setFrame(0, 0, 0, 0);
-                } else {
-                    int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
-                    int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
-                    block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+            // for (int j = 0; j < Constants.getColumns(); j++) {
+            //     Rectangle2D block = blocks[i][j];
+            //     if (isDestroyed[i][j]) {
+            //         block.setFrame(0, 0, 0, 0);
+            //     } else {
+            //         int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
+            //         int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
+            //         block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+            //     }
+            //     g2d.setColor(Color.RED);
+            //     g2d.fill(block);
+            for(int j = 0; j < Constants.getColumns(); j++) {
+                int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
+                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
+                if(isDestroyed[i][j] == false)
+                {
+                	g2d.setColor(Color.RED);
+                    g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
                 }
-                g2d.setColor(Color.RED);
-                g2d.fill(block);
             }
         }
 
         // Visualizing center of ball to nearest point on block
-        ballIntersects(paddle);
-        Line2D line2D = new Line2D.Double(ball.getCenterX(), ball.getCenterY(), closestPointToCircle[0] + ball.getCenterX(), closestPointToCircle[1] + ball.getCenterY());
-        g2d.draw(line2D);
+        // ballIntersects(paddle);
+        // Line2D line2D = new Line2D.Double(ball.getCenterX(), ball.getCenterY(), closestPointToCircle[0] + ball.getCenterX(), closestPointToCircle[1] + ball.getCenterY());
+        // g2d.draw(line2D);
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
@@ -261,12 +294,12 @@ public class BoardView extends JPanel {
 //            }
 //        }
 
-        // If ball and block collide, call this method.
+        // If ball and block collide, call this method. PAUL
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
                 Rectangle2D block = blocks[i][j];
-                if (ballIntersects(block)) {
-//                if (ball.intersects(block)) {
+                // if (ballIntersects(block)) {
+               if (ball.intersects(block)) {
                     System.out.println("Collision" + i + " " + j + " !");
                     ballAndBlockCollision(block);
                     isDestroyed[i][j] = true;
@@ -278,6 +311,55 @@ public class BoardView extends JPanel {
                 break;
             }
         }
+
+            // RASHMI
+//        for (int i = 0; i < Constants.getRows(); i++) {
+//            for (int j = 0; j < Constants.getColumns(); j++) {
+//            	int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
+//                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
+//            	Rectangle blockHitbox = new Rectangle(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+//            	Rectangle ballHitbox2 =  new Rectangle(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
+
+//            	if(ballHitbox2.intersects(blockHitbox))
+//            	{
+//            		//We need the ball to change directions after it has destroyed a block
+//            		Point topOfBall = new Point(ballCoordinates[0], ballCoordinates[1] - 1);
+//            		Point bottomOfBall = new Point(ballCoordinates[0], ballCoordinates[1] + BALL_HEIGHT + 1);
+//            		Point leftOfBall = new Point(ballCoordinates[0] - 1, ballCoordinates[1]);
+//            		Point rightOfBall = new Point(ballCoordinates[0] + BALL_WIDTH + 1, ballCoordinates[1]);
+
+//            		if(isDestroyed[i][j] == false)
+//                    {
+//            			if(blockHitbox.contains(topOfBall)) //top of the ball is in contact with the block
+//            			{
+//            				ballVelocity[1] *= -1; //if ball hits block's bottom side, it bounces down
+//            			}
+//            			else if(blockHitbox.contains(bottomOfBall)) //bottom of the ball is in contact with the block
+//            			{
+//            				ballVelocity[1] *= -1; //if ball hits block's top side, it bounces up
+//            			}
+
+//            			if(blockHitbox.contains(leftOfBall)) //left of the ball is in contact with the block
+//            			{
+//            				ballVelocity[0] *= -1; //if ball hits block's right side, it bounces right
+//            			}
+//            			else if(blockHitbox.contains(rightOfBall)) //right of the ball is in contact with the block
+//            			{
+//            				ballVelocity[0] *= -1; //if ball hits block's left side, it bounces left
+//            			}
+
+//            			isDestroyed[i][j] = true;
+//                    }
+//            	}
+
+
+// //                if (ballHitbox.intersects(blocks[i][j])) {
+// //                    System.out.println("Intersection!");
+// //                }
+// //            	  break;
+// 
+        //    }
+        // }
     }
 
     private boolean ballIntersects(Rectangle2D block) {
@@ -477,11 +559,12 @@ public class BoardView extends JPanel {
             // Uncomment this code block and Line 163 to use the message system and comment the other block
             // (Lines 186 - 191) below this one and comment Line 164.
             // This println below is to see what happens to the direction variable when this method is called.
-            try {
-                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
-            } catch (InterruptedException exception) {
-                exception.printStackTrace();
-            }
+           try {
+               queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+               //queue.put(new MoveMessage(direction));
+           } catch (InterruptedException exception) {
+               exception.printStackTrace();
+           }
 
             // This code works in moving the paddle, but this doesn't use the message
             // system and doesn't interact with Breakout, the controller.
