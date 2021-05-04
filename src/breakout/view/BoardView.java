@@ -9,12 +9,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
 
-import java.awt.Rectangle;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Ellipse2D.Double;
+import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
@@ -28,8 +30,8 @@ import javax.swing.Timer;
 
 public class BoardView extends JPanel {
 
-    public static final int BALL_WIDTH = Constants.getBallRadius()*2;
-    public static final int BALL_HEIGHT = Constants.getBallRadius()*2;
+    public static final int BALL_WIDTH = Constants.getBallRadius() * 2;
+    public static final int BALL_HEIGHT = Constants.getBallRadius() * 2;
     public static final int PADDLE_WIDTH = Constants.getPaddleWidth();
     public static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
     public static final int BOARD_WIDTH = Constants.getPanelWidth();
@@ -41,18 +43,23 @@ public class BoardView extends JPanel {
     private Rectangle2D paddle;
     private Ellipse2D ball;
     private Rectangle2D ballHitbox;
+    private Ellipse2D previousBall;
 
-    private int[] ballCoordinates;
-    private int[] ballVelocity;
-    private int[] paddleCoordinates;
+    private double[] ballCoordinates;
+    private double[] ballVelocity;
+    private double[] paddleCoordinates;
+    private double[] paddleVelocity;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
+    private Insets frameInsets;
+    private double circleToBoxLength;
+    private double[] closestPointToCircle;
 
-    public BoardView(BlockingQueue<Message> queue) {
+    public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
 
         // This code is NOT related to using the message system. It's just to see if JIcon would work or not.
         // PaddleIcon pi = new PaddleIcon();
@@ -65,7 +72,7 @@ public class BoardView extends JPanel {
 
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
-        timer = new Timer(50, e -> {
+        timer = new Timer(17, e -> {
             moveBall();
             repaint();
         });
@@ -78,6 +85,7 @@ public class BoardView extends JPanel {
         }
 
         this.queue = queue;
+        this.frameInsets = frameInsets;
 
         ballHitbox = new Rectangle2D.Double();
         paddle = new Rectangle2D.Double();
@@ -86,18 +94,23 @@ public class BoardView extends JPanel {
         isDestroyed = new boolean[Constants.getRows()][Constants.getColumns()];
 
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
-        ballCoordinates = new int[2];
+        ballCoordinates = new double[2];
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new int[]{-5, -5};
+        ballVelocity = new double[]{-4, -4};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
-        paddleCoordinates = new int[2];
+        paddleCoordinates = new double[2];
+
+        // Velocity for the paddle
+        paddleVelocity = new double[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
         paddleCoordinates[0] = BOARD_WIDTH / 2 - PADDLE_WIDTH / 2;
-        paddleCoordinates[1] = BOARD_HEIGHT - PADDLE_HEIGHT - Constants.getPaddleOffSet();
+        paddleCoordinates[1] =
+                BOARD_HEIGHT - PADDLE_HEIGHT - frameInsets.top - frameInsets.bottom - Constants
+                        .getPaddleOffSet();
         ballCoordinates[0] = BOARD_WIDTH / 2 - BALL_WIDTH / 2;
         ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
 
@@ -118,10 +131,15 @@ public class BoardView extends JPanel {
         // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
-        am.put("pressed.left", new MoveAction(-5));
-        am.put("pressed.right", new MoveAction(5));
+        am.put("pressed.left", new MoveAction(-7));
+        am.put("pressed.right", new MoveAction(7));
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
+
+//        am.put("pressed.left", new MoveAction(true, false));
+//        am.put("pressed.right", new MoveAction(false, true));
+//        am.put("released.left", new MoveAction(false, false));
+//        am.put("released.right", new MoveAction(false, false));
     }
 
     @Override
@@ -139,7 +157,8 @@ public class BoardView extends JPanel {
         Rectangle2D bounds = ball.getBounds2D();
 
         // I guess it has to be greater than 5 for each side?
-        ballHitbox.setFrame(bounds.getX() - 15, bounds.getY() - 15, bounds.getWidth() + 30, bounds.getHeight() + 30);
+        ballHitbox.setFrame(bounds.getX() - 6, bounds.getY() - 6, bounds.getWidth() + 11,
+                bounds.getHeight() + 11);
 //        g2d.fill(ballHitbox);
 
         /*
@@ -157,20 +176,40 @@ public class BoardView extends JPanel {
         } */
 
         for (int i = 0; i < Constants.getRows(); i++) {
-            for(int j = 0; j < Constants.getColumns(); j++) {
-                int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
-                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
+            for (int j = 0; j < Constants.getColumns(); j++) {
+                Rectangle2D block = blocks[i][j];
+                if (isDestroyed[i][j]) {
+                    block.setFrame(0, 0, 0, 0);
+                } else {
+                    int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
+                    int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
+                    block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                }
                 g2d.setColor(Color.RED);
-                g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
+                g2d.fill(block);
             }
-        }  
+        }
+
+        // Visualizing center of ball to nearest point on block
+        ballIntersects(paddle);
+        Line2D line2D = new Line2D.Double(ball.getCenterX(), ball.getCenterY(), closestPointToCircle[0] + ball.getCenterX(), closestPointToCircle[1] + ball.getCenterY());
+        g2d.draw(line2D);
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
+//        for (int i = 0; i < previousBallCoordinates.length; i++) {
+//            previousBallCoordinates[i] = closestPointToCircle[i] + ball.getCenterX();
+//        }
+
+        previousBall = new Ellipse2D.Double(ball.getX() - ballVelocity[0] * 3, ball.getY() - ballVelocity[1] * 3, BALL_WIDTH, BALL_HEIGHT);
+
         for (int i = 0; i < ballCoordinates.length; i++) {
             ballCoordinates[i] += ballVelocity[i];
         }
+
+        // I think this makes the intersects method work better?
+        ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
 
         // Handles collision between ball and left and right side of the view.
         if (ballCoordinates[0] < 0 || ballCoordinates[0] > getWidth() - BALL_WIDTH) {
@@ -192,49 +231,182 @@ public class BoardView extends JPanel {
             timer.stop();
         }
 
-        // Should only call this method if ball and paddle collide.
+        // Should only call this method if ball and paddle collide. This is a lot smoother than
+        // intersects.
 //        if (ballCoordinates[0] >= paddleCoordinates[0]
 //                && ballCoordinates[0] <= paddleCoordinates[0] + PADDLE_WIDTH
 //                && ballCoordinates[1] >= paddleCoordinates[1] - BALL_HEIGHT
 //                && ballCoordinates[1] <= paddleCoordinates[1] + PADDLE_HEIGHT) {
 //            ballAndPaddleCollision();
 //        }
-        // The intersects method doesn't work as great :(
-        if (ballHitbox.intersects(paddle)) {
+
+        // The intersects method doesn't work as great :( There's like this slight lag before it
+        // changes direction. It might be because I'm being reactive instead of proactive...
+        // The ball isn't moved yet, but the ballCoordinates are moved. Okay yeah I think it's better
+        // now?
+//        if (ball.intersects(paddle)) {
+        if (ballIntersects(paddle)) {
             ballAndPaddleCollision();
         }
 
+        boolean stop = false;
         // If ball and block collide, call this method.
+//        for (int i = 0; i < Constants.getRows(); i++) {
+//            for (int j = 0; j < Constants.getColumns(); j++) {
+//                if (ballHitbox.intersects(blocks[i][j])) {
+//                    ballVelocity[1] *= -1;
+//                    isDestroyed[i][j] = true;
+//                    break;
+//                }
+//            }
+//        }
 
-        for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                if (ballHitbox.intersects(blocks[i][j])) {
-                    System.out.println("Intersection!");
+        // If ball and block collide, call this method.
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[0].length; j++) {
+                Rectangle2D block = blocks[i][j];
+                if (ballIntersects(block)) {
+//                if (ball.intersects(block)) {
+                    System.out.println("Collision" + i + " " + j + " !");
+                    ballAndBlockCollision(block);
+                    isDestroyed[i][j] = true;
+                    stop = true;
+                    break;
                 }
+            }
+            if (stop) {
                 break;
             }
         }
-        
+    }
 
+    private boolean ballIntersects(Rectangle2D block) {
+        double blockTop = block.getY();
+        double blockBottom = block.getY() + block.getHeight();
+        double blockLeft = block.getX();
+        double blockRight = block.getX() + block.getWidth();
+
+        closestPointToCircle = new double[]{ball.getCenterX(), ball.getCenterY()};
+//        if (closestPointToCircle[0] < blockLeft) {
+//            closestPointToCircle[0] = blockLeft;
+//        } else if  (closestPointToCircle[0] > blockRight) {
+//            closestPointToCircle[1] = blockRight;
+//        }
+//
+//        if (closestPointToCircle[1] < blockBottom) {
+//            closestPointToCircle[1] = blockBottom;
+//        } else if (closestPointToCircle[1] > blockTop) {
+//            closestPointToCircle[1] = blockTop;
+//        }
+
+        // The same as the if/else statements, but shorter.
+        closestPointToCircle[0] = Math.max(blockLeft, Math.min(blockRight, closestPointToCircle[0]));
+        closestPointToCircle[1] = Math.max(blockTop, Math.min(blockBottom, closestPointToCircle[1]));
+
+        closestPointToCircle[0] -= ball.getCenterX();
+        closestPointToCircle[1] -= ball.getCenterY();
+
+        circleToBoxLength = Math.hypot(closestPointToCircle[0], closestPointToCircle[1]);
+
+//        return Math.pow(closestPointToCircle[0] - ball.getCenterX(), 2) + Math.
+//        pow(closestPointToCircle[1] - ball.getCenterY(),2) <= Math.pow(Constants.getBallRadius(),2);
+        // If the length of the line from the center of the circle to the point on the box closest
+        // to the ball is less than or equal to the ball radius then there is collision.
+        return circleToBoxLength <= Constants.getBallRadius();
+    }
+
+    private void ballAndBlockCollision(Rectangle2D block) {
+        System.out.println(circleToBoxLength);
+        // First try
+        // Check if top of ball is hitting block or bottom of ball is hitting block or sides as well
+//        double blockTop = block.getY() - ball.getHeight();
+//        double blockBottom = block.getY() + block.getHeight();
+//        double blockLeft = block.getX() - ball.getWidth();
+//        double blockRight = block.getX() + block.getWidth();
+//
+//        if (ballCoordinates[1] >= blockTop) {
+//            ballCoordinates[1] = blockTop - 1;
+//            ballVelocity[1] *= -1;
+//        } else if (ballCoordinates[1] <= blockBottom) {
+//            ballCoordinates[1] = blockBottom + 1;
+//            ballVelocity[1] *= -1;
+//        } else if (ballCoordinates[0] >= blockLeft) {
+//            ballCoordinates[0] = blockLeft - 1;
+//            ballVelocity[0] *= -1;
+//        } else if (ballCoordinates[0] <= blockRight) {
+//            ballCoordinates[0] = blockRight + 1;
+//            ballVelocity[0] *= -1;
+//        }
+
+        // Second try
+//        int ballLeft = (int) ball.getBounds2D().getMinX();
+//        int ballHeight = (int) ball.getBounds2D().getHeight();
+//        int ballWidth = (int) ball.getBounds2D().getWidth();
+//        int ballTop = (int) ball.getBounds2D().getMinY();
+//
+//        Point pointRight = new Point(ballLeft + ballWidth, (int) ball.getCenterY());
+//        Point pointLeft = new Point(ballLeft, (int) ball.getCenterY());
+//        Point pointTop = new Point(ballLeft, ballTop);
+//        Point pointBottom = new Point(ballLeft, ballTop + ballHeight);
+//
+//        if (block.getBounds().contains(pointTop)) {
+//            ballCoordinates[1] = block.getY() + block.getHeight() + 1;
+//            ballVelocity[1] *= -1;
+//        } else if (block.getBounds().contains(pointBottom)) {
+//            ballCoordinates[1] = block.getY() - ballHeight - 1;
+//            ballVelocity[1] *= -1;
+//        } else if (block.getBounds().contains(pointLeft)) {
+//            ballCoordinates[0] = block.getX() + block.getWidth() + 1;
+//            ballVelocity[0] *= -1;
+//        } else if (block.getBounds().contains(pointRight)) {
+//            ballCoordinates[0] = block.getX() - 1;
+//            ballVelocity[0] *= -1;
+//        }
+
+        double blockTop = block.getY();
+        double blockBottom = block.getY() + block.getHeight();
+        double blockLeft = block.getX();
+        double blockRight = block.getX() + block.getWidth();
+
+        // Third try
+        double overlap = Constants.getBallRadius() - circleToBoxLength;
+        double collisionResolution1 = closestPointToCircle[0] / circleToBoxLength * overlap;
+        double collisionResolution2 = closestPointToCircle[1] / circleToBoxLength * overlap;
+        ballCoordinates[0] -= collisionResolution1;
+        ballCoordinates[1] -= collisionResolution2;
+
+        System.out.println(collisionResolution1);
+        System.out.println(collisionResolution2);
+        System.out.println();
+
+        if (collisionResolution1 == 0) {
+            ballVelocity[1] *= -1;
+        } else if (collisionResolution2 == 0) {
+            ballVelocity[0] *= -1;
+        } else if (previousBall.getCenterX() >= blockLeft && previousBall.getCenterX() <= blockRight) {
+            ballVelocity[1] *= -1;
+        } else if (previousBall.getCenterY() >= blockTop && previousBall.getCenterY() <= blockBottom) {
+            ballVelocity[0] *= -1;
+        }
     }
 
     /**
-     * This method is for handling any collisions that happen between ball and paddle. This method shouldn't 
-     * affect any other part of the program.
+     * This method is for handling any collisions that happen between ball and paddle. This method
+     * shouldn't affect any other part of the program.
      */
     private void ballAndPaddleCollision() {
         if (!gameFinished && ballVelocity[0] == 0) {
             ballVelocity[0] = -5;
         }
 
-        int paddleLeft = paddleCoordinates[0];
-        int paddleMiddleLeft = paddleLeft + PADDLE_WIDTH / 2 - 5;
-        int paddleMiddleRight = paddleLeft + PADDLE_WIDTH / 2 + 5;
-        int paddleRight = paddleCoordinates[0] + PADDLE_WIDTH;
+        double paddleLeft = paddleCoordinates[0];
+        double paddleMiddleLeft = paddleLeft + PADDLE_WIDTH / 2 - 5;
+        double paddleMiddleRight = paddleLeft + PADDLE_WIDTH / 2 + 5;
+        double paddleRight = paddleCoordinates[0] + PADDLE_WIDTH;
         // This is the top of the paddle relative to the ball's coordinates. The actual top
         // of paddle is just paddleCoordinates[1].
-        int paddleTop = paddleCoordinates[1] - BALL_HEIGHT;
-        int paddleBottom = paddleCoordinates[1] + PADDLE_HEIGHT;
+        double paddleTop = paddleCoordinates[1] - BALL_HEIGHT;
+        double paddleBottom = paddleCoordinates[1] + PADDLE_HEIGHT;
 
         // Hitting on left side makes ball go left. Hitting on middle (Giving it about 10 pixels of
         // space) makes ball go straight up. Hitting on right side makes ball go right.
@@ -255,19 +427,23 @@ public class BoardView extends JPanel {
             }
             ballVelocity[1] *= -1;
         }
+
+        ballCoordinates[1] = paddleTop - 1;
     }
 
     /**
      * Sets the x and y coordinates of the ball.
      */
-    public void setBallCoordinates(int[] ballCoordinates) {
+    public void setBallCoordinates(double[] ballCoordinates) {
         this.ballCoordinates = ballCoordinates;
     }
 
     /**
      * Sets the x coordinate of the paddle, since it only moves left and right.
+     *
+     * @param paddleCoordinates
      */
-    public void setPaddleCoordinates(int paddleCoordinates) {
+    public void setPaddleCoordinates(double paddleCoordinates) {
         if (paddleCoordinates < 0) {
             paddleCoordinates = 0;
         } else if (paddleCoordinates >= getWidth() - PADDLE_WIDTH) {
@@ -277,7 +453,8 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * So basically, whenever a key is pressed or released it will call MoveAction's overrided actionPerformed method
+     * So basically, whenever a key is pressed or released it will call MoveAction's overrided
+     * actionPerformed method
      */
     private class MoveAction extends AbstractAction {
 
@@ -285,9 +462,9 @@ public class BoardView extends JPanel {
 
         public MoveAction(int direction) {
             // This line is for moving the paddle WITH the message system. Uncomment if you want to use message system.
-           this.direction = direction;
-           // This line is for moving the paddle WITHOUT the message system. Uncomment if you want to not use message system.
-        //    this.direction = direction;
+            this.direction = direction;
+            // This line is for moving the paddle WITHOUT the message system. Uncomment if you want to not use message system.
+            //    this.direction = direction;
         }
 
         @Override
@@ -297,19 +474,19 @@ public class BoardView extends JPanel {
             }
 
             // This code doesn't really work in moving the paddle, but uses the message system.
-            // Uncomment this code block and Line 163 to use the message system and comment the other block 
+            // Uncomment this code block and Line 163 to use the message system and comment the other block
             // (Lines 186 - 191) below this one and comment Line 164.
             // This println below is to see what happens to the direction variable when this method is called.
-           try {
-               queue.put(new MoveMessage(direction + paddleCoordinates[0]));
-           } catch (InterruptedException exception) {
-               exception.printStackTrace();
-           }
+            try {
+                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
 
             // This code works in moving the paddle, but this doesn't use the message
             // system and doesn't interact with Breakout, the controller.
             // If you want to see how the program works without the message system, uncomment this code block and Line 164.
-            // If you want to see how the program work with the message system, comment this code block and uncomment the 
+            // If you want to see how the program work with the message system, comment this code block and uncomment the
             // code block above this
             // paddleCoordinates[0] += direction;
             // if (paddleCoordinates[0] < 0) {
@@ -319,4 +496,48 @@ public class BoardView extends JPanel {
             // }
         }
     }
+
+//    /**
+//     * So basically, whenever a key is pressed or released it will call MoveAction's overrided
+//     * actionPerformed method
+//     */
+//    private class MoveAction extends AbstractAction {
+//        private int speed;
+//        private boolean leftPressed;
+//        private boolean rightPressed;
+//
+//        public MoveAction(boolean leftPressed, boolean rightPressed) {
+//            this.leftPressed = leftPressed;
+//            this.rightPressed = rightPressed;
+//        }
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            if (!timer.isRunning()) {
+//                timer.start();
+//            }
+//
+//            if (!leftPressed && !rightPressed) {
+//                speed *= 0.8;
+//            } else if (leftPressed && !rightPressed) {
+//                speed--;
+//            } else if (rightPressed && !leftPressed){
+//                speed++;
+//            }
+//
+//            if (speed >= -0.75 && speed < 0 || speed <= 0.75 && speed > 0) {
+//                speed = 0;
+//            } else if (speed < -7) {
+//                speed = -7;
+//            } else if (speed > 7) {
+//                speed = 7;
+//            }
+//
+//            try {
+//                queue.put(new MoveMessage(speed + paddleCoordinates[0]));
+//            } catch (InterruptedException exception) {
+//                exception.printStackTrace();
+//            }
+//        }
+//    }
 }

@@ -1,7 +1,7 @@
 package breakout.model;
 
 public class Constants {
-    private static final int BALL_RADIUS = 10;
+    private static final int BALL_RADIUS = 8;
     private final static int BLOCK_HEIGHT = 20;
     private final static int BLOCK_WIDTH = 40;
     private static final int ROWS = 5;
@@ -11,7 +11,7 @@ public class Constants {
     private static final int BLOCK_SEP = 2;
     private static final int PADDLE_WIDTH = 80;
     private static final int PADDLE_HEIGHT = 15;
-    private static final int PADDLE_OFFSET = 40;
+    private static final int PADDLE_OFFSET = 30;
 
     public static int getBallRadius(){
         return BALL_RADIUS;
