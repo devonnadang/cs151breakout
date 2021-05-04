@@ -1,7 +1,9 @@
 package breakout.view;
 
+import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
+import breakout.model.Board;
 import breakout.model.Constants;
 
 import java.awt.Dimension;
@@ -21,6 +23,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -52,6 +55,8 @@ public class BoardView extends JPanel {
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
+    
+    private JButton leaderboardButton;
 
     public BoardView(BlockingQueue<Message> queue) {
 
@@ -102,10 +107,10 @@ public class BoardView extends JPanel {
         paddleCoordinates = new int[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
-        paddleCoordinates[0] = BOARD_WIDTH / 2 - PADDLE_WIDTH / 2;
-        paddleCoordinates[1] = BOARD_HEIGHT - PADDLE_HEIGHT - Constants.getPaddleOffSet();
-        ballCoordinates[0] = BOARD_WIDTH / 2 - BALL_WIDTH / 2;
-        ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
+        paddleCoordinates[0] = Constants.getPaddleXReset();
+        paddleCoordinates[1] = Constants.getPaddleYReset();
+        ballCoordinates[0] = Constants.getBallXReset();
+        ballCoordinates[1] = Constants.getBallYReset();
 
         // This maps the left and right arrow keys to different actions.
         // I used key bindings instead of ActionListener because sometimes the panel becomes out of focus and the inputs do nothing,
@@ -124,10 +129,20 @@ public class BoardView extends JPanel {
         // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
-        am.put("pressed.left", new MoveAction(-5));
-        am.put("pressed.right", new MoveAction(5));
+        am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit()));
+        am.put("pressed.right", new MoveAction(Constants.getPaddleMoveRightUnit()));
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
+        
+        // button to open new window to see leaderboard and scores
+        leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
+        leaderboardButton.addActionListener(e -> {
+        	LeaderboardWindow lw = new LeaderboardWindow();
+        });
+        
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
     }
 
     @Override
@@ -350,6 +365,7 @@ public class BoardView extends JPanel {
             // This println below is to see what happens to the direction variable when this method is called.
            try {
                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+               //queue.put(new MoveMessage(direction));
            } catch (InterruptedException exception) {
                exception.printStackTrace();
            }

@@ -25,24 +25,8 @@ public class Board {
     public Board(){
         blockCounter = ROWS*COLUMNS;
         createBlocks();
-        createBall();
-        createPaddle();
-    }
-
-    /**
-     * TODO method
-     * Will notify view of changes. 
-     * @param view
-     */
-    public void notify(View view) {
-        
-    }
-
-    /**
-     * Creates the ball that will destroy blocks.
-     */
-    private void createBall(){
-        ball = new Ball(280, 550); //Ball(x coordinate, y coordinate)
+        ball = new Ball();
+        paddle = new Paddle();
     }
 
     public Ball getBall(){
@@ -51,8 +35,11 @@ public class Board {
     
     private void createPaddle()
     {
-    	paddle = new Paddle(this.getBoardWidth(), this.getBoardHeight());
-		
+    	paddle = new Paddle();
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
     }
 
     /**
