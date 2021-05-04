@@ -32,6 +32,11 @@ public class Board {
     public Ball getBall(){
         return ball;
     }
+    
+    private void createPaddle()
+    {
+    	paddle = new Paddle();
+    }
 
     public Paddle getPaddle() {
         return paddle;

@@ -77,12 +77,13 @@ public class Paddle {
 	{
 		return x;
 	}
-
+	
 	/**
 	 * Gets the y value of the paddle
 	 * @param y the y coordinate
 	 */
-	public int getY(){
+	public int getY()
+	{
 		return y;
 	}
 
