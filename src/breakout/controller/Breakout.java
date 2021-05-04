@@ -47,6 +47,7 @@ public class Breakout {
             if (message.getClass() == MoveMessage.class) {
                 MoveMessage moveMessage = (MoveMessage) message;
                 
+//                board.getPaddle().move(moveMessage.getNewCoordinate());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
                 view.updateBoardView(moveMessage.getNewCoordinate());

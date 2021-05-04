@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -76,13 +78,20 @@ public class BoardView extends JPanel {
         ball = new Ellipse2D.Double();
 
         isDestroyed = new boolean[blocks.length];
+        // isDestroyed = new boolean[Constants.getRows()][Constants.getColumns()];
+        // for (int i = 0; i < Constants.getRows(); i++) {
+        //     for (int j = 0; j < Constants.getColumns(); j++) {
+        //         isDestroyed[i][j] = false;
+        //     }
+        // }
 
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new int[2];
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new int[]{-5, -5};
+        ballVelocity = new double[]{Constants.getBallVelocity(), Constants.getBallVelocity()};
+
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new int[2];
@@ -104,16 +113,43 @@ public class BoardView extends JPanel {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false), "pressed.right");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, true), "released.left");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "released.right");
+        // Manually moving ball
+//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "pressed.up");
+//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "pressed.down");
+//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true), "released.up");
+//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "released.down");
 
         // Basically pressing keys will make paddle move and releasing keys will make paddle stop.
         // Pressing left should make the paddle move -5 which means the paddle should move left.
         // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
-        am.put("pressed.left", new MoveAction(-5));
-        am.put("pressed.right", new MoveAction(5));
+
+
+        am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit()));
+        am.put("pressed.right", new MoveAction(Constants.getPaddleMoveRightUnit()));
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
+
+        // Manually moving ball
+//        am.put("pressed.left", new MoveAction(-5, true, false));
+//        am.put("pressed.right", new MoveAction(5, true, false));
+//        am.put("pressed.up", new MoveAction(-5, false, true));
+//        am.put("pressed.down", new MoveAction(5, false, true));
+//        am.put("released.left", new MoveAction(0, true, false));
+//        am.put("released.right", new MoveAction(0, true, false));
+//        am.put("released.up", new MoveAction(0, false, true));
+//        am.put("released.down", new MoveAction(0, false, true));
+
+        // button to open new window to see leaderboard and scores
+        leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
+        leaderboardButton.addActionListener(e -> {
+            LeaderboardWindow lw = new LeaderboardWindow();
+        });
+
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
     }
 
     @Override
@@ -135,6 +171,7 @@ public class BoardView extends JPanel {
 //        g2d.fill(ballHitbox);
 
         // Drawing the blocks
+        /*
         int x = 20;
         for (int i = 0; i < blocks.length; i++) {
             Rectangle2D block = blocks[i];
@@ -145,11 +182,34 @@ public class BoardView extends JPanel {
             }
             g2d.fill(block);
             x += 60;
+        } */
+
+        for (int i = 0; i < Constants.getRows(); i++) {
+            for (int j = 0; j < Constants.getColumns(); j++) {
+                Rectangle2D block = blocks[i][j];
+                int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * (j));
+                int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * (i));
+                block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                if (!isDestroyed[i][j]) {
+                    block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                } else {
+                    block.setFrame(0,0,0,0);
+                }
+                g2d.setColor(Color.RED);
+                g2d.fill(block);
+            }
         }
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
+//        for (int i = 0; i < previousBallCoordinates.length; i++) {
+//            previousBallCoordinates[i] = closestPointToCircle[i] + ball.getCenterX();
+//        }
+
+        previousBall = new Ellipse2D.Double(ball.getX() - ballVelocity[0] * 3,
+                ball.getY() - ballVelocity[1] * 3, BALL_WIDTH, BALL_HEIGHT);
+
         for (int i = 0; i < ballCoordinates.length; i++) {
             ballCoordinates[i] += ballVelocity[i];
         }
@@ -188,13 +248,156 @@ public class BoardView extends JPanel {
 
         // If ball and block collide, call this method.
 
-        for (Rectangle2D block : blocks) {
-            if (ballHitbox.intersects(block)) {
-                System.out.println("Intersection!");
+        // If ball and block collide, call this method. PAUL
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[0].length; j++) {
+                Rectangle2D block = blocks[i][j];
+                if (ballIntersects(block)) {
+//               if (ball.intersects(block)) {
+                    System.out.println("Collision" + i + " " + j + " !");
+                    ballAndBlockCollision(block);
+                    isDestroyed[i][j] = true;
+                    stop = true;
+                    break;
+                }
+            }
+            if (stop) {
+                break;
             }
             break;
         }
 
+        // RASHMI
+//        for (int i = 0; i < Constants.getRows(); i++) {
+//            for (int j = 0; j < Constants.getColumns(); j++) {
+//                int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * (j + 1));
+//                int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * (i + 1));
+//                Rectangle blockHitbox = new Rectangle(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+//                Rectangle ballHitbox2 = new Rectangle(ballCoordinates[0], ballCoordinates[1],
+//                        BALL_WIDTH, BALL_HEIGHT);
+//
+//                if (ballHitbox2.intersects(blockHitbox)) {
+//                    //We need the ball to change directions after it has destroyed a block
+//                    Point topOfBall = new Point(ballCoordinates[0], ballCoordinates[1] - 1);
+//                    Point bottomOfBall = new Point(ballCoordinates[0],
+//                            ballCoordinates[1] + BALL_HEIGHT + 1);
+//                    Point leftOfBall = new Point(ballCoordinates[0] - 1, ballCoordinates[1]);
+//                    Point rightOfBall = new Point(ballCoordinates[0] + BALL_WIDTH + 1,
+//                            ballCoordinates[1]);
+//
+//                    if (isDestroyed[i][j] == false) {
+//                        if (blockHitbox
+//                                .contains(topOfBall)) //top of the ball is in contact with the block
+//                        {
+//                            ballVelocity[1] *= -1; //if ball hits block's bottom side, it bounces down
+//                        } else if (blockHitbox.contains(
+//                                bottomOfBall)) //bottom of the ball is in contact with the block
+//                        {
+//                            ballVelocity[1] *= -1; //if ball hits block's top side, it bounces up
+//                        }
+//
+//                        if (blockHitbox.contains(
+//                                leftOfBall)) //left of the ball is in contact with the block
+//                        {
+//                            ballVelocity[0] *= -1; //if ball hits block's right side, it bounces right
+//                        } else if (blockHitbox.contains(
+//                                rightOfBall)) //right of the ball is in contact with the block
+//                        {
+//                            ballVelocity[0] *= -1; //if ball hits block's left side, it bounces left
+//                        }
+//
+//                        isDestroyed[i][j] = true;
+//                    }
+//                }
+//
+//                //                if (ballHitbox.intersects(blocks[i][j])) {
+//                //                    System.out.println("Intersection!");
+//                //                }
+//                //            	  break;
+//
+//            }
+//        }
+    }
+
+    private boolean ballIntersects(Rectangle2D block) {
+        double blockTop = block.getY();
+        double blockBottom = block.getY() + block.getHeight();
+        double blockLeft = block.getX();
+        double blockRight = block.getX() + block.getWidth();
+
+        closestPointToCircle = new double[]{ball.getCenterX(), ball.getCenterY()};
+//        if (closestPointToCircle[0] < blockLeft) {
+//            closestPointToCircle[0] = blockLeft;
+//        } else if  (closestPointToCircle[0] > blockRight) {
+//            closestPointToCircle[1] = blockRight;
+//        }
+//
+//        if (closestPointToCircle[1] < blockBottom) {
+//            closestPointToCircle[1] = blockBottom;
+//        } else if (closestPointToCircle[1] > blockTop) {
+//            closestPointToCircle[1] = blockTop;
+//        }
+
+        // The same as the if/else statements, but shorter.
+        closestPointToCircle[0] = Math
+                .max(blockLeft, Math.min(blockRight, closestPointToCircle[0]));
+        closestPointToCircle[1] = Math
+                .max(blockTop, Math.min(blockBottom, closestPointToCircle[1]));
+
+        closestPointToCircle[0] -= ball.getCenterX();
+        closestPointToCircle[1] -= ball.getCenterY();
+
+        circleToBoxLength = Math.hypot(closestPointToCircle[0], closestPointToCircle[1]);
+
+//        return Math.pow(closestPointToCircle[0] - ball.getCenterX(), 2) + Math.
+//        pow(closestPointToCircle[1] - ball.getCenterY(),2) <= Math.pow(Constants.getBallRadius(),2);
+        // If the length of the line from the center of the circle to the point on the box closest
+        // to the ball is less than or equal to the ball radius then there is collision.
+        return circleToBoxLength <= Constants.getBallRadius();
+    }
+
+    private void ballAndBlockCollision(Rectangle2D block) {
+        System.out.println(circleToBoxLength);
+
+        double blockTop = block.getY();
+        double blockBottom = block.getY() + block.getHeight();
+        double blockLeft = block.getX();
+        double blockRight = block.getX() + block.getWidth();
+
+        // Third try
+        double overlap = Constants.getBallRadius() - circleToBoxLength;
+        double collisionResolution1 = (closestPointToCircle[0] / circleToBoxLength) * overlap;
+        double collisionResolution2 = (closestPointToCircle[1] / circleToBoxLength) * overlap;
+        ballCoordinates[0] -= collisionResolution1;
+        ballCoordinates[1] -= collisionResolution2;
+
+        System.out.println(collisionResolution1);
+        System.out.println(collisionResolution2);
+        System.out.println();
+
+        // Rotate direction by 90 degrees?
+        if (collisionResolution1 == 0) {
+            ballVelocity[1] *= -1;
+        } else if (collisionResolution2 == 0) {
+            ballVelocity[0] *= -1;
+        } else {
+            // Corner of block has been hit
+
+        }
+
+        // Go clockwise if velocity is: up-left (Bottom) , up-right (Left) , down-right (Top),
+        // and down-left (Right).
+        // Go counterclockwise if velocity is: up-right, down-right, down-left, and up-left.
+//        double xVelocity = ballVelocity[0];
+//        if (ballVelocity[0] > 0) {
+//            // Clockwise
+//            ballVelocity[0] = -ballVelocity[1];
+//            ballVelocity[1] = xVelocity;
+//        } else {
+//            // Counter-clockwise
+//            ballVelocity[0] = ballVelocity[1];
+//            ballVelocity[1] = -xVelocity;
+//        }
     }
 
     /**
@@ -263,11 +466,17 @@ public class BoardView extends JPanel {
         private int direction;
 
         public MoveAction(int direction) {
-            // This line is for moving the paddle WITH the message system. Uncomment if you want to use message system.
-           this.direction = direction;
-           // This line is for moving the paddle WITHOUT the message system. Uncomment if you want to not use message system.
-        //    this.direction = direction;
+            this.direction = direction;
         }
+
+//        private boolean leftOrRight;
+//        private boolean upOrDown;
+//
+//        public MoveAction(int direction, boolean leftOrRight, boolean upOrDown) {
+//            this.direction = direction;
+//            this.leftOrRight = leftOrRight;
+//            this.upOrDown = upOrDown;
+//        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -279,23 +488,19 @@ public class BoardView extends JPanel {
             // Uncomment this code block and Line 163 to use the message system and comment the other block 
             // (Lines 186 - 191) below this one and comment Line 164.
             // This println below is to see what happens to the direction variable when this method is called.
-           try {
-               queue.put(new MoveMessage(direction + paddleCoordinates[0]));
-           } catch (InterruptedException exception) {
-               exception.printStackTrace();
-           }
+            try {
+                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+                //queue.put(new MoveMessage(direction));
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
 
-            // This code works in moving the paddle, but this doesn't use the message
-            // system and doesn't interact with Breakout, the controller.
-            // If you want to see how the program works without the message system, uncomment this code block and Line 164.
-            // If you want to see how the program work with the message system, comment this code block and uncomment the 
-            // code block above this
-            // paddleCoordinates[0] += direction;
-            // if (paddleCoordinates[0] < 0) {
-            //     paddleCoordinates[0] = 0;
-            // } else if (paddleCoordinates[0] >= getWidth() - PADDLE_WIDTH) {
-            //     paddleCoordinates[0] = getWidth() - PADDLE_WIDTH;
-            // }
+//            if (leftOrRight) {
+//                ballCoordinates[0] += direction;
+//            } else {
+//                ballCoordinates[1] += direction;
+//            }
+
         }
     }
 }
