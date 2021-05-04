@@ -12,18 +12,18 @@ public class Ball {
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
 	//how can it interact with paddle/bounce off of it?
+	private int [] ballVelocity; 
 	
 	
 	/**
 	 * This is the constructor which initializes x & y to its starting positions.
 	 */
-	public Ball(int x, int y)
+	public Ball()
 	{
-		//this.x = (Board.getBoardWidth()/2) - getBallRadius();
-		//this.y = (Board.getBoardHeight()/2) - getBallRadius();
-		this.x = x;
-		this.y = y;
+		this.x = Constants.getBallXReset();
+		this.y = Constants.getBallYReset();
 		setCoordinates(x, y);
+		ballVelocity = new int [] {Constants.getBallVelocity(), Constants.getBallVelocity()};
 	}
 	
 	/**
@@ -83,19 +83,34 @@ public class Ball {
 	 */
 	public void move()
 	{
-		//change x & y coord
-		
-		/*
-		if(x is #) //out of bound 
-		{
-			//setX(1);
-		}
-		
-		if(y is #) //out of bound 
-		{
-			//setY(0);
-		}
-		*/
+		x += ballVelocity[0];
+		y += ballVelocity[1];
+        
+
+        // Handles collision between ball and left and right side of the view.
+        if (x < 0 || x > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
+            ballVelocity[0] *= -1;
+        }
+
+        // Handles collision between ball and top of the view.
+        if (y < 0) {
+            ballVelocity[1] *= -1;
+        }
+
+        // Handles collision between ball and bottom of the view.
+        // Actually if ball goes below it should end game, but there is no end game implementation
+        // as of now.
+        if (ballFallsBelow()) {
+            ballVelocity[0] = 0;
+			ballVelocity[1] = 0;
+			reset();
+        }
+	}
+
+	public boolean ballFallsBelow(){
+		if (y >= Constants.getPanelHeight() - (Constants.getBallRadius()*2)) {
+            return true;
+        } return false;
 	}
 	
 	/**
@@ -111,15 +126,9 @@ public class Ball {
 	 * Resets the position of the ball
 	 * @param r value indicating whether reset of ball should occur
 	 */
-	public void reset(boolean r)
+	public void reset()
 	{
-		if(r)
-		{
-			//set x & y to its initial coordinates
-			//temp starting coordinates
-			//this.x = 1;
-			//this.y = 0; 
-		}
+		setCoordinates(Constants.getBallXReset(), Constants.getBallYReset());
 	}
 	
 }
