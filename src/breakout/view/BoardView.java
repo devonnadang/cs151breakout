@@ -20,6 +20,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -51,6 +52,8 @@ public class BoardView extends JPanel {
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
+    
+    private JButton leaderboardButton;
 
     public BoardView(BlockingQueue<Message> queue) {
 
@@ -122,6 +125,16 @@ public class BoardView extends JPanel {
         am.put("pressed.right", new MoveAction(5));
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
+        
+        // button to open new window to see leaderboard and scores
+        leaderboardButton = new JButton("Leaderboard");
+        leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
+        leaderboardButton.addActionListener(e -> {
+        	LeaderboardWindow lw = new LeaderboardWindow();
+        });
+        
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
     }
 
     @Override
