@@ -261,8 +261,8 @@ class BreakoutTest {
     @Test
     void destroyBlockTest() {
         Board board = new Board();
-        int expectedBlockCounter = board.getRows()*board.getColumns() - 1;
-        board.getBall().setCoordinates(30, 35);
+        int expectedBlockCounter = board.getRows()*board.getColumns() - 1; //one block is destroyed
+        board.getBall().setCoordinates(30, 35); 
 
         Block testBlock = new Block(30, 30);
         if (board.checkClash()){ 
@@ -320,7 +320,12 @@ class BreakoutTest {
      */
     @Test
     void paddleMoveTest() {
-
+        Paddle paddle = new Paddle();
+        paddle.moveLeft();
+        paddle.moveLeft();
+        int xExpected = Constants.getPaddleXReset() + Constants.getPaddleMoveLeftUnit() + Constants.getPaddleMoveLeftUnit();
+        int xActual = paddle.getX();
+        assertEquals(xExpected, xActual);
     }
 
 

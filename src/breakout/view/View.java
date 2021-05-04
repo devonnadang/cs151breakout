@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.JFrame;
 
+import breakout.model.Board;
 /**
  * Serves as the main view for Breakout. All other views will be within this one.
  */
@@ -13,18 +14,21 @@ public class View extends JFrame{
     private BoardView boardView;
     private BlockingQueue<Message> queue;
 
+    //ViewPanel panel;
     /**
      * Constructs the main view of Breakout.
      */
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
         // Swing stuff
-        setPreferredSize(new Dimension(500, 600));
-        setResizable(true);
-        setTitle("Breakout");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-        setVisible(true);
+        //panel = new ViewPanel();
+         //this.add(panel);
+         this.setPreferredSize(new Dimension (Board.getBoardWidth(),Board.getBoardHeight()));
+         setResizable(true);
+         setTitle("Breakout");
+         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+         pack();
+         setVisible(true);
     }
 
     /**

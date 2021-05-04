@@ -3,8 +3,11 @@ package breakout.controller;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.swing.Timer;
+
 import breakout.model.Board;
 import breakout.model.Life;
+import breakout.model.Paddle;
 import breakout.view.View;
 
 /**
@@ -50,7 +53,7 @@ public class Breakout {
 //                board.getPaddle().move(moveMessage.getNewCoordinate());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getNewCoordinate());
+                view.updateBoardView(moveMessage.getDirection());
             }
         }
 

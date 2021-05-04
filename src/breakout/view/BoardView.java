@@ -1,10 +1,16 @@
 package breakout.view;
 
+import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
+import breakout.model.Board;
+import breakout.model.Constants;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Color;
 
 import java.awt.Insets;
 import java.awt.Point;
@@ -19,6 +25,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
@@ -27,12 +34,15 @@ import javax.swing.Timer;
 
 public class BoardView extends JPanel {
 
-    public static final int BALL_WIDTH = 15;
-    public static final int BALL_HEIGHT = 15;
-    public static final int PADDLE_WIDTH = 80;
-    public static final int PADDLE_HEIGHT = 15;
-    public static final int BOARD_WIDTH = 484;
-    public static final int BOARD_HEIGHT = 561;
+    public static final int BALL_WIDTH = Constants.getBallRadius()*2;
+    public static final int BALL_HEIGHT = Constants.getBallRadius()*2;
+    public static final int PADDLE_WIDTH = Constants.getPaddleWidth();
+    public static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
+    public static final int BOARD_WIDTH = Constants.getPanelWidth();
+    public static final int BOARD_HEIGHT = Constants.getPanelHeight();
+    public static final int BLOCK_WIDTH = Constants.getBlockWidth();
+    public static final int BLOCK_HEIGHT = Constants.getBlockHeight();
+    public static final int BLOCK_SEP = Constants.getBlockSep();
 
     private Rectangle2D paddle;
     private Ellipse2D ball;
@@ -41,12 +51,14 @@ public class BoardView extends JPanel {
     private int[] ballCoordinates;
     private int[] ballVelocity;
     private int[] paddleCoordinates;
-    private Rectangle2D[] blocks;
-    private boolean[] isDestroyed;
+    private Rectangle2D[][] blocks;
+    private boolean[][] isDestroyed;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
+    
+    private JButton leaderboardButton;
 
     public BoardView(BlockingQueue<Message> queue) {
 
@@ -66,9 +78,11 @@ public class BoardView extends JPanel {
             repaint();
         });
 
-        blocks = new Rectangle2D[5];
-        for (int i = 0; i < 5; i++) {
-            blocks[i] = new Rectangle2D.Double();
+        blocks = new Rectangle2D[Constants.getRows()][Constants.getColumns()];
+        for (int i = 0; i < Constants.getRows(); i++) {
+            for (int j = 0; j < Constants.getColumns(); j++) {
+                blocks[i][j] = new Rectangle2D.Double();
+            }
         }
 
         this.queue = queue;
@@ -97,10 +111,10 @@ public class BoardView extends JPanel {
         paddleCoordinates = new int[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
-        paddleCoordinates[0] = BOARD_WIDTH / 2 - PADDLE_WIDTH / 2;
-        paddleCoordinates[1] = BOARD_HEIGHT - PADDLE_HEIGHT - 20;
-        ballCoordinates[0] = BOARD_WIDTH / 2 - BALL_WIDTH / 2;
-        ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
+        paddleCoordinates[0] = Constants.getPaddleXReset();
+        paddleCoordinates[1] = Constants.getPaddleYReset();
+        ballCoordinates[0] = Constants.getBallXReset();
+        ballCoordinates[1] = Constants.getBallYReset();
 
         // This maps the left and right arrow keys to different actions.
         // I used key bindings instead of ActionListener because sometimes the panel becomes out of focus and the inputs do nothing,
@@ -170,6 +184,7 @@ public class BoardView extends JPanel {
         ballHitbox.setFrame(bounds.getX() - 15, bounds.getY() - 15, bounds.getWidth() + 30, bounds.getHeight() + 30);
 //        g2d.fill(ballHitbox);
 
+        /*
         // Drawing the blocks
         /*
         int x = 20;
@@ -264,8 +279,8 @@ public class BoardView extends JPanel {
             if (stop) {
                 break;
             }
-            break;
         }
+        
 
         // RASHMI
 //        for (int i = 0; i < Constants.getRows(); i++) {

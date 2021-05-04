@@ -13,38 +13,33 @@ public class Board {
     Ball ball;
     Paddle paddle;
     int blockCounter;
-    private static final int ROWS = 5;
-    private static final int COLUMNS = 10;
-    private static final int WIDTH = 300;
-    private static final int HEIGHT = 600;
+    private static final int ROWS = Constants.getRows();
+    private static final int COLUMNS = Constants.getColumns();
+    private static final int WIDTH = Constants.getPanelWidth();
+    private static final int HEIGHT = Constants.getPanelHeight();
     private static final int BLOCK_START = WIDTH/10; //30
-    private static final int BLOCK_WIDTH = 10;
-	private static final int BLOCK_HEIGHT = 5;
+    private static final int BLOCK_WIDTH = Constants.getBlockWidth();
+    private static final int BLOCK_HEIGHT = Constants.getBlockWidth();
+    private static final int BLOCK_SEP = 2;
 
     public Board(){
         blockCounter = ROWS*COLUMNS;
         createBlocks();
-        createBall();
-    }
-
-    /**
-     * TODO method
-     * Will notify view of changes. 
-     * @param view
-     */
-    public void notify(View view) {
-        
-    }
-
-    /**
-     * Creates the ball that will destory blocks.
-     */
-    private void createBall(){
-        ball = new Ball(280, 550); //Ball(x coordinate, y coordinate)
+        ball = new Ball();
+        paddle = new Paddle();
     }
 
     public Ball getBall(){
         return ball;
+    }
+    
+    private void createPaddle()
+    {
+    	paddle = new Paddle();
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
     }
 
     /**
@@ -97,36 +92,29 @@ public class Board {
         } else {
             return false;
         }
-
-        /*
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLUMNS; j++) {
-                if (blocks[i][j].getDestroyed() != true) {
-                    return false;
-                }
-            }
-        }
-        return true;
-        */
     }
 
-    public int getRows(){
+    public static int getRows(){
         return ROWS;
     }
 
-    public int getColumns(){
+    public static int getColumns(){
         return COLUMNS;
     }
 
-    public int getBoardWidth(){
+    public static int getBoardWidth(){
         return WIDTH;
     }
 
-    public int getBoardHeight(){
+    public static int getBoardHeight(){
         return HEIGHT;
     }
 
     public int getBlockCounter(){
         return blockCounter;
+    }
+
+    public static int getBlockSep() {
+        return BLOCK_SEP;
     }
 }
