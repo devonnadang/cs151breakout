@@ -54,6 +54,12 @@ public class Breakout {
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
                 view.updateBoardView(moveMessage.getDirection());
             }
+            
+            // when save score button is pressed
+            else if (message.getClass() == SaveScoreMessage.class) {
+            	SaveScoreMessage saveScoreMessage = (SaveScoreMessage) message;
+                // maybe prompt to enter username and add score
+            }
         }
 
         // Calling endgame after while loop ends
