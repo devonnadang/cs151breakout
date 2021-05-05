@@ -49,10 +49,10 @@ public class Breakout {
             // Figure out what message it is and do correct action
             if (message.getClass() == MoveMessage.class) {
                 MoveMessage moveMessage = (MoveMessage) message;
-                board.getPaddle().move(moveMessage.getDirection());
+//                board.getPaddle().move(moveMessage.getDirection());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getDirection());
+                view.updateBoardView(moveMessage.getNewCoordinate());
             }
         }
 
