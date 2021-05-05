@@ -218,6 +218,7 @@ public class BoardView extends JPanel {
             if(livesCounter != 3)
             {
             	livesCounter++;
+            	gameFinished = false;
             	repaintBoard();
             }
         }
