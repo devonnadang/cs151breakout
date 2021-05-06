@@ -35,10 +35,11 @@ public class BoardView extends JPanel {
     public static final int BLOCK_WIDTH = Constants.getBlockWidth();
     public static final int BLOCK_HEIGHT = Constants.getBlockHeight();
     public static final int BLOCK_SEP = Constants.getBlockSep();
+    public static final int BALL_MAX_VELOCITY = Constants.getBallMaxVelocity();
+    public static final int BALL_MIN_VELOCITY = Constants.getBallMinVelocity();
 
     private Rectangle2D paddle;
     private Ellipse2D ball;
-    private Rectangle2D ballHitbox;
 
     private double[] ballCoordinates;
     private double[] ballVelocity;
@@ -78,7 +79,6 @@ public class BoardView extends JPanel {
         this.queue = queue;
         this.frameInsets = frameInsets;
 
-        ballHitbox = new Rectangle2D.Double();
         paddle = new Rectangle2D.Double();
         ball = new Ellipse2D.Double();
 
@@ -94,7 +94,7 @@ public class BoardView extends JPanel {
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-5, -5};
+        ballVelocity = new double[]{-BALL_MAX_VELOCITY, -BALL_MAX_VELOCITY};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
@@ -160,7 +160,6 @@ public class BoardView extends JPanel {
         // Draws the ball above the paddle
         ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
         g2d.fill(ball);
-        Rectangle2D bounds = ball.getBounds2D();
 
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
@@ -192,18 +191,19 @@ public class BoardView extends JPanel {
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
         // These two statements will make sure max velocity is 5 and min velocity is -5.
-        ballVelocity[0] = Math.max(-5, Math.min(5, ballVelocity[0]));
-        ballVelocity[1] = Math.max(-5, Math.min(5, ballVelocity[1]));
+        ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
+        ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
 
         // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
-        if (ballVelocity[0] > -2 && ballVelocity[0] < 2) {
+        if (ballVelocity[0] > -BALL_MIN_VELOCITY && ballVelocity[0] < BALL_MIN_VELOCITY) {
             if (ballVelocity[0] < 0) {
                 ballVelocity[0] -= .5;
             } else if (ballVelocity[0] > 0) {
                 ballVelocity[0] += .5;
             }
         }
-        if (ballVelocity[1] > -2 && ballVelocity[1] < 2) {
+
+        if (ballVelocity[1] > -BALL_MIN_VELOCITY && ballVelocity[1] < BALL_MIN_VELOCITY) {
             if (ballVelocity[1] < 0) {
                 ballVelocity[1] -= .5;
             } else if (ballVelocity[1] > 0) {
@@ -334,29 +334,10 @@ public class BoardView extends JPanel {
 
         // Hitting on left side makes ball go left. Hitting on middle (Giving it about 10 pixels of
         // space) makes ball go straight up. Hitting on right side makes ball go right.
-        if (ballCoordinates[0] >= paddleCoordinates[0] && ballCoordinates[0] < paddleMiddleLeft
+        if (ballCoordinates[0] >= paddleCoordinates[0] && ballCoordinates[0] <= paddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
-            if (ballVelocity[0] > 0) {
-                ballVelocity[0] *= -1;
-                ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
-            }
-            ballVelocity[1] *= -1;
-            ballCoordinates[1] = paddleTop - 1;
-        } else if (ballCoordinates[0] >= paddleMiddleLeft && ballCoordinates[0] <= paddleMiddleRight
-                && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
-                .getBallRadius()) {
-            //         ballVelocity[0] = 0;
-            ballVelocity[1] *= -1;
-            ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
-            ballCoordinates[1] = paddleTop - 1;
-        } else if (ballCoordinates[0] > paddleMiddleRight && ballCoordinates[0] <= paddleRight
-                && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
-                .getBallRadius()) {
-            if (ballVelocity[0] < 0) {
-                ballVelocity[0] *= -1;
-                ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
-            }
+                ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
             ballVelocity[1] *= -1;
             ballCoordinates[1] = paddleTop - 1;
         } else {
