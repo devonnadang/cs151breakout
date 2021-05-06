@@ -1,21 +1,21 @@
 package breakout.controller;
 
 /**
- * This is called MoveMessage, but really it's just for movin the paddle along the x-axis as of now.
+ * This is called MoveMessage, but really it's just for moving the paddle along the x-axis as of now.
  * Honestly, not sure if I should let Ball be moved using MoveMessage as well.
  */
 public class MoveMessage implements Message{
-    private double newCoordinate;
+    private int newVelocity;
 
     /**
      * Intializes MoveMessage with the new coordinate.
-     * @param newCoordinate the new coordinate to update BoardView.
+     * @param newVelocity the new velocity to update BoardView.
      */
-    public MoveMessage(double newCoordinate) {
-        this.newCoordinate = newCoordinate;
+    public MoveMessage(int newVelocity) {
+        this.newVelocity = newVelocity;
     }
 
-    public double getNewCoordinate() {
-        return newCoordinate;
+    public int getNewVelocity() {
+        return newVelocity;
     }
 }

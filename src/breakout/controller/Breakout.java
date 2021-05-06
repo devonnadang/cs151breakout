@@ -51,7 +51,7 @@ public class Breakout {
                 MoveMessage moveMessage = (MoveMessage) message;
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getNewCoordinate());
+                view.updateBoardView(moveMessage.getNewVelocity());
             }
             // when save score button is pressed
             else if (message.getClass() == SaveScoreMessage.class) {
@@ -60,7 +60,6 @@ public class Breakout {
             }
             // When game ends
             else if (message.getClass() == EndGameMessage.class) {
-                System.out.println("In breakout");
                 EndGameMessage endGameMessage = (EndGameMessage) message;
                 view.endGame();
             }

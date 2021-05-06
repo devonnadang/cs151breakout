@@ -45,10 +45,10 @@ public class BoardView extends JPanel {
     private double[] ballCoordinates;
     private double[] ballVelocity;
     private double[] paddleCoordinates;
-    private double[] paddleVelocity;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
+    public int paddleVelocity;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -69,6 +69,7 @@ public class BoardView extends JPanel {
                 endGame();
             }
             moveBall();
+            setPaddleCoordinates(paddleCoordinates[0] += paddleVelocity);
             repaint();
         });
 
@@ -97,13 +98,11 @@ public class BoardView extends JPanel {
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-BALL_MAX_VELOCITY, -BALL_MAX_VELOCITY};
+        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
+                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
-
-        // Velocity for the paddle
-        paddleVelocity = new double[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
         // Can't really use Constants for the y coordinates because you need the View to be created
@@ -173,13 +172,19 @@ public class BoardView extends JPanel {
         ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
         g2d.fill(ball);
 
+        int destroyedBlocks = 0;
         if (!gameFinished) {
             for (int i = 0; i < Constants.getRows(); i++) {
                 for (int j = 0; j < Constants.getColumns(); j++) {
                     Rectangle2D block = blocks[i][j];
+//                    if (isDestroyed[i][j] && i != Constants.getRows() - 1 && j != Constants.getColumns() - 1) {
+//                        block.setFrame(0, 0, 0, 0);
+//                        gameFinished = true;
+//                    } else if (isDestroyed[i][j]) {
+//                        block.setFrame(0,0,0,0);
                     if (isDestroyed[i][j]) {
                         block.setFrame(0, 0, 0, 0);
-                        gameFinished = true;
+                        destroyedBlocks++;
                     } else {
                         int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
                         int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
@@ -195,11 +200,13 @@ public class BoardView extends JPanel {
                         } else if (i == 4) {
                             g2d.setColor(Color.BLUE);
                         }
-                        gameFinished = false;
                     }
                     g2d.fill(block);
                 }
             }
+        }
+        if (destroyedBlocks == Constants.getRows() * Constants.getColumns()) {
+            gameFinished = true;
         }
     }
 
@@ -382,13 +389,18 @@ public class BoardView extends JPanel {
         this.paddleCoordinates[0] = paddleCoordinates;
     }
 
+    public void setPaddleVelocity(int paddleVelocity) {
+        this.paddleVelocity = paddleVelocity;
+    }
+
     public void repaintBoard() {
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-5, -5};
+        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
+                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
@@ -421,7 +433,7 @@ public class BoardView extends JPanel {
             }
 
             try {
-                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
+                queue.put(new MoveMessage(direction));
             } catch (Exception exception) {
                 exception.printStackTrace();
             }

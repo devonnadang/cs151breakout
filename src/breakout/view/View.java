@@ -39,14 +39,8 @@ public class View extends JFrame{
         repaint();
     }
 
-    /**
-     * Updates BoardView with a new coordinate. This coordinate is going to be for the paddle's x coordinates, since
-     * that's the only coordinate that take in input and needs to be changed. This method is used with the message system.
-     * So, if you need to use the message system, then leave this method uncommented.
-     * @param newCoordinate
-     */
-    public void updateBoardView(double newCoordinate) {
-        boardView.setPaddleCoordinates(newCoordinate);
+    public void updateBoardView(int newVelocity) {
+        boardView.setPaddleVelocity(newVelocity);
         repaint();
     }
 
