@@ -4,6 +4,7 @@ import breakout.controller.Message;
 import java.awt.Dimension;
 
 import java.util.concurrent.BlockingQueue;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import breakout.model.Board;
@@ -20,9 +21,6 @@ public class View extends JFrame{
      */
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
-        // Swing stuff
-        //panel = new ViewPanel();
-         //this.add(panel);
          this.setPreferredSize(new Dimension(Board.getBoardWidth(),Board.getBoardHeight()));
          setResizable(true);
          setTitle("Breakout");
@@ -49,6 +47,17 @@ public class View extends JFrame{
      */
     public void updateBoardView(double newCoordinate) {
         boardView.setPaddleCoordinates(newCoordinate);
+        repaint();
+    }
+
+    public void endGame() {
+        JButton endGameButton = new JButton("Play Again");
+        endGameButton.addActionListener(actionListener -> {
+            remove(boardView);
+            createBoardView();
+        });
+        boardView.add(endGameButton);
+        revalidate();
         repaint();
     }
 }

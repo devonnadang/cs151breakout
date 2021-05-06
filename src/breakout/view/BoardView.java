@@ -1,5 +1,6 @@
 package breakout.view;
 
+import breakout.controller.EndGameMessage;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
 import breakout.model.Constants;
@@ -61,10 +62,12 @@ public class BoardView extends JPanel {
     private JLabel gameOver;
 
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
-
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
+            if (gameFinished) {
+                endGame();
+            }
             moveBall();
             repaint();
         });
@@ -148,6 +151,15 @@ public class BoardView extends JPanel {
         this.add(leaderboardButton); //BorderLayout.EAST???
     }
 
+    public void endGame() {
+        try {
+            queue.add(new EndGameMessage());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        timer.stop();
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -161,37 +173,43 @@ public class BoardView extends JPanel {
         ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
         g2d.fill(ball);
 
-        for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                Rectangle2D block = blocks[i][j];
-                if (isDestroyed[i][j]) {
-                    block.setFrame(0, 0, 0, 0);
-                } else {
-                    int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
-                    int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
-                    block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
-                    if (i == 0) {
-                        g2d.setColor(Color.RED);
-                    } else if (i == 1) {
-                        g2d.setColor(Color.ORANGE);
-                    } else if (i == 2) {
-                        g2d.setColor(Color.YELLOW);
-                    } else if (i == 3) {
-                        g2d.setColor(Color.GREEN);
-                    } else if (i == 4) {
-                        g2d.setColor(Color.BLUE);
+        if (!gameFinished) {
+            for (int i = 0; i < Constants.getRows(); i++) {
+                for (int j = 0; j < Constants.getColumns(); j++) {
+                    Rectangle2D block = blocks[i][j];
+                    if (isDestroyed[i][j]) {
+                        block.setFrame(0, 0, 0, 0);
+                        gameFinished = true;
+                    } else {
+                        int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
+                        int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
+                        block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                        if (i == 0) {
+                            g2d.setColor(Color.RED);
+                        } else if (i == 1) {
+                            g2d.setColor(Color.ORANGE);
+                        } else if (i == 2) {
+                            g2d.setColor(Color.YELLOW);
+                        } else if (i == 3) {
+                            g2d.setColor(Color.GREEN);
+                        } else if (i == 4) {
+                            g2d.setColor(Color.BLUE);
+                        }
+                        gameFinished = false;
                     }
+                    g2d.fill(block);
                 }
-                g2d.fill(block);
             }
         }
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
-        // These two statements will make sure max velocity is 5 and min velocity is -5.
-        ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
-        ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
+        // These two statements will make sure max velocity is 4 and min velocity is -4.
+        ballVelocity[0] = Math
+                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
+        ballVelocity[1] = Math
+                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
 
         // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
         if (ballVelocity[0] > -BALL_MIN_VELOCITY && ballVelocity[0] < BALL_MIN_VELOCITY) {
@@ -231,13 +249,11 @@ public class BoardView extends JPanel {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
-            gameFinished = true;
-            timer.stop();
             if (livesCounter != 3) {
                 livesCounter++;
-                gameFinished = false;
                 repaintBoard();
             } else if (livesCounter == 3) {
+                gameFinished = true;
                 gameOver.setText("GameOver!");
             }
         }
@@ -254,19 +270,17 @@ public class BoardView extends JPanel {
                 Rectangle2D block = blocks[i][j];
                 boolean ballIntersection = ballIntersects(block);
                 if (ballIntersection && stop) {
-                    System.out.println("Collision" + i + " " + j + " !");
                     ballAndBlockCollision(block);
                 } else if (ballIntersection) {
-                    System.out.println("Collision" + i + " " + j + " !");
                     ballAndBlockCollision(block);
                     isDestroyed[i][j] = true;
                     stop = true;
                 }
             }
             // Not sure if I should leave this commented or not
-//            if (stop) {
-//                break;
-//            }
+            if (stop) {
+                break;
+            }
         }
     }
 
@@ -336,7 +350,8 @@ public class BoardView extends JPanel {
         if (ballCoordinates[0] >= paddleCoordinates[0] && ballCoordinates[0] <= paddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
-                ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
+            ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(
+                    BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
             ballVelocity[1] *= -1;
             ballCoordinates[1] = paddleTop - 1;
         } else {
@@ -368,11 +383,6 @@ public class BoardView extends JPanel {
     }
 
     public void repaintBoard() {
-        timer = new Timer(17, e -> {
-            moveBall();
-            repaint();
-        });
-
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
@@ -406,13 +416,13 @@ public class BoardView extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!timer.isRunning()) {
+            if (!timer.isRunning() && !gameFinished) {
                 timer.start();
             }
 
             try {
                 queue.put(new MoveMessage(direction + paddleCoordinates[0]));
-            } catch (InterruptedException exception) {
+            } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
