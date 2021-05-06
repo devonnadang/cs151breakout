@@ -182,7 +182,6 @@ public class BoardView extends JPanel {
                         g2d.setColor(Color.BLUE);
                     }
                 }
-                g2d.setColor(Color.RED);
                 g2d.fill(block);
             }
         }
