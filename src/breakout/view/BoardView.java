@@ -51,6 +51,7 @@ public class BoardView extends JPanel {
     private int[] paddleCoordinates;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
+    private int livesCounter = 1;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -214,6 +215,12 @@ public class BoardView extends JPanel {
             ballVelocity[1] = 0;
             gameFinished = true;
             timer.stop();
+            if(livesCounter != 3)
+            {
+            	livesCounter++;
+            	gameFinished = false;
+            	repaintBoard();
+            }
         }
 
         // Should only call this method if ball and paddle collide.
@@ -337,6 +344,30 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
+    }
+    
+    public void repaintBoard()
+    {
+    	timer = new Timer(50, e -> {
+            moveBall();
+            repaint();
+        });
+        
+        // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
+        ballCoordinates = new int[2];
+
+        // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
+        // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
+        ballVelocity = new int[]{-5, -5};
+
+        // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
+        paddleCoordinates = new int[2];
+
+        // Calculating where the ball and paddle should be at the start of the game.
+        paddleCoordinates[0] = Constants.getPaddleXReset();
+        paddleCoordinates[1] = Constants.getPaddleYReset();
+        ballCoordinates[0] = Constants.getBallXReset();
+        ballCoordinates[1] = Constants.getBallYReset();
     }
 
     /**
