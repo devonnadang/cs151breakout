@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Ellipse2D.Double;
 import java.awt.geom.Rectangle2D;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -51,12 +52,15 @@ public class BoardView extends JPanel {
     private int[] paddleCoordinates;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
+    private int livesCounter = 1;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
     private Timer timer;
     
     private JButton leaderboardButton;
+    private Random rgen = new Random();
+    private JLabel gameOver;
 
     public BoardView(BlockingQueue<Message> queue) {
 
@@ -141,6 +145,9 @@ public class BoardView extends JPanel {
         	LeaderboardWindow lw = new LeaderboardWindow();
         });
         
+        gameOver = new JLabel (" ");
+        this.add(gameOver);
+
         // can't figure out how to make it align to the left
         this.add(leaderboardButton); //BorderLayout.EAST???
     }
@@ -183,7 +190,17 @@ public class BoardView extends JPanel {
                 int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
                 if(isDestroyed[i][j] == false)
                 {
-                	g2d.setColor(Color.RED);
+                    if (i==0) {
+                        g2d.setColor(Color.RED);
+                    } else if (i==1) {
+                        g2d.setColor(Color.ORANGE);
+                    } else if (i==2) {
+                        g2d.setColor(Color.YELLOW);
+                    } else if (i==3) {
+                        g2d.setColor(Color.GREEN);
+                    } else if (i==4) {
+                        g2d.setColor(Color.BLUE);
+                    }
                     g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
                 }
             }
@@ -210,10 +227,17 @@ public class BoardView extends JPanel {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
-            ballVelocity[0] = 0;
-            ballVelocity[1] = 0;
+            //ballVelocity[0] = 0;
+            //ballVelocity[1] = 0;
             gameFinished = true;
+            gameOver.setText("GameOver!");
             timer.stop();
+            if(livesCounter != 3)
+            {
+            	livesCounter++;
+            	gameFinished = false;
+            	repaintBoard();
+            }
         }
 
         // Should only call this method if ball and paddle collide.
@@ -304,17 +328,20 @@ public class BoardView extends JPanel {
         if (ballCoordinates[0] >= paddleCoordinates[0] && ballCoordinates[0] < paddleMiddleLeft
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] <= paddleBottom) {
             if (ballVelocity[0] > 0) {
-                ballVelocity[0] *= -1;
+                ballVelocity[0] *= -1 ;
+                ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
             }
             ballVelocity[1] *= -1;
         } else if (ballCoordinates[0] >= paddleMiddleLeft && ballCoordinates[0] <= paddleMiddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] <= paddleBottom) {
-            ballVelocity[0] = 0;
+   //         ballVelocity[0] = 0;
             ballVelocity[1] *= -1;
+            ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
         } else if (ballCoordinates[0] > paddleMiddleRight && ballCoordinates[0] <= paddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] <= paddleBottom) {
             if (ballVelocity[0] < 0) {
                 ballVelocity[0] *= -1;
+                ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
             }
             ballVelocity[1] *= -1;
         }
@@ -337,6 +364,30 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
+    }
+    
+    public void repaintBoard()
+    {
+    	timer = new Timer(50, e -> {
+            moveBall();
+            repaint();
+        });
+        
+        // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
+        ballCoordinates = new int[2];
+
+        // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
+        // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
+        ballVelocity = new int[]{-5, -5};
+
+        // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
+        paddleCoordinates = new int[2];
+
+        // Calculating where the ball and paddle should be at the start of the game.
+        paddleCoordinates[0] = Constants.getPaddleXReset();
+        paddleCoordinates[1] = Constants.getPaddleYReset();
+        ballCoordinates[0] = Constants.getBallXReset();
+        ballCoordinates[1] = Constants.getBallYReset();
     }
 
     /**
