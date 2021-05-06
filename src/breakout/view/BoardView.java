@@ -5,7 +5,6 @@ import breakout.controller.Message;
 import breakout.controller.MoveMessage;
 import breakout.model.Board;
 import breakout.model.Constants;
-import breakout.model.Score;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -57,9 +56,6 @@ public class BoardView extends JPanel {
     private boolean gameFinished;
     private Timer timer;
     
-    private JLabel score;
-    private Score currentScore;
-    private JButton saveScore;
     private JButton leaderboardButton;
 
     public BoardView(BlockingQueue<Message> queue) {
@@ -138,15 +134,6 @@ public class BoardView extends JPanel {
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
         
-        // score
-        score = new JLabel("0");
-        currentScore = new Score();
-        this.add(score);
-        
-        // save score button
-        saveScore = new JButton("Save Score");
-        this.add(saveScore);
-        
         // button to open new window to see leaderboard and scores
         leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
@@ -156,7 +143,6 @@ public class BoardView extends JPanel {
         
         // can't figure out how to make it align to the left
         this.add(leaderboardButton); //BorderLayout.EAST???
-        
     }
 
     @Override
@@ -201,9 +187,7 @@ public class BoardView extends JPanel {
                     g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
                 }
             }
-        }
-        
-        this.updateScore(); // update score when a block is destroyed
+        }  
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
@@ -282,7 +266,6 @@ public class BoardView extends JPanel {
             			}
             			
             			isDestroyed[i][j] = true;
-            			currentScore.incrementScore(); // update score when a block is destroyed
                     }
             	}
             		
@@ -399,9 +382,5 @@ public class BoardView extends JPanel {
             //     paddleCoordinates[0] = getWidth() - PADDLE_WIDTH;
             // }
         }
-    }
-    
-    public void updateScore() {
-    	score.setText(String.valueOf(currentScore.getScore()));
     }
 }
