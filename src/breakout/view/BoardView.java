@@ -352,26 +352,6 @@ public class BoardView extends JPanel {
             moveBall();
             repaint();
         });
-
-        blocks = new Rectangle2D[Constants.getRows()][Constants.getColumns()];
-        for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                blocks[i][j] = new Rectangle2D.Double();
-            }
-        }
-
-        this.queue = queue;
-
-        ballHitbox = new Rectangle2D.Double();
-        paddle = new Rectangle2D.Double();
-        ball = new Ellipse2D.Double();
-
-        isDestroyed = new boolean[Constants.getRows()][Constants.getColumns()];
-        for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                isDestroyed[i][j] = false;
-            }
-        }
         
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new int[2];
