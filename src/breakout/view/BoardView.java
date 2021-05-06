@@ -189,7 +189,17 @@ public class BoardView extends JPanel {
                 int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
                 if(isDestroyed[i][j] == false)
                 {
-                	g2d.setColor(Color.RED);
+                    if (i==0) {
+                        g2d.setColor(Color.RED);
+                    } else if (i==1) {
+                        g2d.setColor(Color.ORANGE);
+                    } else if (i==2) {
+                        g2d.setColor(Color.YELLOW);
+                    } else if (i==3) {
+                        g2d.setColor(Color.GREEN);
+                    } else if (i==4) {
+                        g2d.setColor(Color.BLUE);
+                    }
                     g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
                 }
             }
