@@ -23,7 +23,7 @@ public class View extends JFrame{
         // Swing stuff
         //panel = new ViewPanel();
          //this.add(panel);
-         this.setPreferredSize(new Dimension (Board.getBoardWidth(),Board.getBoardHeight()));
+         this.setPreferredSize(new Dimension(Board.getBoardWidth(),Board.getBoardHeight()));
          setResizable(true);
          setTitle("Breakout");
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,7 +35,7 @@ public class View extends JFrame{
      * This method creates the board and repaints the main view to make the board visible.
      */
     public void createBoardView() {
-        boardView = new BoardView(queue);
+        boardView = new BoardView(queue, getInsets());
         add(boardView);
         revalidate();
         repaint();
@@ -47,7 +47,7 @@ public class View extends JFrame{
      * So, if you need to use the message system, then leave this method uncommented.
      * @param newCoordinate
      */
-    public void updateBoardView(int newCoordinate) {
+    public void updateBoardView(double newCoordinate) {
         boardView.setPaddleCoordinates(newCoordinate);
         repaint();
     }
