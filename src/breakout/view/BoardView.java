@@ -1,26 +1,17 @@
 package breakout.view;
 
-import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
-import breakout.model.Board;
 import breakout.model.Constants;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Color;
 
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Ellipse2D.Double;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
@@ -31,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.SpringLayout;
 import javax.swing.Timer;
 
 public class BoardView extends JPanel {
@@ -49,7 +39,6 @@ public class BoardView extends JPanel {
     private Rectangle2D paddle;
     private Ellipse2D ball;
     private Rectangle2D ballHitbox;
-    private Ellipse2D previousBall;
 
     private double[] ballCoordinates;
     private double[] ballVelocity;
@@ -64,21 +53,13 @@ public class BoardView extends JPanel {
     private Timer timer;
     private double circleToBoxLength;
     private double[] closestPointToCircle;
+    private Insets frameInsets;
 
     private JButton leaderboardButton;
     private Random rgen = new Random();
     private JLabel gameOver;
 
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
-
-        // This code is NOT related to using the message system. It's just to see if JIcon would work or not.
-        // PaddleIcon pi = new PaddleIcon();
-        // JLabel paddleLabel = new JLabel(pi);
-        // add(paddleLabel);
-        // SpringLayout springLayout = new SpringLayout();
-        // setLayout(springLayout);
-        // springLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, paddleLabel, 0, SpringLayout.HORIZONTAL_CENTER, this);
-        // springLayout.putConstraint(SpringLayout.SOUTH, paddleLabel, paddleLabel.getHeight() - 10, SpringLayout.SOUTH, this);
 
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
@@ -95,6 +76,7 @@ public class BoardView extends JPanel {
         }
 
         this.queue = queue;
+        this.frameInsets = frameInsets;
 
         ballHitbox = new Rectangle2D.Double();
         paddle = new Rectangle2D.Double();
@@ -112,7 +94,7 @@ public class BoardView extends JPanel {
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-4, -4};
+        ballVelocity = new double[]{-5, -5};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
@@ -152,28 +134,14 @@ public class BoardView extends JPanel {
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
 
-        // This is for manually moving ball
-//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false), "pressed.up");
-//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false), "pressed.down");
-//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, true), "released.up");
-//        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, true), "released.down");
-
-//        am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit(), true, false));
-//        am.put("pressed.right", new MoveAction(Constants.getPaddleMoveRightUnit(), true, false));
-//        am.put("released.left", new MoveAction(0, true, false));
-//        am.put("released.right", new MoveAction(0, true, false));
-//        am.put("pressed.up", new MoveAction(Constants.getPaddleMoveLeftUnit(), false, true));
-//        am.put("pressed.down", new MoveAction(Constants.getPaddleMoveRightUnit(), false, true));
-//        am.put("released.up", new MoveAction(0, false, true));
-//        am.put("released.down", new MoveAction(0, false, true));
         // button to open new window to see leaderboard and scores
         leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
         leaderboardButton.addActionListener(e -> {
             LeaderboardWindow lw = new LeaderboardWindow();
         });
-        
-        gameOver = new JLabel (" ");
+
+        gameOver = new JLabel(" ");
         this.add(gameOver);
 
         // can't figure out how to make it align to the left
@@ -194,25 +162,6 @@ public class BoardView extends JPanel {
         g2d.fill(ball);
         Rectangle2D bounds = ball.getBounds2D();
 
-        // I guess it has to be greater than 5 for each side?
-        ballHitbox.setFrame(bounds.getX() - 6, bounds.getY() - 6, bounds.getWidth() + 11,
-                bounds.getHeight() + 11);
-//        g2d.fill(ballHitbox);
-
-        /*
-        // Drawing the blocks
-        int x = 20;
-        for (int i = 0; i < blocks.length; i++) {
-            Rectangle2D block = blocks[i];
-            if (isDestroyed[i]) {
-                block.setFrame(0,0,0,0);
-            } else {
-                block.setFrame(x, 20, 50, 10);
-            }
-            g2d.fill(block);
-            x += 60;
-        } */
-
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
                 Rectangle2D block = blocks[i][j];
@@ -222,40 +171,26 @@ public class BoardView extends JPanel {
                     int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
                     int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
                     block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
-            // for(int j = 0; j < Constants.getColumns(); j++) {
-            //     int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
-            //     int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
-            //     if(isDestroyed[i][j] == false)
-            //     {
-            //         if (i==0) {
-            //             g2d.setColor(Color.RED);
-            //         } else if (i==1) {
-            //             g2d.setColor(Color.ORANGE);
-            //         } else if (i==2) {
-            //             g2d.setColor(Color.YELLOW);
-            //         } else if (i==3) {
-            //             g2d.setColor(Color.GREEN);
-            //         } else if (i==4) {
-            //             g2d.setColor(Color.BLUE);
-            //         }
-            //         g2d.fill(new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT));
+                    if (i == 0) {
+                        g2d.setColor(Color.RED);
+                    } else if (i == 1) {
+                        g2d.setColor(Color.ORANGE);
+                    } else if (i == 2) {
+                        g2d.setColor(Color.YELLOW);
+                    } else if (i == 3) {
+                        g2d.setColor(Color.GREEN);
+                    } else if (i == 4) {
+                        g2d.setColor(Color.BLUE);
+                    }
                 }
                 g2d.setColor(Color.RED);
                 g2d.fill(block);
             }
         }
-
-        // Visualizing center of ball to nearest point on block
-//        ballIntersects(paddle);
-//        Line2D line2D = new Line2D.Double(ball.getCenterX(), ball.getCenterY(),
-//                closestPointToCircle[0] + ball.getCenterX(),
-//                closestPointToCircle[1] + ball.getCenterY());
-//        g2d.draw(line2D);
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
-//        previousBall = new Ellipse2D.Double(ball.getX(), ball.getY(), BALL_WIDTH, BALL_HEIGHT);
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math.max(-5, Math.min(5, ballVelocity[0]));
         ballVelocity[1] = Math.max(-5, Math.min(5, ballVelocity[1]));
@@ -297,16 +232,14 @@ public class BoardView extends JPanel {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
-            //ballVelocity[0] = 0;
-            //ballVelocity[1] = 0;
             gameFinished = true;
-            gameOver.setText("GameOver!");
             timer.stop();
-            if(livesCounter != 3)
-            {
-            	livesCounter++;
-            	gameFinished = false;
-            	repaintBoard();
+            if (livesCounter != 3) {
+                livesCounter++;
+                gameFinished = false;
+                repaintBoard();
+            } else if (livesCounter == 3) {
+                gameOver.setText("GameOver!");
             }
         }
 
@@ -316,17 +249,6 @@ public class BoardView extends JPanel {
         }
 
         boolean stop = false;
-        // If ball and block collide, call this method.
-//        for (int i = 0; i < Constants.getRows(); i++) {
-//            for (int j = 0; j < Constants.getColumns(); j++) {
-//                if (ballHitbox.intersects(blocks[i][j])) {
-//                    ballVelocity[1] *= -1;
-//                    isDestroyed[i][j] = true;
-//                    break;
-//                }
-//            }
-//        }
-
         // If ball and block collide, call this method. PAUL
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
@@ -347,58 +269,6 @@ public class BoardView extends JPanel {
 //                break;
 //            }
         }
-
-        // When a little bit of the ball overlaps, it doesn't catch that. Also, the top of the ball
-        // seems to collide too early.
-        // RASHMI
-//        for (int i = 0; i < Constants.getRows(); i++) {
-//            for (int j = 0; j < Constants.getColumns(); j++) {
-//            	int x = 30+(BLOCK_WIDTH*(j+1)) + (BLOCK_SEP*(j+1));
-//                int y = 30+(BLOCK_HEIGHT*(i+1)) + (BLOCK_SEP*(i+1));
-//            	Rectangle2D blockHitbox = new Rectangle2D.Double(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
-//            	Rectangle2D ballHitbox2 =  new Rectangle2D.Double(ballCoordinates[0],
-//                        ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
-//
-//            	if(ballHitbox2.intersects(blockHitbox))
-//            	{
-//            		//We need the ball to change directions after it has destroyed a block
-//            		Point2D topOfBall = new Point2D.Double(ballCoordinates[0], ballCoordinates[1] - 1);
-//            		Point2D bottomOfBall = new Point2D.Double(ballCoordinates[0], ballCoordinates[1] + BALL_HEIGHT + 1);
-//            		Point2D leftOfBall = new Point2D.Double(ballCoordinates[0] - 1, ballCoordinates[1]);
-//            		Point2D rightOfBall = new Point2D.Double(ballCoordinates[0] + BALL_WIDTH + 1, ballCoordinates[1]);
-//
-//            		if(isDestroyed[i][j] == false)
-//                    {
-//            			if(blockHitbox.contains(topOfBall)) //top of the ball is in contact with the block
-//            			{
-//            				ballVelocity[1] *= -1; //if ball hits block's bottom side, it bounces down
-//            			}
-//            			else if(blockHitbox.contains(bottomOfBall)) //bottom of the ball is in contact with the block
-//            			{
-//            				ballVelocity[1] *= -1; //if ball hits block's top side, it bounces up
-//            			}
-//
-//            			if(blockHitbox.contains(leftOfBall)) //left of the ball is in contact with the block
-//            			{
-//            				ballVelocity[0] *= -1; //if ball hits block's right side, it bounces right
-//            			}
-//            			else if(blockHitbox.contains(rightOfBall)) //right of the ball is in contact with the block
-//            			{
-//            				ballVelocity[0] *= -1; //if ball hits block's left side, it bounces left
-//            			}
-//
-//            			isDestroyed[i][j] = true;
-//                    }
-//            	}
-//
-//
-// //                if (ballHitbox.intersects(blocks[i][j])) {
-// //                    System.out.println("Intersection!");
-// //                }
-// //            	  break;
-//
-//            }
-//         }
     }
 
     private boolean ballIntersects(Rectangle2D block) {
@@ -426,7 +296,6 @@ public class BoardView extends JPanel {
     }
 
     private void ballAndBlockCollision(Rectangle2D block) {
-//        System.out.println(circleToBoxLength);
 
         // Third try
         double overlap = Constants.getBallRadius() - circleToBoxLength;
@@ -435,13 +304,6 @@ public class BoardView extends JPanel {
 
         ballCoordinates[0] -= collisionResolution1;
         ballCoordinates[1] -= collisionResolution2;
-
-//        for (double ball : ballCoordinates) {
-//            System.out.println(ball);
-//        }
-
-//        System.out.println(collisionResolution1);
-//        System.out.println(collisionResolution2);
 
         // Got it from here:
         // https://gamedev.stackexchange.com/questions/10911/a-ball-hits-the-corner-where-will-it-deflect
@@ -476,7 +338,7 @@ public class BoardView extends JPanel {
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
             if (ballVelocity[0] > 0) {
-                ballVelocity[0] *= -1 ;
+                ballVelocity[0] *= -1;
                 ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
             }
             ballVelocity[1] *= -1;
@@ -484,7 +346,7 @@ public class BoardView extends JPanel {
         } else if (ballCoordinates[0] >= paddleMiddleLeft && ballCoordinates[0] <= paddleMiddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
-   //         ballVelocity[0] = 0;
+            //         ballVelocity[0] = 0;
             ballVelocity[1] *= -1;
             ballVelocity[0] += rgen.nextInt(5); // creates random direction on paddle
             ballCoordinates[1] = paddleTop - 1;
@@ -524,14 +386,13 @@ public class BoardView extends JPanel {
         }
         this.paddleCoordinates[0] = paddleCoordinates;
     }
-    
-    public void repaintBoard()
-    {
-    	timer = new Timer(50, e -> {
+
+    public void repaintBoard() {
+        timer = new Timer(17, e -> {
             moveBall();
             repaint();
         });
-        
+
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
@@ -544,9 +405,11 @@ public class BoardView extends JPanel {
 
         // Calculating where the ball and paddle should be at the start of the game.
         paddleCoordinates[0] = Constants.getPaddleXReset();
-        paddleCoordinates[1] = Constants.getPaddleYReset();
+        paddleCoordinates[1] =
+                BOARD_HEIGHT - PADDLE_HEIGHT - frameInsets.top - frameInsets.bottom - Constants
+                        .getPaddleOffSet();
         ballCoordinates[0] = Constants.getBallXReset();
-        ballCoordinates[1] = Constants.getBallYReset();
+        ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
     }
 
     /**
@@ -555,20 +418,11 @@ public class BoardView extends JPanel {
      */
     private class MoveAction extends AbstractAction {
 
-        // All the commented code here is for manually moving the ball.
         private int direction;
-//        private boolean leftOrRightPressed;
-//        private boolean upOrDownPressed;
 
         public MoveAction(int direction) {
             this.direction = direction;
         }
-
-//        public MoveAction(int direction, boolean leftOrRightPressed, boolean upOrDownPressed) {
-//            this.direction = direction;
-//            this.leftOrRightPressed = leftOrRightPressed;
-//            this.upOrDownPressed = upOrDownPressed;
-//        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -581,12 +435,6 @@ public class BoardView extends JPanel {
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
             }
-
-//            if (leftOrRightPressed) {
-//                ballCoordinates[0] += direction;
-//            } else if (upOrDownPressed) {
-//                ballCoordinates[1] += direction;
-//            }
         }
     }
 }
