@@ -23,7 +23,7 @@ public class Ball {
 		this.x = Constants.getBallXReset();
 		this.y = Constants.getBallYReset();
 		setCoordinates(x, y);
-		ballVelocity = new int [] {Constants.getBallVelocity(), Constants.getBallVelocity()};
+		ballVelocity = new int [] {-Constants.getBallMaxVelocity(), -Constants.getBallMaxVelocity()};
 	}
 	
 	/**
@@ -124,7 +124,6 @@ public class Ball {
 	
 	/**
 	 * Resets the position of the ball
-	 * @param r value indicating whether reset of ball should occur
 	 */
 	public void reset()
 	{
