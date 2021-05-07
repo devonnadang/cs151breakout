@@ -1,8 +1,10 @@
 package breakout.view;
 
+import breakout.controller.LeaderboardMessage;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
 import breakout.model.Constants;
+import breakout.model.Leaderboard;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -48,6 +50,7 @@ public class BoardView extends JPanel {
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
+    private Leaderboard scoreList;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -57,6 +60,7 @@ public class BoardView extends JPanel {
     private Insets frameInsets;
 
     private JButton leaderboardButton;
+    private JButton saveScoreButton;
     private Random rgen = new Random();
     private JLabel gameOver;
 
@@ -134,18 +138,33 @@ public class BoardView extends JPanel {
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
 
+        // opens a new window to save score; enter username
+        saveScoreButton = new JButton("Save Score");
+        saveScoreButton.addActionListener(e -> {
+            SaveScoreView ssw = new SaveScoreView(queue, 0); //add actual score later
+        });
+        this.add(saveScoreButton);
+        
         // button to open new window to see leaderboard and scores
         leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
         leaderboardButton.addActionListener(e -> {
-            LeaderboardWindow lw = new LeaderboardWindow();
+        	try {
+            	LeaderboardMessage lw = new LeaderboardMessage();
+            	queue.put(lw);
+            	LeaderboardView leaderboard = new LeaderboardView(scoreList);
+			} catch (InterruptedException e1) {
+				// do nothing
+			}
         });
-
+        
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
+        
         gameOver = new JLabel(" ");
         this.add(gameOver);
 
-        // can't figure out how to make it align to the left
-        this.add(leaderboardButton); //BorderLayout.EAST???
+        
     }
 
     @Override
@@ -417,4 +436,8 @@ public class BoardView extends JPanel {
             }
         }
     }
+    
+    public void setScores(Leaderboard scoreList) {
+		this.scoreList = scoreList;	
+	}
 }
