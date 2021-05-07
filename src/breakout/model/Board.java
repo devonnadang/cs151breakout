@@ -13,7 +13,7 @@ public class Board {
     Ball ball;
     Paddle paddle;
     int blockCounter;
-    Score score;
+    Leaderboard leaderboard;
     private static final int ROWS = Constants.getRows();
     private static final int COLUMNS = Constants.getColumns();
     private static final int WIDTH = Constants.getPanelWidth();
@@ -28,11 +28,15 @@ public class Board {
         createBlocks();
         ball = new Ball();
         paddle = new Paddle();
-        score = new Score();
+        leaderboard = new Leaderboard();
     }
     
-    public Score getScore() {
-    	return score;
+    public Leaderboard getScore() {
+    	return leaderboard;
+    }
+    
+    public void addScore(Score score) {
+    	leaderboard.addNewScore(score);
     }
 
     public Ball getBall(){
