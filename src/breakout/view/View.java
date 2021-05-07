@@ -7,6 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import javax.swing.JFrame;
 
 import breakout.model.Board;
+import breakout.model.Leaderboard;
 /**
  * Serves as the main view for Breakout. All other views will be within this one.
  */
@@ -50,5 +51,9 @@ public class View extends JFrame{
     public void updateBoardView(double newCoordinate) {
         boardView.setPaddleCoordinates(newCoordinate);
         repaint();
+    }
+    
+    public void updateLeaderboardView(Leaderboard scoreList) {
+    	boardView.setScores(scoreList);
     }
 }
