@@ -5,7 +5,7 @@ package breakout.model;
  * Moves left and right using keyboard arrows. It will be used to keep ball in the air.
  * In charge of Paddle characteristics.
  */
-public class Paddle {
+public final class Paddle {
 	private int x; //x coordinate of the paddle object
 	private int y; //y coordinate of the paddle object
 	
@@ -13,14 +13,20 @@ public class Paddle {
 	private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
 	private static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
 	
+	private static final Paddle INSTANCE = new Paddle();
+
 	/**
 	 * This is the constructor which initializes paddle location.
 	 */
-	public Paddle()
+	private Paddle()
 	{
 		//initialize paddle location
 		this.x = (Constants.getPanelWidth()/2) - (Constants.getPaddleWidth() / 2);
 		this.y = Constants.getPanelHeight() - Constants.getPaddleHeight() - Constants.getPaddleOffSet();
+	}
+
+	public static Paddle getInstance() {
+		return INSTANCE;
 	}
 
 	public void setCoordinates(int x, int y){

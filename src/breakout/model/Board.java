@@ -27,7 +27,7 @@ public class Board {
         blockCounter = ROWS*COLUMNS;
         createBlocks();
         ball = Ball.getInstance();
-        paddle = new Paddle();
+        paddle = Paddle.getInstance();
         score = new Score();
     }
     
@@ -37,11 +37,6 @@ public class Board {
 
     public Ball getBall(){
         return ball;
-    }
-    
-    private void createPaddle()
-    {
-    	paddle = new Paddle();
     }
 
     public Paddle getPaddle() {
