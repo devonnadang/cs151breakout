@@ -21,12 +21,12 @@ public class Board {
     private static final int BLOCK_START = WIDTH/10; //30
     private static final int BLOCK_WIDTH = Constants.getBlockWidth();
     private static final int BLOCK_HEIGHT = Constants.getBlockWidth();
-    private static final int BLOCK_SEP = 2;
+    private static final int BLOCK_SEP = Constants.getBlockSep();
 
     public Board(){
         blockCounter = ROWS*COLUMNS;
         createBlocks();
-        ball = new Ball();
+        ball = Ball.getInstance();
         paddle = new Paddle();
         score = new Score();
     }
@@ -84,10 +84,13 @@ public class Board {
         blocks = new Block[ROWS][COLUMNS];
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLUMNS; j++) {
-                blocks[i][j] = new Block(BLOCK_START + BLOCK_WIDTH*j, BLOCK_START + (BLOCK_HEIGHT*i) );
+                int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
+                int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
+                blocks[i][j] = new Block(x, y);
             }
         }
     }
+
 
     /**
      * @return if there are any bricks left

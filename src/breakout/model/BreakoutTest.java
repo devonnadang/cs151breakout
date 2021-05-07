@@ -22,8 +22,8 @@ class BreakoutTest {
         Board board = new Board();
 
         //set all blocks to destroyed
-        for (int i = 0; i < board.getRows(); i++) {
-            for (int j = 0; j < board.getColumns(); j++) {
+        for (int i = 0; i < Constants.getRows(); i++) {
+            for (int j = 0; j < Constants.getColumns(); j++) {
                 board.blocks[i][j].setDestroyed(true);
             }
         }
@@ -261,7 +261,7 @@ class BreakoutTest {
     @Test
     void destroyBlockTest() {
         Board board = new Board();
-        int expectedBlockCounter = board.getRows()*board.getColumns() - 1; //one block is destroyed
+        int expectedBlockCounter = Constants.getRows()*Constants.getColumns() + 1; //one block is destroyed
         board.getBall().setCoordinates(30, 35); 
 
         Block testBlock = new Block(30, 30);
