@@ -9,11 +9,11 @@ import breakout.view.View;
  * Responsible for communicating with the View class.
  */
 public class Board {
-    Block [][] blocks;
-    Ball ball;
-    Paddle paddle;
-    int blockCounter;
-    Score score;
+    private Block [][] blocks;
+    private Ball ball;
+    private Paddle paddle;
+    private int blockCounter;
+    private Score score;
     private static final int ROWS = Constants.getRows();
     private static final int COLUMNS = Constants.getColumns();
     private static final int WIDTH = Constants.getPanelWidth();
@@ -41,6 +41,10 @@ public class Board {
 
     public Paddle getPaddle() {
         return paddle;
+    }
+
+    public Block getBlock(int i, int j) {
+        return blocks[i][j];
     }
 
     /**
@@ -86,7 +90,11 @@ public class Board {
         }
     }
 
-
+    protected void ballCollide(Block block) {
+        ball.destroyBlock(block);
+        blockCounter--;
+    }
+ 
     /**
      * @return if there are any bricks left
      */

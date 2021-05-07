@@ -24,7 +24,7 @@ class BreakoutTest {
         //set all blocks to destroyed
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
-                board.blocks[i][j].setDestroyed(true);
+                board.ballCollide(board.getBlock(i,j));
             }
         }
         actual = board.bricksAreCleared();
