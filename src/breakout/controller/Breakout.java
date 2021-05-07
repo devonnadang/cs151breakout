@@ -56,9 +56,19 @@ public class Breakout {
             }
             
             // when save score button is pressed
+            // add a new score to board
             else if (message.getClass() == SaveScoreMessage.class) {
-            	SaveScoreMessage saveScoreMessage = (SaveScoreMessage) message;
-                // maybe prompt to enter username and add score
+            	SaveScoreMessage saveUsernameMessage = (SaveScoreMessage) message;
+            	board.addScore(saveUsernameMessage.getScore());
+            }
+            
+            // when leaderboard button is pressed
+            // update leaderboard with all scores
+            else if(message.getClass() == LeaderboardMessage.class)
+            {
+            	LeaderboardMessage leaderboardMessage = (LeaderboardMessage) message;
+            	leaderboardMessage.addScores(board.getScore());
+            	view.updateLeaderboardView(leaderboardMessage.getScores());
             }
         }
 
