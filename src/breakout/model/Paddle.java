@@ -35,15 +35,11 @@ public final class Paddle {
 	}
 
 	/**
-	 * In charge of paddle movement given that paddle moves only left and right
+	 * @param direction the new x coordinate for paddle
 	 */
-	public void move(int direction)
+	public void move(double direction)
 	{
-		if (direction == Constants.getPaddleMoveLeftUnit()){
-			moveLeft();
-		} else {
-			moveRight();
-		}
+		setX((int) direction);
 	}
 
 	public void moveLeft(){

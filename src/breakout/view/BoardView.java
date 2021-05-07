@@ -263,10 +263,6 @@ public class BoardView extends JPanel {
                     stop = true;
                 }
             }
-            // Not sure if I should leave this commented or not
-//            if (stop) {
-//                break;
-//            }
         }
     }
 
@@ -365,6 +361,7 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
+ //       System.out.println("Front BoardView: " + this.paddleCoordinates[0]);
     }
 
     public void repaintBoard() {
