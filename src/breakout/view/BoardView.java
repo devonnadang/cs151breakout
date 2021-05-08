@@ -48,6 +48,7 @@ public class BoardView extends JPanel {
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
+    private JLabel livesLeftDisplay;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -143,6 +144,10 @@ public class BoardView extends JPanel {
 
         gameOver = new JLabel(" ");
         this.add(gameOver);
+        
+        livesLeftDisplay = new JLabel (" ");
+        this.add(livesLeftDisplay);
+        livesLeftDisplay.setText("Lives Left: 3");
 
         // can't figure out how to make it align to the left
         this.add(leaderboardButton); //BorderLayout.EAST???
@@ -189,6 +194,8 @@ public class BoardView extends JPanel {
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
+    	livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
+    	
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
         ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
@@ -235,6 +242,7 @@ public class BoardView extends JPanel {
             timer.stop();
             if (livesCounter != 3) {
                 livesCounter++;
+                livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
                 gameFinished = false;
                 repaintBoard();
             } else if (livesCounter == 3) {
@@ -318,7 +326,7 @@ public class BoardView extends JPanel {
      * shouldn't affect any other part of the program.
      */
     private void ballAndPaddleCollision() {
-        if (!gameFinished && ballVelocity[0] == 0) {
+    	if (!gameFinished && ballVelocity[0] == 0) {
             ballVelocity[0] = -5;
         }
 
