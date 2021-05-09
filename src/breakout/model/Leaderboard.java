@@ -10,15 +10,19 @@ import java.util.Collections;
 
 public class Leaderboard {
 	private ArrayList<Score> highScores; // sorted from highest to lowest score
-	
+	private static final Leaderboard INSTANCE = new Leaderboard();
+
 	
 	/**
 	 * Creates the arraylist to the for the 10 highest scores.
 	 */
-	public Leaderboard() {
+	private Leaderboard() {
 		highScores = new ArrayList<>();
 	}
 	
+	public static Leaderboard getInstance() {
+		return INSTANCE;
+	}
 	
 	/**
 	 * Adds a new Score object to ArrayList highScores, then sorts all Score objects from highest to lowest.

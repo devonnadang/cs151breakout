@@ -28,7 +28,7 @@ public class Board {
         blockCounter = ROWS*COLUMNS;
         createBlocks();
 
-        leaderboard = new Leaderboard();
+        leaderboard = Leaderboard.getInstance();
         ball = Ball.getInstance();
         paddle = Paddle.getInstance();
     }
