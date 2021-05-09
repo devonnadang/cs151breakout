@@ -49,6 +49,7 @@ public class BoardView extends JPanel {
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
     public int paddleVelocity;
+    private JLabel livesLeftDisplay;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -145,6 +146,10 @@ public class BoardView extends JPanel {
 
         gameOver = new JLabel(" ");
         this.add(gameOver);
+        
+        livesLeftDisplay = new JLabel (" ");
+        this.add(livesLeftDisplay);
+        livesLeftDisplay.setText("Lives Left: 3");
 
         // can't figure out how to make it align to the left
         this.add(leaderboardButton); //BorderLayout.EAST???
@@ -177,11 +182,6 @@ public class BoardView extends JPanel {
             for (int i = 0; i < Constants.getRows(); i++) {
                 for (int j = 0; j < Constants.getColumns(); j++) {
                     Rectangle2D block = blocks[i][j];
-//                    if (isDestroyed[i][j] && i != Constants.getRows() - 1 && j != Constants.getColumns() - 1) {
-//                        block.setFrame(0, 0, 0, 0);
-//                        gameFinished = true;
-//                    } else if (isDestroyed[i][j]) {
-//                        block.setFrame(0,0,0,0);
                     if (isDestroyed[i][j]) {
                         block.setFrame(0, 0, 0, 0);
                         destroyedBlocks++;
@@ -212,11 +212,15 @@ public class BoardView extends JPanel {
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
-        // These two statements will make sure max velocity is 4 and min velocity is -4.
-        ballVelocity[0] = Math
-                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
-        ballVelocity[1] = Math
-                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
+    	livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
+    	
+        // These two statements will make sure max velocity is 5 and min velocity is -5.
+        ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
+        ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
+
+        if (ballVelocity[0] == 0) {
+            ballVelocity[0] = BALL_MAX_VELOCITY;
+        }
 
         // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
         if (ballVelocity[0] > -BALL_MIN_VELOCITY && ballVelocity[0] < BALL_MIN_VELOCITY) {
@@ -258,6 +262,8 @@ public class BoardView extends JPanel {
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
             if (livesCounter != 3) {
                 livesCounter++;
+                livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
+                gameFinished = false;
                 repaintBoard();
             } else if (livesCounter == 3) {
                 gameFinished = true;
@@ -283,10 +289,6 @@ public class BoardView extends JPanel {
                     isDestroyed[i][j] = true;
                     stop = true;
                 }
-            }
-            // Not sure if I should leave this commented or not
-            if (stop) {
-                break;
             }
         }
     }
@@ -339,7 +341,7 @@ public class BoardView extends JPanel {
      * shouldn't affect any other part of the program.
      */
     private void ballAndPaddleCollision() {
-        if (!gameFinished && ballVelocity[0] == 0) {
+    	if (!gameFinished && ballVelocity[0] == 0) {
             ballVelocity[0] = -5;
         }
 
@@ -387,6 +389,7 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
+ //       System.out.println("Front BoardView: " + this.paddleCoordinates[0]);
     }
 
     public void setPaddleVelocity(int paddleVelocity) {
