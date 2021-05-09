@@ -53,6 +53,7 @@ public class BoardView extends JPanel {
     private Leaderboard scoreList;
     private int paddleVelocity;
     private JLabel livesLeftDisplay;
+    private JLabel scoreDisplay;
 
     private BlockingQueue<Message> queue;
     private boolean gameFinished;
@@ -167,6 +168,10 @@ public class BoardView extends JPanel {
         livesLeftDisplay = new JLabel (" ");
         this.add(livesLeftDisplay);
         livesLeftDisplay.setText("Lives Left: 3");
+        
+        scoreDisplay = new JLabel (" ");
+        this.add(scoreDisplay);
+        scoreDisplay.setText("Score: 0");
 
         
     }
@@ -201,6 +206,7 @@ public class BoardView extends JPanel {
                     if (isDestroyed[i][j]) {
                         block.setFrame(0, 0, 0, 0);
                         destroyedBlocks++;
+                        scoreDisplay.setText("Score: " + destroyedBlocks*5);
                     } else {
                         int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
                         int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
