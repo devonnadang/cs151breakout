@@ -16,8 +16,8 @@ public class Constants {
     private static final int PADDLE_Y_RESET = PANEL_HEIGHT - PADDLE_HEIGHT - PADDLE_OFFSET;
     private static final int BALL_X_RESET = PANEL_WIDTH / 2 - ((BALL_RADIUS*2)/2);
     private static final int BALL_Y_RESET = PADDLE_Y_RESET - (BALL_RADIUS*2);
-    private static final int PADDLE_MOVE_RIGHT_UNIT = 7;
-    private static final int PADDLE_MOVE_LEFT_UNIT = -7;
+    private static final int PADDLE_MOVE_RIGHT_UNIT = 5;
+    private static final int PADDLE_MOVE_LEFT_UNIT = -5;
     private static final int BALL_MAX_VELOCITY = 4;
     private static final int BALL_MIN_VELOCITY = 3;
 
