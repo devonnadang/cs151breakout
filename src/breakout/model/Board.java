@@ -9,11 +9,12 @@ import breakout.view.View;
  * Responsible for communicating with the View class.
  */
 public class Board {
+  
     private Block [][] blocks;
     private Ball ball;
     private Paddle paddle;
     private int blockCounter;
-    private Score score;
+    private Leaderboard leaderboard;
     private static final int ROWS = Constants.getRows();
     private static final int COLUMNS = Constants.getColumns();
     private static final int WIDTH = Constants.getPanelWidth();
@@ -26,13 +27,18 @@ public class Board {
     public Board(){
         blockCounter = ROWS*COLUMNS;
         createBlocks();
+
+        leaderboard = new Leaderboard();
         ball = Ball.getInstance();
         paddle = Paddle.getInstance();
-        score = new Score();
     }
     
-    public Score getScore() {
-    	return score;
+    public Leaderboard getScore() {
+    	return leaderboard;
+    }
+    
+    public void addScore(Score score) {
+    	leaderboard.addNewScore(score);
     }
 
     public Ball getBall(){
