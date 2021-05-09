@@ -51,7 +51,7 @@ public class BoardView extends JPanel {
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
     private Leaderboard scoreList;
-    public int paddleVelocity;
+    private int paddleVelocity;
     private JLabel livesLeftDisplay;
 
     private BlockingQueue<Message> queue;
@@ -70,9 +70,6 @@ public class BoardView extends JPanel {
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
-            if (gameFinished) {
-                endGame();
-            }
             moveBall();
             setPaddleCoordinates(paddleCoordinates[0] += paddleVelocity);
             repaint();
@@ -226,19 +223,20 @@ public class BoardView extends JPanel {
         }
         if (destroyedBlocks == Constants.getRows() * Constants.getColumns()) {
             gameFinished = true;
+            endGame();
         }
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
     	livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
-    	
+
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
         ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
 
-        if (ballVelocity[0] == 0) {
-            ballVelocity[0] = BALL_MAX_VELOCITY;
+        if (ballVelocity[1] == 0) {
+            ballVelocity[1] = BALL_MAX_VELOCITY;
         }
 
         // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
@@ -287,7 +285,9 @@ public class BoardView extends JPanel {
             } else if (livesCounter == 3) {
                 gameFinished = true;
                 gameOver.setText("GameOver!");
+                endGame();
             }
+            timer.stop();
         }
 
         // If ball intersects paddle then resolve collision.
