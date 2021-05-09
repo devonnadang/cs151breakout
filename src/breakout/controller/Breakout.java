@@ -49,16 +49,31 @@ public class Breakout {
             // Figure out what message it is and do correct action
             if (message.getClass() == MoveMessage.class) {
                 MoveMessage moveMessage = (MoveMessage) message;
-//                board.getPaddle().move(moveMessage.getDirection());
+                board.getPaddle().move(moveMessage.getNewVelocity());
+ //               System.out.println("From Paddle x: "+ board.getPaddle().getX());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getNewCoordinate());
+                view.updateBoardView(moveMessage.getNewVelocity());
+            }
+            // when save score button is pressed
+            // add a new score to board
+            else if (message.getClass() == SaveScoreMessage.class) {
+            	SaveScoreMessage saveUsernameMessage = (SaveScoreMessage) message;
+            	board.addScore(saveUsernameMessage.getScore());
             }
             
-            // when save score button is pressed
-            else if (message.getClass() == SaveScoreMessage.class) {
-            	SaveScoreMessage saveScoreMessage = (SaveScoreMessage) message;
-                // maybe prompt to enter username and add score
+            // when leaderboard button is pressed
+            // update leaderboard with all scores
+            else if(message.getClass() == LeaderboardMessage.class)
+            {
+            	LeaderboardMessage leaderboardMessage = (LeaderboardMessage) message;
+            	leaderboardMessage.addScores(board.getScore());
+            	view.updateLeaderboardView(leaderboardMessage.getScores());
+            }
+            // When game ends
+            else if (message.getClass() == EndGameMessage.class) {
+                EndGameMessage endGameMessage = (EndGameMessage) message;
+                view.endGame();
             }
         }
 

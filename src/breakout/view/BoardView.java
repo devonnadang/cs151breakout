@@ -1,8 +1,11 @@
 package breakout.view;
 
+import breakout.controller.LeaderboardMessage;
+import breakout.controller.EndGameMessage;
 import breakout.controller.Message;
 import breakout.controller.MoveMessage;
 import breakout.model.Constants;
+import breakout.model.Leaderboard;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -44,10 +47,11 @@ public class BoardView extends JPanel {
     private double[] ballCoordinates;
     private double[] ballVelocity;
     private double[] paddleCoordinates;
-    private double[] paddleVelocity;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
     private int livesCounter = 1;
+    private Leaderboard scoreList;
+    public int paddleVelocity;
     private JLabel livesLeftDisplay;
 
     private BlockingQueue<Message> queue;
@@ -58,15 +62,19 @@ public class BoardView extends JPanel {
     private Insets frameInsets;
 
     private JButton leaderboardButton;
+    private JButton saveScoreButton;
     private Random rgen = new Random();
     private JLabel gameOver;
 
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
-
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
+            if (gameFinished) {
+                endGame();
+            }
             moveBall();
+            setPaddleCoordinates(paddleCoordinates[0] += paddleVelocity);
             repaint();
         });
 
@@ -95,13 +103,11 @@ public class BoardView extends JPanel {
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-BALL_MAX_VELOCITY, -BALL_MAX_VELOCITY};
+        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
+                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
-
-        // Velocity for the paddle
-        paddleVelocity = new double[2];
 
         // Calculating where the ball and paddle should be at the start of the game.
         // Can't really use Constants for the y coordinates because you need the View to be created
@@ -135,13 +141,29 @@ public class BoardView extends JPanel {
         am.put("released.left", new MoveAction(0));
         am.put("released.right", new MoveAction(0));
 
+        // opens a new window to save score; enter username
+        saveScoreButton = new JButton("Save Score");
+        saveScoreButton.addActionListener(e -> {
+            SaveScoreView ssw = new SaveScoreView(queue, 0); //add actual score later
+        });
+        this.add(saveScoreButton);
+        
         // button to open new window to see leaderboard and scores
         leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
         leaderboardButton.addActionListener(e -> {
-            LeaderboardWindow lw = new LeaderboardWindow();
+        	try {
+            	LeaderboardMessage lw = new LeaderboardMessage();
+            	queue.put(lw);
+            	LeaderboardView leaderboard = new LeaderboardView(scoreList);
+			} catch (InterruptedException e1) {
+				// do nothing
+			}
         });
-
+        
+        // can't figure out how to make it align to the left
+        this.add(leaderboardButton); //BorderLayout.EAST???
+        
         gameOver = new JLabel(" ");
         this.add(gameOver);
         
@@ -149,8 +171,16 @@ public class BoardView extends JPanel {
         this.add(livesLeftDisplay);
         livesLeftDisplay.setText("Lives Left: 3");
 
-        // can't figure out how to make it align to the left
-        this.add(leaderboardButton); //BorderLayout.EAST???
+        
+    }
+
+    public void endGame() {
+        try {
+            queue.add(new EndGameMessage());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+        timer.stop();
     }
 
     @Override
@@ -166,29 +196,36 @@ public class BoardView extends JPanel {
         ball.setFrame(ballCoordinates[0], ballCoordinates[1], BALL_WIDTH, BALL_HEIGHT);
         g2d.fill(ball);
 
-        for (int i = 0; i < Constants.getRows(); i++) {
-            for (int j = 0; j < Constants.getColumns(); j++) {
-                Rectangle2D block = blocks[i][j];
-                if (isDestroyed[i][j]) {
-                    block.setFrame(0, 0, 0, 0);
-                } else {
-                    int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
-                    int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
-                    block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
-                    if (i == 0) {
-                        g2d.setColor(Color.RED);
-                    } else if (i == 1) {
-                        g2d.setColor(Color.ORANGE);
-                    } else if (i == 2) {
-                        g2d.setColor(Color.YELLOW);
-                    } else if (i == 3) {
-                        g2d.setColor(Color.GREEN);
-                    } else if (i == 4) {
-                        g2d.setColor(Color.BLUE);
+        int destroyedBlocks = 0;
+        if (!gameFinished) {
+            for (int i = 0; i < Constants.getRows(); i++) {
+                for (int j = 0; j < Constants.getColumns(); j++) {
+                    Rectangle2D block = blocks[i][j];
+                    if (isDestroyed[i][j]) {
+                        block.setFrame(0, 0, 0, 0);
+                        destroyedBlocks++;
+                    } else {
+                        int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
+                        int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
+                        block.setFrame(x, y, BLOCK_WIDTH, BLOCK_HEIGHT);
+                        if (i == 0) {
+                            g2d.setColor(Color.RED);
+                        } else if (i == 1) {
+                            g2d.setColor(Color.ORANGE);
+                        } else if (i == 2) {
+                            g2d.setColor(Color.YELLOW);
+                        } else if (i == 3) {
+                            g2d.setColor(Color.GREEN);
+                        } else if (i == 4) {
+                            g2d.setColor(Color.BLUE);
+                        }
                     }
+                    g2d.fill(block);
                 }
-                g2d.fill(block);
             }
+        }
+        if (destroyedBlocks == Constants.getRows() * Constants.getColumns()) {
+            gameFinished = true;
         }
     }
 
@@ -199,6 +236,10 @@ public class BoardView extends JPanel {
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
         ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
+
+        if (ballVelocity[0] == 0) {
+            ballVelocity[0] = BALL_MAX_VELOCITY;
+        }
 
         // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
         if (ballVelocity[0] > -BALL_MIN_VELOCITY && ballVelocity[0] < BALL_MIN_VELOCITY) {
@@ -238,14 +279,13 @@ public class BoardView extends JPanel {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
-            gameFinished = true;
-            timer.stop();
             if (livesCounter != 3) {
                 livesCounter++;
                 livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
                 gameFinished = false;
                 repaintBoard();
             } else if (livesCounter == 3) {
+                gameFinished = true;
                 gameOver.setText("GameOver!");
             }
         }
@@ -262,19 +302,13 @@ public class BoardView extends JPanel {
                 Rectangle2D block = blocks[i][j];
                 boolean ballIntersection = ballIntersects(block);
                 if (ballIntersection && stop) {
-                    System.out.println("Collision" + i + " " + j + " !");
                     ballAndBlockCollision(block);
                 } else if (ballIntersection) {
-                    System.out.println("Collision" + i + " " + j + " !");
                     ballAndBlockCollision(block);
                     isDestroyed[i][j] = true;
                     stop = true;
                 }
             }
-            // Not sure if I should leave this commented or not
-//            if (stop) {
-//                break;
-//            }
         }
     }
 
@@ -344,7 +378,8 @@ public class BoardView extends JPanel {
         if (ballCoordinates[0] >= paddleCoordinates[0] && ballCoordinates[0] <= paddleRight
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
-                ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
+            ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(
+                    BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
             ballVelocity[1] *= -1;
             ballCoordinates[1] = paddleTop - 1;
         } else {
@@ -373,20 +408,21 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
+ //       System.out.println("Front BoardView: " + this.paddleCoordinates[0]);
+    }
+
+    public void setPaddleVelocity(int paddleVelocity) {
+        this.paddleVelocity = paddleVelocity;
     }
 
     public void repaintBoard() {
-        timer = new Timer(17, e -> {
-            moveBall();
-            repaint();
-        });
-
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
         // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
         // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{-5, -5};
+        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
+                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
 
         // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
         paddleCoordinates = new double[2];
@@ -414,15 +450,19 @@ public class BoardView extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!timer.isRunning()) {
+            if (!timer.isRunning() && !gameFinished) {
                 timer.start();
             }
 
             try {
-                queue.put(new MoveMessage(direction + paddleCoordinates[0]));
-            } catch (InterruptedException exception) {
+                queue.put(new MoveMessage(direction));
+            } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
     }
+    
+    public void setScores(Leaderboard scoreList) {
+		this.scoreList = scoreList;	
+	}
 }
