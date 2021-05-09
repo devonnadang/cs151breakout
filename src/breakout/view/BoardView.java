@@ -66,7 +66,7 @@ public class BoardView extends JPanel {
     private JButton saveScoreButton;
     private Random rgen = new Random();
     private JLabel gameOver;
-    private int finalScore;
+    private int finalScore = 0;
 
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
@@ -174,7 +174,7 @@ public class BoardView extends JPanel {
         
         scoreDisplay = new JLabel (" ");
         this.add(scoreDisplay);
-        scoreDisplay.setText("Score: 0");
+        scoreDisplay.setText("Score: " + finalScore);
 
         
     }
@@ -209,7 +209,7 @@ public class BoardView extends JPanel {
                     if (isDestroyed[i][j]) {
                         block.setFrame(0, 0, 0, 0);
                         destroyedBlocks++;
-                        scoreDisplay.setText("Score: " + destroyedBlocks*5);
+                        scoreDisplay.setText("Score: " + finalScore);
                     } else {
                         int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
                         int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
