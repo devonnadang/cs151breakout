@@ -5,25 +5,28 @@ package breakout.model;
  * The Ball is a class that moves and destroys blocks.
  * It's control of ball movements.
  */
-public class Ball {
+public final class Ball {
 
+	private static final Ball INSTANCE = new Ball();
 	private static final int BALL_RADIUS = Constants.getBallRadius();
-	private int speed = 60; //remove if not needed
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
 	//how can it interact with paddle/bounce off of it?
 	private int [] ballVelocity; 
 	
-	
 	/**
 	 * This is the constructor which initializes x & y to its starting positions.
 	 */
-	public Ball()
+	private Ball()
 	{
 		this.x = Constants.getBallXReset();
 		this.y = Constants.getBallYReset();
 		setCoordinates(x, y);
 		ballVelocity = new int [] {-Constants.getBallMaxVelocity(), -Constants.getBallMaxVelocity()};
+	}
+
+	public static Ball getInstance() {
+		return INSTANCE;
 	}
 	
 	/**
