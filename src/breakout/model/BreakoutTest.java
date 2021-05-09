@@ -153,7 +153,7 @@ class BreakoutTest {
         s12.setScore(250);
         s12.setUsername("L");
         
-        Leaderboard scores = new Leaderboard();
+        Leaderboard scores = Leaderboard.getInstance();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
         scores.addNewScore(s3);
@@ -205,7 +205,7 @@ class BreakoutTest {
         s5.setScore(100);
         s5.setUsername("E");
         
-        Leaderboard scores = new Leaderboard();
+        Leaderboard scores = Leaderboard.getInstance();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
         scores.addNewScore(s3);
