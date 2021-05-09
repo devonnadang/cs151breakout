@@ -1,19 +1,19 @@
 package breakout.controller;
 
+import breakout.model.Score;
+
 public class SaveScoreMessage implements Message {
-	int score;
-	String username;
+	private Score score;
 	
-	public int getScore() {
+	public SaveScoreMessage(int score, String username) {
+		this.score = new Score();
+		
+		this.score.setScore(score);
+		this.score.setUsername(username);
+	}
+	
+	public Score getScore() {
 		return score;
 	}
-	public void setScore(int score) {
-		this.score = score;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
+
 }
