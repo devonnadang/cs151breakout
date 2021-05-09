@@ -49,17 +49,21 @@ public class Breakout {
             // Figure out what message it is and do correct action
             if (message.getClass() == MoveMessage.class) {
                 MoveMessage moveMessage = (MoveMessage) message;
-                board.getPaddle().move(moveMessage.getNewCoordinate());
+                board.getPaddle().move(moveMessage.getNewVelocity());
  //               System.out.println("From Paddle x: "+ board.getPaddle().getX());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getNewCoordinate());
+                view.updateBoardView(moveMessage.getNewVelocity());
             }
-            
             // when save score button is pressed
             else if (message.getClass() == SaveScoreMessage.class) {
             	SaveScoreMessage saveScoreMessage = (SaveScoreMessage) message;
                 // maybe prompt to enter username and add score
+            }
+            // When game ends
+            else if (message.getClass() == EndGameMessage.class) {
+                EndGameMessage endGameMessage = (EndGameMessage) message;
+                view.endGame();
             }
         }
 

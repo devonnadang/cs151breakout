@@ -4,6 +4,7 @@ import breakout.controller.Message;
 import java.awt.Dimension;
 
 import java.util.concurrent.BlockingQueue;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import breakout.model.Board;
@@ -20,9 +21,6 @@ public class View extends JFrame{
      */
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
-        // Swing stuff
-        //panel = new ViewPanel();
-         //this.add(panel);
          this.setPreferredSize(new Dimension(Board.getBoardWidth(),Board.getBoardHeight()));
          setResizable(true);
          setTitle("Breakout");
@@ -41,14 +39,19 @@ public class View extends JFrame{
         repaint();
     }
 
-    /**
-     * Updates BoardView with a new coordinate. This coordinate is going to be for the paddle's x coordinates, since
-     * that's the only coordinate that take in input and needs to be changed. This method is used with the message system.
-     * So, if you need to use the message system, then leave this method uncommented.
-     * @param newCoordinate
-     */
-    public void updateBoardView(double newCoordinate) {
-        boardView.setPaddleCoordinates(newCoordinate);
+    public void updateBoardView(int newVelocity) {
+        boardView.setPaddleVelocity(newVelocity);
+        repaint();
+    }
+
+    public void endGame() {
+        JButton endGameButton = new JButton("Play Again");
+        endGameButton.addActionListener(actionListener -> {
+            remove(boardView);
+            createBoardView();
+        });
+        boardView.add(endGameButton);
+        revalidate();
         repaint();
     }
 }
