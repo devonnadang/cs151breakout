@@ -103,7 +103,10 @@ class BreakoutTest {
     	// int blocksDestroyed = getRows() * getColumns() - getBlockCounter() = // how many blocks are out
     }
 
-    @Test // only get 10 highest score
+    /**
+     * Checking if Leaderboard returns the 10 highest score
+     */
+    @Test
     void get10HighestScores() {
     	Score s1 = new Score();
         s1.setScore(65);
@@ -180,10 +183,12 @@ class BreakoutTest {
         expectedScores.add(s8);
 
         assertEquals(expectedScores, scores.getTop10Score());
-
     }
 
-    @Test // make sure all scores are added and in order
+    /**
+     * Checking that all scores are added and in order 
+     */
+    @Test
     void addScoreTest() {
     	Score s1 = new Score();
         s1.setScore(65);
