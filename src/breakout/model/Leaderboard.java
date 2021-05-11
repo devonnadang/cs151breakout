@@ -1,28 +1,42 @@
 package breakout.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Keeps track of all scores and orders scores from highest to lowest.
  */
 
-import java.util.Collections;
-
 public class Leaderboard {
 	private ArrayList<Score> highScores; // sorted from highest to lowest score
-	private static final Leaderboard INSTANCE = new Leaderboard();
+	private static final Leaderboard INSTANCE = new Leaderboard(); // implement singleton
 
 	
 	/**
-	 * Creates the arraylist to the for the 10 highest scores.
+	 * Initialize highScores arraylist of scores.
 	 */
 	private Leaderboard() {
 		highScores = new ArrayList<>();
 	}
 	
+	
+	/**
+	 * Static method to get the Leaderboard
+	 * @return Leaderboard
+	 */
 	public static Leaderboard getInstance() {
 		return INSTANCE;
 	}
+	
+	
+	/**
+	 * Returns an arraylist of scores from highest to lowest
+	 * @return highScore the arraylist of scores
+	 */
+	public ArrayList<Score> getHighScores() {
+		return highScores;
+	}
+	
 	
 	/**
 	 * Adds a new Score object to ArrayList highScores, then sorts all Score objects from highest to lowest.
@@ -32,18 +46,6 @@ public class Leaderboard {
 	public void addNewScore(Score newScore) {
 		highScores.add(newScore);
 		Collections.sort(highScores);
-		// using collections sort for now but maybe treeset & limit number of high scores?
-			// like when adding new score, drop the lowest or cant add cuz score is too low
-	}
-	
-	
-	// might need to change after implementing view
-	// just for junit testing for now
-	public String getAllScores() {
-		String allScores = "";
-		for (Score s : highScores)
-			allScores += s.toString();
-		return allScores;
 	}
 	
 	
@@ -57,10 +59,5 @@ public class Leaderboard {
 		for(int i = 0; i < 10; i++)
 			top10Score.add(highScores.get(i));
 		return top10Score;
-	}
-
-
-	public ArrayList<Score> getHighScores() {
-		return highScores;
 	}
 }
