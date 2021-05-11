@@ -6,8 +6,8 @@ package breakout.model;
  * In charge of Paddle characteristics.
  */
 public final class Paddle {
-	private int x; //x coordinate of the paddle object
-	private int y; //y coordinate of the paddle object
+	private double[] paddleCoordinates;
+	private double paddleVelocity;
 	
 	//dimensions of paddle
 	private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
@@ -21,73 +21,37 @@ public final class Paddle {
 	private Paddle()
 	{
 		//initialize paddle location
-		this.x = (Constants.getPanelWidth()/2) - (Constants.getPaddleWidth() / 2);
-		this.y = Constants.getPanelHeight() - Constants.getPaddleHeight() - Constants.getPaddleOffSet();
+		this.paddleCoordinates = new double[]{Constants.getPaddleXReset(), Constants.getPaddleYReset()};
+		this.paddleVelocity = 0;
 	}
 
 	public static Paddle getInstance() {
 		return INSTANCE;
 	}
 
-	public void setCoordinates(int x, int y){
-		setX(x);
-		setY(y);
+	public void move() {
+		paddleCoordinates[0] += paddleVelocity;
 	}
 
-	/**
-	 * @param direction the new x coordinate for paddle
-	 */
-	public void move(double direction)
-	{
-		setX((int) direction);
+	public double[] getPaddleCoordinates() {
+		return paddleCoordinates;
 	}
 
-	public void moveLeft(){
-		x += Constants.getPaddleMoveLeftUnit();
+	public void setPaddleVelocity(double paddleVelocity) {
+		this.paddleVelocity = paddleVelocity;
 	}
 
-	public void moveRight(){
-		x += Constants.getPaddleMoveRightUnit();
-	}
-	
-	/**
-	 * Resets the position of the paddle
-	 * @param r value indicating whether reset of ball should occur
-	 */
-	public void reset()
-	{
-		setCoordinates(Constants.getPaddleXReset(),Constants.getPaddleYReset());
-	}
-	public void setY(int y){
-		this.y = y;
-	}
-	
-	/**
-	 * Sets the x value of the paddle
-	 * @param x the new x coordinate
-	 */
-	public void setX(int x)
-	{
-		this.x = x;
+	public void setPaddleCoordinates(double[] paddleCoordinates) {
+		this.paddleCoordinates = paddleCoordinates;
 	}
 
-	/**
-	 * Gets the x value of the paddle
-	 * @param x the x coordinate
-	 */
-	public int getX()
-	{
-		return x;
-	}
-	
-	/**
-	 * Gets the y value of the paddle
-	 * @param y the y coordinate
-	 */
-	public int getY()
-	{
-		return y;
-	}
+//	/**
+//	 * Resets the position of the paddle
+//	 */
+//	public void reset()
+//	{
+//		setCoordinates(Constants.getPaddleXReset(),Constants.getPaddleYReset());
+//	}
 
 	/**
 	 * Gets the width of the paddle

@@ -23,7 +23,7 @@ public class View extends JFrame{
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
          this.setPreferredSize(new Dimension(Board.getBoardWidth(),Board.getBoardHeight()));
-         setResizable(true);
+         setResizable(false);
          setTitle("Breakout");
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
          pack();
@@ -33,23 +33,24 @@ public class View extends JFrame{
     /**
      * This method creates the board and repaints the main view to make the board visible.
      */
-    public void createBoardView() {
-        boardView = new BoardView(queue, getInsets());
+    public void createBoardView(double[] ballCoordinates, double[] paddleCoordinates, double[] ballVelocity) {
+        boardView = new BoardView(queue, getInsets(), ballCoordinates, paddleCoordinates, ballVelocity);
         add(boardView);
         revalidate();
         repaint();
     }
 
-    public void updateBoardView(int newVelocity) {
-        boardView.setPaddleVelocity(newVelocity);
+    public void updateBoardView(double paddleCoordinate) {
+        // Board needs to call this
+        boardView.setPaddleCoordinates(paddleCoordinate);
         repaint();
     }
 
-    public void endGame() {
+    public void endGame(double[] ballCoordinates, double[] paddleCoordinates, double [] ballVelocity) {
         JButton endGameButton = new JButton("Play Again");
         endGameButton.addActionListener(actionListener -> {
             remove(boardView);
-            createBoardView();
+            createBoardView(ballCoordinates, paddleCoordinates, ballVelocity);
         });
         boardView.add(endGameButton);
         revalidate();

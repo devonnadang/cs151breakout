@@ -1,5 +1,6 @@
 package breakout.model;
 
+import java.util.Random;
 
 /**
  * The Ball is a class that moves and destroys blocks.
@@ -12,7 +13,9 @@ public final class Ball {
 	private int x; //x coordinate of the ball object
 	private int y; //y coordinate of the ball object
 	//how can it interact with paddle/bounce off of it?
-	private int [] ballVelocity; 
+	private double [] ballVelocity;
+	private double [] ballCoordinates; //[0] = x coordinate, [1] y coordinate
+	private Random rgen = new Random();
 	
 	/**
 	 * This is the constructor which initializes x & y to its starting positions.
@@ -22,11 +25,21 @@ public final class Ball {
 		this.x = Constants.getBallXReset();
 		this.y = Constants.getBallYReset();
 		setCoordinates(x, y);
-		ballVelocity = new int [] {-Constants.getBallMaxVelocity(), -Constants.getBallMaxVelocity()};
+		ballVelocity = new double [] {Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2),
+				Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2)};
+		ballCoordinates = new double [] {Constants.getBallXReset(), Constants.getBallYReset()};
 	}
 
 	public static Ball getInstance() {
 		return INSTANCE;
+	}
+
+	public double[] getBallCoordinates() {
+		return ballCoordinates;
+	}
+
+	public double[] getBallVelocity() {
+		return ballVelocity;
 	}
 	
 	/**
@@ -45,6 +58,15 @@ public final class Ball {
 		return y;
 	}
 
+
+	public double getCenterX() {
+		return ballCoordinates[0] + getHeight() / 2.0;
+	}
+
+	public double getCenterY() {
+		return ballCoordinates[1] + getHeight() / 2.0;
+	}
+
 	/**
 	 * @return ball radius
 	 */
@@ -61,6 +83,10 @@ public final class Ball {
 	public void setCoordinates(int x, int y){
 		setX(x);
 		setY(y);
+	}
+
+	public void setBallCoordinates(double[] ballCoordinates) {
+		this.ballCoordinates = ballCoordinates;
 	}
 	
 	/**
@@ -132,5 +158,9 @@ public final class Ball {
 	{
 		setCoordinates(Constants.getBallXReset(), Constants.getBallYReset());
 	}
-	
+
+	public int getHeight() {
+		return Constants.getBallRadius() * 2;
+	}
+
 }

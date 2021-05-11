@@ -3,7 +3,7 @@ package breakout.view;
 import breakout.controller.LeaderboardMessage;
 import breakout.controller.EndGameMessage;
 import breakout.controller.Message;
-import breakout.controller.MoveMessage;
+import breakout.controller.MovePaddleMessage;
 import breakout.model.Constants;
 import breakout.model.Leaderboard;
 
@@ -68,12 +68,11 @@ public class BoardView extends JPanel {
     private JLabel gameOver;
     private int finalScore = 0;
 
-    public BoardView(BlockingQueue<Message> queue, Insets frameInsets) {
+    public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates, double[] paddleCoordinates, double[] ballVelocity) {
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
             moveBall();
-            setPaddleCoordinates(paddleCoordinates[0] += paddleVelocity);
             repaint();
         });
 
@@ -86,6 +85,9 @@ public class BoardView extends JPanel {
 
         this.queue = queue;
         this.frameInsets = frameInsets;
+        this.ballCoordinates = ballCoordinates;
+        this.paddleCoordinates = paddleCoordinates;
+        this.ballVelocity = ballVelocity;
 
         paddle = new Rectangle2D.Double();
         ball = new Ellipse2D.Double();
@@ -96,27 +98,6 @@ public class BoardView extends JPanel {
                 isDestroyed[i][j] = false;
             }
         }
-
-        // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
-        ballCoordinates = new double[2];
-
-        // How much the ball will move in each direction: [0] = x velocity and [1] = y velocity
-        // So, starting off the ball should move 5 pixels in x and y direction making it go Northwest.
-        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
-                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
-
-        // Coordinates for the paddle: [0] = x coordinate and [1] = y coordinate.
-        paddleCoordinates = new double[2];
-
-        // Calculating where the ball and paddle should be at the start of the game.
-        // Can't really use Constants for the y coordinates because you need the View to be created
-        // to get its Insets to be able to properly place the paddle and ball.
-        paddleCoordinates[0] = Constants.getPaddleXReset();
-        paddleCoordinates[1] =
-                BOARD_HEIGHT - PADDLE_HEIGHT - frameInsets.top - frameInsets.bottom - Constants
-                        .getPaddleOffSet();
-        ballCoordinates[0] = Constants.getBallXReset();
-        ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
 
         // This maps the left and right arrow keys to different actions.
         // I used key bindings instead of ActionListener because sometimes the panel becomes out of focus and the inputs do nothing,
@@ -171,8 +152,6 @@ public class BoardView extends JPanel {
         scoreDisplay = new JLabel (" ");
         this.add(scoreDisplay);
         scoreDisplay.setText("Score: " + finalScore);
-
-        
     }
 
     public void endGame() {
@@ -372,14 +351,10 @@ public class BoardView extends JPanel {
             ballVelocity[0] = -5;
         }
 
-        double paddleLeft = paddleCoordinates[0];
-        double paddleMiddleLeft = paddleLeft + PADDLE_WIDTH / 2 - 10;
-        double paddleMiddleRight = paddleLeft + PADDLE_WIDTH / 2 + 10;
         double paddleRight = paddleCoordinates[0] + PADDLE_WIDTH;
         // This is the top of the paddle relative to the ball's coordinates. The actual top
         // of paddle is just paddleCoordinates[1].
         double paddleTop = paddleCoordinates[1] - BALL_HEIGHT;
-        double paddleBottom = paddleCoordinates[1] + PADDLE_HEIGHT;
 
         // Hitting on left side makes ball go left. Hitting on middle (Giving it about 10 pixels of
         // space) makes ball go straight up. Hitting on right side makes ball go right.
@@ -395,13 +370,6 @@ public class BoardView extends JPanel {
             // end of game when it hits the bottom of the board.
             ballAndBlockCollision(paddle);
         }
-    }
-
-    /**
-     * Sets the x and y coordinates of the ball.
-     */
-    public void setBallCoordinates(double[] ballCoordinates) {
-        this.ballCoordinates = ballCoordinates;
     }
 
     /**
@@ -463,7 +431,7 @@ public class BoardView extends JPanel {
             }
 
             try {
-                queue.put(new MoveMessage(direction));
+                queue.put(new MovePaddleMessage(direction));
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -471,6 +439,6 @@ public class BoardView extends JPanel {
     }
     
     public void setScores(Leaderboard scoreList) {
-		this.scoreList = scoreList;	
+		this.scoreList = scoreList;
 	}
 }
