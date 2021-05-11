@@ -36,13 +36,27 @@ public class LeaderboardView extends JFrame{
         
         // add Scores
         int i = 1;
-        for (Score s : scoreList.getTop10Score())
+        if(scoreList.getHighScores().size() > 10)
         {
-        	panel.add(new JLabel(String.valueOf(i), SwingConstants.CENTER));
-        	panel.add(new JLabel(s.getUsername(), SwingConstants.CENTER));
-        	panel.add(new JLabel(String.valueOf(s.getScore()), SwingConstants.CENTER));
-        	i++;
+        	for (Score s : scoreList.getTop10Score())
+            {
+            	panel.add(new JLabel(String.valueOf(i), SwingConstants.CENTER));
+            	panel.add(new JLabel(s.getUsername(), SwingConstants.CENTER));
+            	panel.add(new JLabel(String.valueOf(s.getScore()), SwingConstants.CENTER));
+            	i++;
+            }
         }
+        else
+        {
+        	for (Score s : scoreList.getHighScores())
+            {
+            	panel.add(new JLabel(String.valueOf(i), SwingConstants.CENTER));
+            	panel.add(new JLabel(s.getUsername(), SwingConstants.CENTER));
+            	panel.add(new JLabel(String.valueOf(s.getScore()), SwingConstants.CENTER));
+            	i++;
+            }
+        }
+        
 
         this.add(panel);
     	
