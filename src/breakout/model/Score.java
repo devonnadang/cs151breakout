@@ -1,12 +1,10 @@
 package breakout.model;
 
-// Testing push
 /**
  * Keeps track of the user's score.
  * 
  */
 
-//maybe later: score also store time
 public class Score implements Comparable<Score> {
 	
 	private String username;
@@ -74,13 +72,6 @@ public class Score implements Comparable<Score> {
 	public void incrementScore() {
 		currentScore += 5; // 5 points per block destroyed
 	}
-	
-	
-	// might need to change after implementing view
-	// for junit test
-	public String toString() {
-		return this.getUsername() + " " + this.getScore();
-	}
 
 	
 	@Override
@@ -114,5 +105,4 @@ public class Score implements Comparable<Score> {
 		}
 		return false;
 	}
-	
 }

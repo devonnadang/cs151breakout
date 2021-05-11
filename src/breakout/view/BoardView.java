@@ -62,8 +62,8 @@ public class BoardView extends JPanel {
     private double[] closestPointToCircle;
     private Insets frameInsets;
 
-    private JButton leaderboardButton;
     private JButton saveScoreButton;
+    private JButton leaderboardButton;
     private Random rgen = new Random();
     private JLabel gameOver;
     private int finalScore = 0;
@@ -145,13 +145,11 @@ public class BoardView extends JPanel {
         saveScoreButton.addActionListener(e -> {
             SaveScoreView ssw = new SaveScoreView(queue, finalScore); //add actual score later
         });
-        this.add(saveScoreButton);
-        
+                
         // button to open new window to see leaderboard and scores
         scoreList = Leaderboard.getInstance();
         
         leaderboardButton = new JButton("Leaderboard");
-        leaderboardButton.setBounds(350, 100, 150, 40); // x y w h
         leaderboardButton.addActionListener(e -> {
         	try {
             	LeaderboardMessage lw = new LeaderboardMessage();
@@ -162,8 +160,6 @@ public class BoardView extends JPanel {
 			}
         });
         
-        // can't figure out how to make it align to the left
-        this.add(leaderboardButton); //BorderLayout.EAST???
         
         gameOver = new JLabel(" ");
         this.add(gameOver);
@@ -186,6 +182,8 @@ public class BoardView extends JPanel {
             exception.printStackTrace();
         }
         timer.stop();
+        this.add(saveScoreButton);
+        this.add(leaderboardButton);
     }
 
     @Override
