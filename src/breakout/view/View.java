@@ -1,6 +1,7 @@
 package breakout.view;
 
 import breakout.controller.Message;
+import breakout.controller.PlayAgainMessage;
 import java.awt.Dimension;
 
 import java.util.concurrent.BlockingQueue;
@@ -69,14 +70,22 @@ public class View extends JFrame{
         boardView.stopTimer();
         JButton endGameButton = new JButton("Play Again");
         endGameButton.addActionListener(actionListener -> {
-            remove(boardView);
-            createBoardView(ballCoordinates, paddleCoordinates);
+            try {
+                queue.add(new PlayAgainMessage(ballCoordinates, paddleCoordinates));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
         boardView.add(endGameButton);
         revalidate();
         repaint();
     }
-    
+
+    public void playAgain(double[] ballCoordinates, double[] paddleCoordinates) {
+        remove(boardView);
+        createBoardView(ballCoordinates, paddleCoordinates);
+    }
+
     public void updateLeaderboardView(Leaderboard scoreList) {
     	boardView.setScores(scoreList);
     }

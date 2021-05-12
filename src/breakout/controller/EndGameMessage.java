@@ -15,6 +15,6 @@ public class EndGameMessage implements Message {
     }
 
     public double[] getStartingPaddle() {
-        return startingPaddle;
+        return startingPaddle.clone();
     }
 }

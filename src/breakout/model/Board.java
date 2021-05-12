@@ -43,7 +43,7 @@ public class Board {
     private final double[] startingBall;
     private final double[] startingPaddle;
     private int paddleVelocity;
-    private int livesCounter = 1;
+    private int livesCounter;
     private Leaderboard scoreList;
     private boolean gameFinished;
     private double circleToBoxLength;
@@ -52,6 +52,7 @@ public class Board {
     private Random rgen = new Random();
 
     public Board(Insets frameInsets, BlockingQueue queue) {
+        livesCounter = 1;
         this.frameInsets = frameInsets;
         this.queue = queue;
         blockCounter = ROWS * COLUMNS;
@@ -186,11 +187,13 @@ public class Board {
      * Not restarting game, but just resetting ball and paddle when a life is lost.
      */
     public void resetGame() {
-        ball.setBallCoordinates(startingBall.clone());
+        ballCoordinates = startingBall.clone();
+        paddleCoordinates = startingPaddle.clone();
+        ball.setBallCoordinates(ballCoordinates);
         ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
                 BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
         ball.setBallVelocity(ballVelocity);
-        paddle.setPaddleCoordinates(startingPaddle.clone());
+        paddle.setPaddleCoordinates(paddleCoordinates);
     }
 
     // Moves the ball and will handle collision between ball and paddle and the view.
@@ -255,7 +258,7 @@ public class Board {
                 gameFinished = false;
                 // Restart ball and paddle, but this isn't ending game or playing again
                 try {
-                    queue.add(new ResetMessage(startingBall, startingPaddle[0]));
+                    queue.add(new ResetMessage(startingBall.clone(), startingPaddle[0]));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -263,6 +266,9 @@ public class Board {
                 gameFinished = true;
                 endGame();
             }
+        } else {
+            ball.setBallVelocity(ballVelocity);
+            ball.setBallCoordinates(ballCoordinates);
         }
 
         // If ball intersects paddle then resolve collision.
@@ -285,8 +291,8 @@ public class Board {
                 }
             }
         }
-        ball.setBallVelocity(ballVelocity);
-        ball.setBallCoordinates(ballCoordinates);
+//        ball.setBallVelocity(ballVelocity);
+//        ball.setBallCoordinates(ballCoordinates);
         System.out.println(ballCoordinates[0]);
         System.out.println(ball.getBallCoordinates()[0]);
     }
