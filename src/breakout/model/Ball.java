@@ -10,8 +10,6 @@ public final class Ball {
 
 	private static final Ball INSTANCE = new Ball();
 	private static final int BALL_RADIUS = Constants.getBallRadius();
-	private int x; //x coordinate of the ball object
-	private int y; //y coordinate of the ball object
 	//how can it interact with paddle/bounce off of it?
 	private double [] ballVelocity;
 	private double [] ballCoordinates; //[0] = x coordinate, [1] y coordinate
@@ -22,11 +20,9 @@ public final class Ball {
 	 */
 	private Ball()
 	{
-		this.x = Constants.getBallXReset();
-		this.y = Constants.getBallYReset();
-		setCoordinates(x, y);
-		ballVelocity = new double [] {Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2),
+		ballVelocity = new double[] {Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2),
 				Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2)};
+//        ballVelocity = new double[] {-Constants.getBallMaxVelocity(), -Constants.getBallMaxVelocity()};
 		ballCoordinates = new double [] {Constants.getBallXReset(), Constants.getBallYReset()};
 	}
 
@@ -41,30 +37,17 @@ public final class Ball {
 	public double[] getBallVelocity() {
 		return ballVelocity;
 	}
-	
-	/**
-	 * @return x coordinate
-	 */
-	public int getX()
-	{
-		return x;
-	}
-	
-	/**
-	 * @return y coordinate
-	 */
-	public int getY()
-	{
-		return y;
-	}
 
+	public void setBallVelocity(double[] ballVelocity) {
+		this.ballVelocity = ballVelocity;
+	}
 
 	public double getCenterX() {
-		return ballCoordinates[0] + getHeight() / 2.0;
+		return ballCoordinates[0] + Constants.getBallRadius();
 	}
 
 	public double getCenterY() {
-		return ballCoordinates[1] + getHeight() / 2.0;
+		return ballCoordinates[1] + Constants.getBallRadius();
 	}
 
 	/**
@@ -75,54 +58,26 @@ public final class Ball {
 		return BALL_RADIUS;
 	}
 
-	/**
-	 * Set the placement for Block.
-	 * @param x determines the x coordinate
-	 * @param y determines the x coordinate
-	 */
-	public void setCoordinates(int x, int y){
-		setX(x);
-		setY(y);
-	}
-
 	public void setBallCoordinates(double[] ballCoordinates) {
 		this.ballCoordinates = ballCoordinates;
 	}
-	
-	/**
-	 * Set the x coordinate
-	 * @param x determines the x coordinate
-	 */
-	public void setX(int x)
-	{
-		this.x = x;
-	}
-	
-	/**
-	 * Set the y coordinate
-	 * @param y determines the x coordinate
-	 */
-	public void setY(int y)
-	{
-		this.y = y;
-	}
-	
+
 	/**
 	 * In charge of the ball movement.
 	 */
 	public void move()
 	{
-		x += ballVelocity[0];
-		y += ballVelocity[1];
+		ballCoordinates[0] += ballVelocity[0];
+		ballCoordinates[1] += ballVelocity[1];
         
 
         // Handles collision between ball and left and right side of the view.
-        if (x < 0 || x > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
+        if (ballCoordinates[0] < 0 || ballCoordinates[0] > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
             ballVelocity[0] *= -1;
         }
 
         // Handles collision between ball and top of the view.
-        if (y < 0) {
+        if (ballCoordinates[1] < 0) {
             ballVelocity[1] *= -1;
         }
 
@@ -132,12 +87,12 @@ public final class Ball {
         if (ballFallsBelow()) {
             ballVelocity[0] = 0;
 			ballVelocity[1] = 0;
-			reset();
+//			reset();
         }
 	}
 
 	public boolean ballFallsBelow(){
-		if (y >= Constants.getPanelHeight() - (Constants.getBallRadius()*2)) {
+		if (ballCoordinates[1] >= Constants.getPanelHeight() - (Constants.getBallRadius()*2)) {
             return true;
         } return false;
 	}
@@ -151,13 +106,13 @@ public final class Ball {
 		block.setDestroyed(true);
 	}
 	
-	/**
-	 * Resets the position of the ball
-	 */
-	public void reset()
-	{
-		setCoordinates(Constants.getBallXReset(), Constants.getBallYReset());
-	}
+//	/**
+//	 * Resets the position of the ball
+//	 */
+//	public void reset()
+//	{
+//		setCoordinates(Constants.getBallXReset(), Constants.getBallYReset());
+//	}
 
 	public int getHeight() {
 		return Constants.getBallRadius() * 2;

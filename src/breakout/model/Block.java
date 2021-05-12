@@ -1,19 +1,47 @@
 package breakout.model;
 
+import breakout.controller.BlockDestroyedMessage;
+import java.util.concurrent.BlockingQueue;
+
 /**
  * The Block class can be destroyed by the Ball.
  */
 public class Block {
+
 	private boolean destroyed;
 	private int x;
 	private int y;
-	private final static int BLOCK_HEIGHT = Constants.getBlockHeight();
-	private final static int BLOCK_WIDTH = Constants.getBlockWidth();
+	private int row;
+	private int column;
+	private BlockingQueue queue;
+//	private final static int BLOCK_HEIGHT = Constants.getBlockHeight();
+//	private final static int BLOCK_WIDTH = Constants.getBlockWidth();
+    private int blockHeight;
+    private int blockWidth;
 
 
-	 public Block(int x, int y) {
+	public Block(int x, int y, int row, int column, BlockingQueue queue) {
+	    this.x = x;
+	    this.y = y;
+		this.row = row;
+		this.column = column;
+		this.queue = queue;
 		setCoordinates(x, y);
 		destroyed = false;
+		this.blockHeight = Constants.getBlockHeight();
+		this.blockWidth = Constants.getBlockWidth();
+	}
+
+	public void destroy() {
+	 	setDestroyed(true);
+	 	setCoordinates(0,0);
+	 	setBlockWidth(0);
+	 	setBlockHeight(0);
+	 	try {
+	 		queue.add(new BlockDestroyedMessage(row, column));
+		} catch (Exception e) {
+	 		e.printStackTrace();
+		}
 	}
 	 
 	/**
@@ -89,12 +117,19 @@ public class Block {
 	}
 
 	
-	public static int getBlockWidth() {
-		return BLOCK_WIDTH;
+	public int getBlockWidth() {
+		return blockWidth;
 	}
 
-	public static int getBlockHeight() {
-		return BLOCK_HEIGHT;
+	public int getBlockHeight() {
+		return blockHeight;
 	}
-	
+
+	public void setBlockWidth(int i) {
+		this.blockWidth = blockWidth;
+	}
+
+	public void setBlockHeight(int i) {
+	    this.blockHeight = blockHeight;
+	}
 }

@@ -1,8 +1,10 @@
 package breakout.model;
 
+import breakout.controller.EndGameMessage;
+import breakout.controller.ResetMessage;
 import java.awt.Insets;
 import java.util.Random;
-import javax.swing.Timer;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * The Board class aggregates block, ball, and paddle. Responsible for communicating with the View
@@ -10,6 +12,7 @@ import javax.swing.Timer;
  */
 public class Board {
 
+    private BlockingQueue queue;
     private Block[][] blocks;
     private Ball ball;
     private Paddle paddle;
@@ -21,7 +24,7 @@ public class Board {
     private static final int HEIGHT = Constants.getPanelHeight();
     private static final int BLOCK_START = WIDTH / 10; //30
     private static final int BLOCK_WIDTH = Constants.getBlockWidth();
-    private static final int BLOCK_HEIGHT = Constants.getBlockWidth();
+    private static final int BLOCK_HEIGHT = Constants.getBlockHeight();
     private static final int BLOCK_SEP = Constants.getBlockSep();
 
 
@@ -37,8 +40,9 @@ public class Board {
     private double[] ballCoordinates;
     private double[] ballVelocity;
     private double[] paddleCoordinates;
+    private final double[] startingBall;
+    private final double[] startingPaddle;
     private int paddleVelocity;
-    private boolean[][] isDestroyed;
     private int livesCounter = 1;
     private Leaderboard scoreList;
     private boolean gameFinished;
@@ -47,19 +51,25 @@ public class Board {
     private Insets frameInsets;
     private Random rgen = new Random();
 
-    public Board(Insets frameInsets) {
+    public Board(Insets frameInsets, BlockingQueue queue) {
         this.frameInsets = frameInsets;
+        this.queue = queue;
         blockCounter = ROWS * COLUMNS;
         createBlocks();
 
         leaderboard = Leaderboard.getInstance();
         ball = Ball.getInstance();
         paddle = Paddle.getInstance();
-        paddle.setPaddleCoordinates(new double[]{Constants.getPaddleXReset(),
-                HEIGHT - paddle.getPaddleHeight() - frameInsets.bottom - frameInsets.top - Constants
-                        .getPaddleOffSet()});
-        ball.setBallCoordinates(new double[]{Constants.getBallXReset(),
-                paddle.getPaddleCoordinates()[1] - ball.getHeight()});
+
+        startingPaddle = new double[]{Constants.getPaddleXReset(),
+                HEIGHT - Constants.getPaddleHeight() - frameInsets.bottom - frameInsets.top
+                        - Constants
+                        .getPaddleOffSet()};
+        startingBall = new double[]{Constants.getBallXReset(),
+                startingPaddle[1] - ball.getHeight()};
+
+        paddle.setPaddleCoordinates(startingPaddle.clone());
+        ball.setBallCoordinates(startingBall.clone());
         this.ballVelocity = ball.getBallVelocity();
         this.ballCoordinates = ball.getBallCoordinates();
         this.paddleCoordinates = paddle.getPaddleCoordinates();
@@ -85,6 +95,16 @@ public class Board {
         return blocks[i][j];
     }
 
+    public void movePaddle(double paddleVelocity) {
+        paddle.setPaddleVelocity(paddleVelocity);
+        paddle.move();
+    }
+
+//    public void moveBall(double[] ballVelocity) {
+//        ball.setBallVelocity(ballVelocity);
+//        ball.move();
+//    }
+
     /**
      * @return the coordinates of each block in the Block[][] blocks
      */
@@ -100,19 +120,6 @@ public class Board {
     }
 
     /**
-     * TODO method Checks if the ball clashes with any blocks. Should be called often.
-     */
-    protected boolean checkClash() {
-        /**
-         * if ( brick isn't destoryed yet && ball is touching the border of any brick) {
-         *      ball.destory(Block)
-         *      brickCounter--;
-         * }
-         */
-        return true;
-    }
-
-    /**
      * Creates a block set with 5 rows and 10 columns. Each block has a width of 10 and a height of
      * 5. Around this block set is space of 30 pixels on the top, left, and right.
      */
@@ -122,7 +129,7 @@ public class Board {
             for (int j = 0; j < COLUMNS; j++) {
                 int x = 30 + (BLOCK_WIDTH * (j + 1)) + (BLOCK_SEP * j);
                 int y = 30 + (BLOCK_HEIGHT * (i + 1)) + (BLOCK_SEP * i);
-                blocks[i][j] = new Block(x, y);
+                blocks[i][j] = new Block(x, y, i, j, queue);
             }
         }
     }
@@ -167,8 +174,29 @@ public class Board {
         return BLOCK_SEP;
     }
 
+    public void endGame() {
+        try {
+            queue.add(new EndGameMessage(startingBall, startingPaddle));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Not restarting game, but just resetting ball and paddle when a life is lost.
+     */
+    public void resetGame() {
+        ball.setBallCoordinates(startingBall.clone());
+        ballVelocity = new double[]{BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2),
+                BALL_MAX_VELOCITY - rgen.nextInt(BALL_MAX_VELOCITY * 2)};
+        ball.setBallVelocity(ballVelocity);
+        paddle.setPaddleCoordinates(startingPaddle.clone());
+    }
+
     // Moves the ball and will handle collision between ball and paddle and the view.
-    private void moveBall() {
+    public void moveBall() {
+        System.out.println(ballCoordinates[0]);
+        System.out.println(ball.getBallCoordinates()[0]);
 //        livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
 
         // These two statements will make sure max velocity is 5 and min velocity is -5.
@@ -203,7 +231,7 @@ public class Board {
         }
 
         // I think this makes the intersects method work better?
-        ball.setBallCoordinates(ballCoordinates);
+//        ball.setBallCoordinates(ballCoordinates);
 
         int boardWidth = BOARD_WIDTH - frameInsets.left - frameInsets.right;
         // Handles collision between ball and left and right side of the view.
@@ -216,20 +244,25 @@ public class Board {
             ballVelocity[1] *= -1;
         }
 
+        int boardHeight = BOARD_HEIGHT - frameInsets.top - frameInsets.bottom;
         // Handles collision between ball and bottom of the view.
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
-        if (ballCoordinates[1] >= boardWidth - BALL_HEIGHT) {
-//            if (livesCounter != 3) {
-//                livesCounter++;
-//  //              livesLeftDisplay.setText("Lives Left: " + (3 - livesCounter));
-//                gameFinished = false;
-//                repaintBoard();
-//            } else if (livesCounter == 3) {
-//                gameFinished = true;
-//                gameOver.setText("GameOver!");
-//                endGame();
-//            }
+        if (ballCoordinates[1] >= boardHeight - BALL_HEIGHT) {
+            ballVelocity = new double[]{0,0};
+            if (livesCounter != 3) {
+                livesCounter++;
+                gameFinished = false;
+                // Restart ball and paddle, but this isn't ending game or playing again
+                try {
+                    queue.add(new ResetMessage(startingBall, startingPaddle[0]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (livesCounter == 3) {
+                gameFinished = true;
+                endGame();
+            }
         }
 
         // If ball intersects paddle then resolve collision.
@@ -244,15 +277,18 @@ public class Board {
                 Block block = blocks[i][j];
                 boolean ballIntersection = ballIntersects(block);
                 if (ballIntersection && stop) {
-                    ballAndBlockCollision(block);
+                    ballAndBlockCollision();
                 } else if (ballIntersection) {
-                    ballAndBlockCollision(block);
-                    isDestroyed[i][j] = true;
-//                    finalScore += 5;
+                    ballAndBlockCollision();
+                    block.destroy();
                     stop = true;
                 }
             }
         }
+        ball.setBallVelocity(ballVelocity);
+        ball.setBallCoordinates(ballCoordinates);
+        System.out.println(ballCoordinates[0]);
+        System.out.println(ball.getBallCoordinates()[0]);
     }
 
     private boolean ballIntersects(Block block) {
@@ -261,7 +297,8 @@ public class Board {
         double blockLeft = block.getX();
         double blockRight = block.getX() + Constants.getBlockWidth();
 
-        closestPointToCircle = new double[]{ball.getCenterX(), ball.getCenterY()};
+        closestPointToCircle = new double[]{ballCoordinates[0] + Constants.getBallRadius(),
+                ballCoordinates[1] + Constants.getBallRadius()};
 
         // The same as the if/else statements, but shorter.
         closestPointToCircle[0] = Math
@@ -281,11 +318,12 @@ public class Board {
 
     private boolean ballIntersects() {
         double blockTop = paddleCoordinates[1];
-        double blockBottom = paddleCoordinates[1] + Constants.getBlockHeight();
+        double blockBottom = paddleCoordinates[1] + Constants.getPaddleHeight();
         double blockLeft = paddleCoordinates[0];
-        double blockRight = paddleCoordinates[0] + Constants.getBlockWidth();
+        double blockRight = paddleCoordinates[0] + Constants.getPaddleWidth();
 
-        closestPointToCircle = new double[]{ball.getCenterX(), ball.getCenterY()};
+        closestPointToCircle = new double[]{ballCoordinates[0] + Constants.getBallRadius(),
+                ballCoordinates[1] + Constants.getBallRadius()};
 
         // The same as the if/else statements, but shorter.
         closestPointToCircle[0] = Math
@@ -303,7 +341,7 @@ public class Board {
         return circleToBoxLength <= Constants.getBallRadius();
     }
 
-    private void ballAndBlockCollision(Block block) {
+    private void ballAndBlockCollision() {
 
         double overlap = Constants.getBallRadius() - circleToBoxLength;
         double collisionResolution1 = closestPointToCircle[0] / circleToBoxLength * overlap;
@@ -341,15 +379,13 @@ public class Board {
                 && ballCoordinates[1] >= paddleTop && ballCoordinates[1] < paddleTop + Constants
                 .getBallRadius()) {
             ballVelocity[0] += BALL_MAX_VELOCITY - rgen.nextInt(
-                    BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -5 to 5
+                    BALL_MAX_VELOCITY * 2); // creates random direction on paddle from -4 to 4
             ballVelocity[1] *= -1;
             ballCoordinates[1] = paddleTop - 1;
+        } else {
+            // If it hits side of paddle then just use ball and block collision, which also means
+            // end of game when it hits the bottom of the board.
+            ballAndBlockCollision();
         }
-        // TODO
-//        else {
-//            // If it hits side of paddle then just use ball and block collision, which also means
-//            // end of game when it hits the bottom of the board.
-//            ballAndBlockCollision();
-//        }
     }
 }

@@ -33,24 +33,44 @@ public class View extends JFrame{
     /**
      * This method creates the board and repaints the main view to make the board visible.
      */
-    public void createBoardView(double[] ballCoordinates, double[] paddleCoordinates, double[] ballVelocity) {
-        boardView = new BoardView(queue, getInsets(), ballCoordinates, paddleCoordinates, ballVelocity);
+    public void createBoardView(double[] ballCoordinates, double[] paddleCoordinates) {
+        boardView = new BoardView(queue, getInsets(), ballCoordinates, paddleCoordinates);
         add(boardView);
         revalidate();
         repaint();
     }
 
     public void updateBoardView(double paddleCoordinate) {
-        // Board needs to call this
         boardView.setPaddleCoordinates(paddleCoordinate);
+        revalidate();
         repaint();
     }
 
-    public void endGame(double[] ballCoordinates, double[] paddleCoordinates, double [] ballVelocity) {
+    public void updateBoardView(double[] ballCoordinates) {
+        boardView.setBallCoordinates(ballCoordinates);
+        revalidate();
+        repaint();
+    }
+
+    public void updateBoardView(int row, int column) {
+        boardView.setBlockDestroyed(row, column);
+        repaint();
+    }
+
+    public void resetGame(double[] startingBall, double startingPaddle) {
+        boardView.stopTimer();
+        updateBoardView(startingBall);
+        updateBoardView(startingPaddle);
+        System.out.println(startingBall[0]);
+        System.out.println(startingPaddle);
+    }
+
+    public void endGame(double[] ballCoordinates, double[] paddleCoordinates) {
+        boardView.stopTimer();
         JButton endGameButton = new JButton("Play Again");
         endGameButton.addActionListener(actionListener -> {
             remove(boardView);
-            createBoardView(ballCoordinates, paddleCoordinates, ballVelocity);
+            createBoardView(ballCoordinates, paddleCoordinates);
         });
         boardView.add(endGameButton);
         revalidate();

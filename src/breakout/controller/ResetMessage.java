@@ -1,11 +1,11 @@
 package breakout.controller;
 
-public class EndGameMessage implements Message {
+public class ResetMessage implements Message {
 
     private double[] startingBall;
-    private double[] startingPaddle;
+    private double startingPaddle;
 
-    public EndGameMessage(double[] startingBall, double[] startingPaddle) {
+    public ResetMessage(double[] startingBall, double startingPaddle) {
         this.startingBall = startingBall;
         this.startingPaddle = startingPaddle;
     }
@@ -14,7 +14,7 @@ public class EndGameMessage implements Message {
         return startingBall.clone();
     }
 
-    public double[] getStartingPaddle() {
+    public double getStartingPaddle() {
         return startingPaddle;
     }
 }

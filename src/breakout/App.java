@@ -3,6 +3,7 @@ package breakout;
 import breakout.controller.Breakout;
 import breakout.controller.Message;
 import breakout.view.View;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -13,7 +14,7 @@ public class App {
      * to see which lines to comment and which lines to uncomment.
      */
     public static void main(String[] args) {
-        BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+        BlockingQueue<Message> queue = new ArrayBlockingQueue<>(50);
         View view = new View(queue);
         Breakout breakout = new Breakout(view, queue);
         breakout.startGame();

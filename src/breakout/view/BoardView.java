@@ -3,6 +3,7 @@ package breakout.view;
 import breakout.controller.LeaderboardMessage;
 import breakout.controller.EndGameMessage;
 import breakout.controller.Message;
+import breakout.controller.MoveBallMessage;
 import breakout.controller.MovePaddleMessage;
 import breakout.model.Constants;
 import breakout.model.Leaderboard;
@@ -68,12 +69,17 @@ public class BoardView extends JPanel {
     private JLabel gameOver;
     private int finalScore = 0;
 
-    public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates, double[] paddleCoordinates, double[] ballVelocity) {
+    public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates, double[] paddleCoordinates) {
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
-            moveBall();
-            repaint();
+//            moveBall();
+            try {
+//                queue.add(new MoveBallMessage(ballVelocity));
+                queue.add(new MoveBallMessage());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
         });
 
         blocks = new Rectangle2D[Constants.getRows()][Constants.getColumns()];
@@ -155,14 +161,14 @@ public class BoardView extends JPanel {
     }
 
     public void endGame() {
-        try {
-            queue.add(new EndGameMessage());
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        timer.stop();
-        this.add(saveScoreButton);
-        this.add(leaderboardButton);
+//        try {
+//            queue.add(new EndGameMessage());
+//        } catch (Exception exception) {
+//            exception.printStackTrace();
+//        }
+//        timer.stop();
+//        this.add(saveScoreButton);
+//        this.add(leaderboardButton);
     }
 
     @Override
@@ -391,6 +397,14 @@ public class BoardView extends JPanel {
         this.paddleVelocity = paddleVelocity;
     }
 
+    public void setBallCoordinates(double[] ballCoordinates) {
+        this.ballCoordinates = ballCoordinates;
+    }
+
+    public void setBlockDestroyed(int row, int column) {
+        isDestroyed[row][column] = true;
+    }
+
     public void repaintBoard() {
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
@@ -412,6 +426,10 @@ public class BoardView extends JPanel {
         ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
     }
 
+    public void stopTimer() {
+        timer.stop();
+    }
+
     /**
      * So basically, whenever a key is pressed or released it will call MoveAction's overrided
      * actionPerformed method
@@ -428,6 +446,7 @@ public class BoardView extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!timer.isRunning() && !gameFinished) {
                 timer.start();
+                System.out.println("start");
             }
 
             try {

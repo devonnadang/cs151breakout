@@ -29,8 +29,8 @@ public class Breakout {
      */
     public void startGame() {
         lives = new Life();
-        board = new Board(view.getInsets());
-        view.createBoardView(board.getBall().getBallCoordinates(), board.getPaddle().getPaddleCoordinates(), board.getBall().getBallVelocity());
+        board = new Board(view.getInsets(), queue);
+        view.createBoardView(board.getBall().getBallCoordinates(), board.getPaddle().getPaddleCoordinates());
 
         // While for the message system. I did not implement valves yet.
         while (view.isDisplayable()) {
@@ -44,12 +44,23 @@ public class Breakout {
             // Figure out what message it is and do correct action
             if (message.getClass() == MovePaddleMessage.class) {
                 MovePaddleMessage movePaddleMessage = (MovePaddleMessage) message;
-                board.getPaddle().setPaddleVelocity(movePaddleMessage.getNewVelocity());
-                board.getPaddle().move();
+                board.movePaddle(movePaddleMessage.getNewVelocity());
  //               System.out.println("From Paddle x: "+ board.getPaddle().getX());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
                 view.updateBoardView(board.getPaddle().getPaddleCoordinates()[0]);
+            }
+            // Move Ball
+            else if (message.getClass() == MoveBallMessage.class) {
+                System.out.println("Move!");
+                MoveBallMessage moveBallMessage = (MoveBallMessage) message;
+                board.moveBall();
+                view.updateBoardView(board.getBall().getBallCoordinates());
+            }
+            // Destroy Block
+            else if (message.getClass() == BlockDestroyedMessage.class) {
+                BlockDestroyedMessage blockDestroyedMessage = (BlockDestroyedMessage) message;
+                view.updateBoardView(blockDestroyedMessage.getRow(), blockDestroyedMessage.getColumn());
             }
             // when save score button is pressed
             // add a new score to board
@@ -66,10 +77,17 @@ public class Breakout {
             	leaderboardMessage.addScores(board.getScore());
             	view.updateLeaderboardView(leaderboardMessage.getScores());
             }
+            // When game resets
+            else if (message.getClass() == ResetMessage.class) {
+                System.out.println("reset");
+                ResetMessage resetMessage = (ResetMessage) message;
+                board.resetGame();
+                view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle());
+            }
             // When game ends
             else if (message.getClass() == EndGameMessage.class) {
                 EndGameMessage endGameMessage = (EndGameMessage) message;
-                view.endGame(board.getBall().getBallCoordinates(), board.getPaddle().getPaddleCoordinates(), board.getBall().getBallVelocity());
+                view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle());
             }
         }
 
