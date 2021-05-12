@@ -62,8 +62,6 @@ public class View extends JFrame{
         boardView.stopTimer();
         updateBoardView(startingBall);
         updateBoardView(startingPaddle);
-        System.out.println(startingBall[0]);
-        System.out.println(startingPaddle);
     }
 
     public void endGame(double[] ballCoordinates, double[] paddleCoordinates) {

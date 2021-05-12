@@ -198,9 +198,6 @@ public class Board {
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     public void moveBall() {
-        System.out.println(ballCoordinates[0]);
-        System.out.println(ball.getBallCoordinates()[0]);
-//        livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
 
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math
@@ -233,8 +230,9 @@ public class Board {
             ballCoordinates[i] += ballVelocity[i];
         }
 
-        // I think this makes the intersects method work better?
-//        ball.setBallCoordinates(ballCoordinates);
+        // Setting coordinates here to make intersects and collide work correctly and then setting
+        // it again later after the correction
+        ball.setBallCoordinates(ballCoordinates);
 
         int boardWidth = BOARD_WIDTH - frameInsets.left - frameInsets.right;
         // Handles collision between ball and left and right side of the view.
@@ -252,7 +250,6 @@ public class Board {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= boardHeight - BALL_HEIGHT) {
-            ballVelocity = new double[]{0,0};
             if (livesCounter != 3) {
                 livesCounter++;
                 gameFinished = false;
@@ -262,13 +259,10 @@ public class Board {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (livesCounter == 3) {
+            } else if (livesCounter == 3 && !gameFinished) {
                 gameFinished = true;
                 endGame();
             }
-        } else {
-            ball.setBallVelocity(ballVelocity);
-            ball.setBallCoordinates(ballCoordinates);
         }
 
         // If ball intersects paddle then resolve collision.
@@ -291,10 +285,8 @@ public class Board {
                 }
             }
         }
-//        ball.setBallVelocity(ballVelocity);
-//        ball.setBallCoordinates(ballCoordinates);
-        System.out.println(ballCoordinates[0]);
-        System.out.println(ball.getBallCoordinates()[0]);
+        ball.setBallVelocity(ballVelocity);
+        ball.setBallCoordinates(ballCoordinates);
     }
 
     private boolean ballIntersects(Block block) {

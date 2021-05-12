@@ -52,7 +52,6 @@ public class Breakout {
             }
             // Move Ball
             else if (message.getClass() == MoveBallMessage.class) {
-                System.out.println("Move!");
                 MoveBallMessage moveBallMessage = (MoveBallMessage) message;
                 board.moveBall();
                 view.updateBoardView(board.getBall().getBallCoordinates());
@@ -79,7 +78,6 @@ public class Breakout {
             }
             // When game resets
             else if (message.getClass() == ResetMessage.class) {
-                System.out.println("reset");
                 ResetMessage resetMessage = (ResetMessage) message;
                 board.resetGame();
                 view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle());
@@ -87,7 +85,6 @@ public class Breakout {
             // When game ends
             else if (message.getClass() == EndGameMessage.class) {
                 EndGameMessage endGameMessage = (EndGameMessage) message;
-                board.resetGame();
                 view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle());
             }
             // When player clicks "Play Again" button

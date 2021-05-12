@@ -75,7 +75,6 @@ public class BoardView extends JPanel {
         timer = new Timer(17, e -> {
 //            moveBall();
             try {
-//                queue.add(new MoveBallMessage(ballVelocity));
                 queue.add(new MoveBallMessage());
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -446,7 +445,6 @@ public class BoardView extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!timer.isRunning() && !gameFinished) {
                 timer.start();
-                System.out.println("start");
             }
 
             try {
