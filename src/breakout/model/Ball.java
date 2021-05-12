@@ -67,36 +67,67 @@ public final class Ball {
 	 */
 	public void move()
 	{
-		ballCoordinates[0] += ballVelocity[0];
-		ballCoordinates[1] += ballVelocity[1];
-        
+//		ballCoordinates[0] += ballVelocity[0];
+//		ballCoordinates[1] += ballVelocity[1];
+//
+//
+//        // Handles collision between ball and left and right side of the view.
+//        if (ballCoordinates[0] < 0 || ballCoordinates[0] > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
+//            ballVelocity[0] *= -1;
+//        }
+//
+//        // Handles collision between ball and top of the view.
+//        if (ballCoordinates[1] < 0) {
+//            ballVelocity[1] *= -1;
+//        }
+//
+//        // Handles collision between ball and bottom of the view.
+//        // Actually if ball goes below it should end game, but there is no end game implementation
+//        // as of now.
+//        if (ballFallsBelow()) {
+//            ballVelocity[0] = 0;
+//			ballVelocity[1] = 0;
+////			reset();
+//        }
 
-        // Handles collision between ball and left and right side of the view.
-        if (ballCoordinates[0] < 0 || ballCoordinates[0] > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
-            ballVelocity[0] *= -1;
-        }
+		// These two statements will make sure max velocity is 5 and min velocity is -5.
+		ballVelocity[0] = Math
+				.max(-Constants.getBallMaxVelocity(), Math.min(Constants.getBallMaxVelocity(), ballVelocity[0]));
+		ballVelocity[1] = Math
+				.max(-Constants.getBallMaxVelocity(), Math.min(Constants.getBallMaxVelocity(), ballVelocity[1]));
 
-        // Handles collision between ball and top of the view.
-        if (ballCoordinates[1] < 0) {
-            ballVelocity[1] *= -1;
-        }
+		if (ballVelocity[1] == 0) {
+			ballVelocity[1] = Constants.getBallMaxVelocity();
+		}
 
-        // Handles collision between ball and bottom of the view.
-        // Actually if ball goes below it should end game, but there is no end game implementation
-        // as of now.
-        if (ballFallsBelow()) {
-            ballVelocity[0] = 0;
-			ballVelocity[1] = 0;
-//			reset();
-        }
+		// Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
+		if (ballVelocity[0] > -Constants.getBallMinVelocity() && ballVelocity[0] < Constants.getBallMinVelocity()) {
+			if (ballVelocity[0] < 0) {
+				ballVelocity[0] -= .5;
+			} else if (ballVelocity[0] > 0) {
+				ballVelocity[0] += .5;
+			}
+		}
+
+		if (ballVelocity[1] > -Constants.getBallMinVelocity() && ballVelocity[1] < Constants.getBallMinVelocity()) {
+			if (ballVelocity[1] < 0) {
+				ballVelocity[1] -= .5;
+			} else if (ballVelocity[1] > 0) {
+				ballVelocity[1] += .5;
+			}
+		}
+
+		for (int i = 0; i < ballCoordinates.length; i++) {
+			ballCoordinates[i] += ballVelocity[i];
+		}
 	}
 
 	public boolean ballFallsBelow(){
 		if (ballCoordinates[1] >= Constants.getPanelHeight() - (Constants.getBallRadius()*2)) {
-            return true;
-        } return false;
+			return true;
+		} return false;
 	}
-	
+
 	/**
 	 * Destroys the given block by setting the Block's boolean destroyed variable to true
 	 * @param block the block that should be destroyed

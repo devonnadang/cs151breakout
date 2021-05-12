@@ -199,40 +199,9 @@ public class Board {
     // Moves the ball and will handle collision between ball and paddle and the view.
     public void moveBall() {
 
-        // These two statements will make sure max velocity is 5 and min velocity is -5.
-        ballVelocity[0] = Math
-                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
-        ballVelocity[1] = Math
-                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
-
-        if (ballVelocity[1] == 0) {
-            ballVelocity[1] = BALL_MAX_VELOCITY;
-        }
-
-        // Handles if ball is going too slow. Using .5 so that ball accelerates slowly.
-        if (ballVelocity[0] > -BALL_MIN_VELOCITY && ballVelocity[0] < BALL_MIN_VELOCITY) {
-            if (ballVelocity[0] < 0) {
-                ballVelocity[0] -= .5;
-            } else if (ballVelocity[0] > 0) {
-                ballVelocity[0] += .5;
-            }
-        }
-
-        if (ballVelocity[1] > -BALL_MIN_VELOCITY && ballVelocity[1] < BALL_MIN_VELOCITY) {
-            if (ballVelocity[1] < 0) {
-                ballVelocity[1] -= .5;
-            } else if (ballVelocity[1] > 0) {
-                ballVelocity[1] += .5;
-            }
-        }
-
-        for (int i = 0; i < ballCoordinates.length; i++) {
-            ballCoordinates[i] += ballVelocity[i];
-        }
-
-        // Setting coordinates here to make intersects and collide work correctly and then setting
-        // it again later after the correction
-        ball.setBallCoordinates(ballCoordinates);
+        ball.move();
+        ballCoordinates = ball.getBallCoordinates();
+        ballVelocity = ball.getBallVelocity();
 
         int boardWidth = BOARD_WIDTH - frameInsets.left - frameInsets.right;
         // Handles collision between ball and left and right side of the view.
