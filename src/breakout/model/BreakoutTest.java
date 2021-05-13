@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import breakout.controller.Breakout;
 import breakout.view.View;
- import java.awt.Insets;
+import java.awt.Insets;
 
 
 class BreakoutTest {
@@ -25,12 +25,12 @@ class BreakoutTest {
     void winGameTest() {
         boolean expected = true;
         boolean actual = false;
-        Board board = new Board(new Insets(0,0,0,0), new ArrayBlockingQueue(15));
+        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
 
         //set all blocks to destroyed
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
-                board.ballCollide(board.getBlock(i,j));
+                board.ballCollide(board.getBlock(i, j));
             }
         }
         actual = board.bricksAreCleared();
@@ -87,7 +87,8 @@ class BreakoutTest {
     void startGameTest() {
         // GUI pops up for like a split second; Should I make the system wait? But it gave
         // some errors...
-        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()), new LinkedBlockingQueue<>());
+        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()),
+                new LinkedBlockingQueue<>());
         breakout.startGame();
 
         // How should I test this? Should this even be a test?
@@ -103,10 +104,11 @@ class BreakoutTest {
 
     }
 
-    @Test // get score based on how many blocks are left
+    @Test
+        // get score based on how many blocks are left
     void checkScoreTest() {
-    	// Board boardTest = new Board();
-    	// int blocksDestroyed = getRows() * getColumns() - getBlockCounter() = // how many blocks are out
+        // Board boardTest = new Board();
+        // int blocksDestroyed = getRows() * getColumns() - getBlockCounter() = // how many blocks are out
     }
 
     /**
@@ -114,54 +116,54 @@ class BreakoutTest {
      */
     @Test
     void get10HighestScores() {
-    	Score s1 = new Score();
+        Score s1 = new Score();
         s1.setScore(65);
         s1.setUsername("A");
-        
+
         Score s2 = new Score();
         s2.setScore(10);
         s2.setUsername("B");
-        
+
         Score s3 = new Score();
         s3.setScore(55);
         s3.setUsername("C");
-        
+
         Score s4 = new Score();
         s4.setScore(200);
         s4.setUsername("D");
-        
+
         Score s5 = new Score();
         s5.setScore(250);
         s5.setUsername("E");
-        
+
         Score s6 = new Score();
         s6.setScore(65);
         s6.setUsername("F");
-        
+
         Score s7 = new Score();
         s7.setScore(65);
         s7.setUsername("G");
-        
+
         Score s8 = new Score();
         s8.setScore(15);
         s8.setUsername("H");
-        
+
         Score s9 = new Score();
         s9.setScore(0);
         s9.setUsername("I");
-        
+
         Score s10 = new Score();
         s10.setScore(70);
         s10.setUsername("J");
-        
+
         Score s11 = new Score();
         s11.setScore(40);
         s11.setUsername("K");
-        
+
         Score s12 = new Score();
         s12.setScore(250);
         s12.setUsername("L");
-        
+
         Leaderboard scores = Leaderboard.getInstance();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
@@ -175,7 +177,7 @@ class BreakoutTest {
         scores.addNewScore(s10);
         scores.addNewScore(s11);
         scores.addNewScore(s12);
-        
+
         ArrayList<Score> expectedScores = new ArrayList<>();
         expectedScores.add(s5);
         expectedScores.add(s12);
@@ -192,30 +194,30 @@ class BreakoutTest {
     }
 
     /**
-     * Checking that all scores are added and in order 
+     * Checking that all scores are added and in order
      */
     @Test
     void addScoreTest() {
-    	Score s1 = new Score();
+        Score s1 = new Score();
         s1.setScore(65);
         s1.setUsername("A");
-        
+
         Score s2 = new Score();
         s2.setScore(100);
         s2.setUsername("B");
-        
+
         Score s3 = new Score();
         s3.setScore(5);
         s3.setUsername("C");
-        
+
         Score s4 = new Score();
         s4.setScore(20);
         s4.setUsername("D");
-        
+
         Score s5 = new Score();
         s5.setScore(100);
         s5.setUsername("E");
-        
+
         Leaderboard scores = Leaderboard.getInstance();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
@@ -235,7 +237,7 @@ class BreakoutTest {
 
     @Test
     void createBoardTest() {
-        Board board = new Board(new Insets(0,0,0,0), new ArrayBlockingQueue(15));
+        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
         System.out.println(board.toString());
     }
 
@@ -271,8 +273,9 @@ class BreakoutTest {
 
     @Test
     void destroyBlockTest() {
-        Board board = new Board(new Insets(0,0,0,0), new ArrayBlockingQueue(15));
-        int expectedBlockCounter = Constants.getRows()*Constants.getColumns() + 1; //one block is destroyed
+        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
+        int expectedBlockCounter =
+                Constants.getRows() * Constants.getColumns() + 1; //one block is destroyed
         // TODO
 //        board.getBall().setCoordinates(30, 35);
 
@@ -292,8 +295,8 @@ class BreakoutTest {
     void resetBoardTest() {
         // How to reset board? There no method to access Board's data except how many rows/columns
         // it has.
-        Board board = new Board(new Insets(0,0,0,0), new ArrayBlockingQueue(15));
-        board = new Board(new Insets(0,0,0,0), new ArrayBlockingQueue(15));
+        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
+        board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
 
         assertNotNull(board);
     }

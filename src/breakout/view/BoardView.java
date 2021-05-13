@@ -72,7 +72,8 @@ public class BoardView extends JPanel {
     private JLabel gameOver;
     private int finalScore = 0;
 
-    public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates, double[] paddleCoordinates) {
+    public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates,
+            double[] paddleCoordinates) {
         // This is the timer of the ball, but it shouldn't affect paddle movement. Every 17 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
@@ -154,7 +155,7 @@ public class BoardView extends JPanel {
         livesLeftDisplay = new JLabel(" ");
         this.add(livesLeftDisplay);
 
-        scoreDisplay = new JLabel (" ");
+        scoreDisplay = new JLabel(" ");
         this.add(scoreDisplay);
         scoreDisplay.setText("Score: " + finalScore);
     }
@@ -225,7 +226,7 @@ public class BoardView extends JPanel {
      * view. Ball can bounce off the paddle and off the top, left, and right of the panel.
      */
     private void moveBall() {
-    	livesLeftDisplay.setText("Lives Left: " + livesCounter);
+        livesLeftDisplay.setText("Lives Left: " + livesCounter);
 
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math
@@ -401,7 +402,8 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * Sets the x coordinate of the paddle, since it only moves left and right. Makes sure the paddle stays within the board.
+     * Sets the x coordinate of the paddle, since it only moves left and right. Makes sure the
+     * paddle stays within the board.
      *
      * @param paddleCoordinates
      */
@@ -501,6 +503,6 @@ public class BoardView extends JPanel {
      * @param scoreList
      */
     public void setScores(Leaderboard scoreList) {
-		this.scoreList = scoreList;
-	}
+        this.scoreList = scoreList;
+    }
 }

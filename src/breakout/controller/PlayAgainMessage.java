@@ -1,6 +1,7 @@
 package breakout.controller;
 
 public class PlayAgainMessage implements Message {
+
     private double[] ballCoordinates;
     private double[] paddleCoordinates;
 

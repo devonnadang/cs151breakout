@@ -79,6 +79,7 @@ public class Board {
 
     /**
      * Gets the score.
+     *
      * @return the leaderboard which should be holding the score.
      */
     public Leaderboard getScore() {
@@ -87,6 +88,7 @@ public class Board {
 
     /**
      * Adds score to the leaderboard
+     *
      * @param score score to add to leaderboard
      */
     public void addScore(Score score) {
@@ -146,6 +148,7 @@ public class Board {
 
     /**
      * When ball collides with a block, it destroys it.
+     *
      * @param block the block that the ball collided with
      */
     protected void ballCollide(Block block) {
@@ -172,12 +175,12 @@ public class Board {
         return COLUMNS;
     }
 
-    public static int getBoardWidth() {
-        return WIDTH;
+    public int getBoardWidth() {
+        return WIDTH - frameInsets.left - frameInsets.right;
     }
 
-    public static int getBoardHeight() {
-        return HEIGHT;
+    public int getBoardHeight() {
+        return HEIGHT - frameInsets.top - frameInsets.bottom;
     }
 
     public int getBlockCounter() {
@@ -216,32 +219,21 @@ public class Board {
     // Moves the ball and will handle collision between ball and paddle and the view.
     public void moveBall() {
 
-        ball.move();
+        ball.move(getBoardWidth());
         ballCoordinates = ball.getBallCoordinates();
         ballVelocity = ball.getBallVelocity();
 
-        int boardWidth = BOARD_WIDTH - frameInsets.left - frameInsets.right;
-        // Handles collision between ball and left and right side of the view.
-        if (ballCoordinates[0] < 0 || ballCoordinates[0] > boardWidth - BALL_WIDTH) {
-            ballVelocity[0] *= -1;
-        }
-
-        // Handles collision between ball and top of the view.
-        if (ballCoordinates[1] < 0) {
-            ballVelocity[1] *= -1;
-        }
-
-        int boardHeight = BOARD_HEIGHT - frameInsets.top - frameInsets.bottom;
         // Handles collision between ball and bottom of the view.
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
-        if (ballCoordinates[1] >= boardHeight - BALL_HEIGHT) {
+        if (ball.ballFallsBelow(getBoardHeight())) {
             if (lives.isAlive()) {
                 lives.subtractLife();
                 gameFinished = false;
                 // Restart ball and paddle, but this isn't ending game or playing again
                 try {
-                    queue.add(new ResetMessage(startingBall.clone(), startingPaddle[0], lives.getLives()));
+                    queue.add(new ResetMessage(startingBall.clone(), startingPaddle[0],
+                            lives.getLives()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

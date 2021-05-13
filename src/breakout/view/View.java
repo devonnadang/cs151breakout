@@ -2,6 +2,7 @@ package breakout.view;
 
 import breakout.controller.Message;
 import breakout.controller.PlayAgainMessage;
+import breakout.model.Constants;
 import java.awt.Dimension;
 
 import java.util.concurrent.BlockingQueue;
@@ -24,7 +25,7 @@ public class View extends JFrame {
      */
     public View(BlockingQueue<Message> queue) {
         this.queue = queue;
-         this.setPreferredSize(new Dimension(Board.getBoardWidth(),Board.getBoardHeight()));
+         this.setPreferredSize(new Dimension(Constants.getPanelWidth(), Constants.getPanelHeight()));
          setResizable(false);
          setTitle("Breakout");
          setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
