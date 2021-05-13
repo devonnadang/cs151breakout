@@ -29,7 +29,8 @@ public class Breakout {
     }
 
     /**
-     * Starts Breakout. Initializes Board and any other objects that need to be initialized.
+     * Starts Breakout. Initializes Life, Board, and any other objects that need to be initialized.
+     * Calls on View's createBoardView() to create the graphics for the game.
      */
     public void startGame() {
         lives = new Life();
@@ -50,7 +51,6 @@ public class Breakout {
             if (message.getClass() == MoveMessage.class) {
                 MoveMessage moveMessage = (MoveMessage) message;
                 board.getPaddle().move(moveMessage.getNewVelocity());
- //               System.out.println("From Paddle x: "+ board.getPaddle().getX());
                 // The moveMessage will contain the new x coordinate for the paddle and give it to the
                 // main view for it to update the BoardView and for the BoardView to update the paddle.
                 view.updateBoardView(moveMessage.getNewVelocity());
@@ -76,23 +76,10 @@ public class Breakout {
                 view.endGame();
             }
         }
-
-        // Calling endgame after while loop ends
-        endGame();
     }
 
     /**
-     * Ends Breakout when there are no lives left or when there are no blocks
-     * left.
-     */
-    public void endGame() {
-        // Go to leaderboard page
-    }
-
-    /**
-     * Initializes and starts Breakout. Right now if you run it, the program will be using the message system, but if you want
-     * to see how I set it up without using the message system, then go to my comments in BoardView's private MoveAction class
-     * to see which lines to comment and which lines to uncomment.
+     * Initializes and starts Breakout.
      */
     public static void main(String[] args) {
         BlockingQueue<Message> queue = new LinkedBlockingQueue<>();

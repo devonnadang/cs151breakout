@@ -1,5 +1,8 @@
 package breakout.model;
 
+/**
+ * Holds all of the constants for the game.
+ */
 public class Constants {
     private static final int BALL_RADIUS = 8;
     private final static int BLOCK_HEIGHT = 20;

@@ -1,5 +1,9 @@
 package breakout.view;
 
+/**
+ * This class opens a new save score window when initialized.
+ */
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.concurrent.BlockingQueue;
@@ -25,20 +29,19 @@ public class SaveScoreView extends JFrame {
 		this.queue = queue;
 		
 		this.scoreLabel = new JLabel("Score: ");
-		this.theScore = new JLabel(String.valueOf(score) + "."); // board.getScore()
+		this.theScore = new JLabel(String.valueOf(score) + "."); // displays current score
+
 		this.usernameLabel = new JLabel("Enter username: ");
-		
 		this.enterUsername = new JTextField(10);
 		
 		this.save = new JButton("Save Username");
-		
 		save.addActionListener(e -> {
         	try {
-        		SaveScoreMessage sum = new SaveScoreMessage(score, enterUsername.getText());
-                queue.put(sum);//enterUsername.getText())); // change later to actual score
+        		SaveScoreMessage ssm = new SaveScoreMessage(score, enterUsername.getText());
+                queue.put(ssm);
                 this.dispose();
             } catch (InterruptedException exception) {
-                // do nothing
+        	    exception.printStackTrace();
             }
         });
 		
@@ -52,6 +55,8 @@ public class SaveScoreView extends JFrame {
         this.setLayout(new FlowLayout());
     	this.setResizable(true);
     	this.setTitle("Save Score");
+
+		// closes the window but does not exit the entire program
     	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     	this.pack();
     	this.setVisible(true);
