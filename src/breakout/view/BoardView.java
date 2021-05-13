@@ -464,8 +464,11 @@ public class BoardView extends JPanel {
         ballCoordinates[1] = paddleCoordinates[1] - BALL_HEIGHT;
     }
 
-    public void stopTimer() {
+    public void stopTimer(boolean gameFinished) {
         timer.stop();
+        if (gameFinished) {
+            timer.removeActionListener(timer.getActionListeners()[0]);
+        }
     }
 
     /**

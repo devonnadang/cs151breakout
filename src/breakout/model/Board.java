@@ -197,7 +197,7 @@ public class Board {
 
     public void endGame() {
         try {
-            queue.add(new EndGameMessage(startingBall, startingPaddle));
+            queue.add(new EndGameMessage(startingBall, startingPaddle, lives.getLives()));
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -216,7 +216,10 @@ public class Board {
         paddle.setPaddleCoordinates(paddleCoordinates);
     }
 
-    // Moves the ball and will handle collision between ball and paddle and the view.
+    /**
+     * Moves the ball and will handle collision between the relation of ball with the paddle and the
+     * view. Ball can bounce off the paddle and off the top, left, and right of the panel.
+     */
     public void moveBall() {
 
         ball.move(getBoardWidth());
@@ -227,8 +230,8 @@ public class Board {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ball.ballFallsBelow(getBoardHeight())) {
+            lives.subtractLife();
             if (lives.isAlive()) {
-                lives.subtractLife();
                 gameFinished = false;
                 // Restart ball and paddle, but this isn't ending game or playing again
                 try {
@@ -273,6 +276,13 @@ public class Board {
         }
     }
 
+    /**
+     * Checks if the ball is intersecting with the block. Does this by checking whether the point
+     * closest the block is less than or equal to the ball's radius
+     *
+     * @param block the block to check
+     * @return true if the ball intersects, else false
+     */
     private boolean ballIntersects(Block block) {
         double blockTop = block.getY();
         double blockBottom = block.getY() + block.getBlockHeight();
@@ -282,12 +292,14 @@ public class Board {
         closestPointToCircle = new double[]{ballCoordinates[0] + Constants.getBallRadius(),
                 ballCoordinates[1] + Constants.getBallRadius()};
 
-        // The same as the if/else statements, but shorter.
+        // These max and min statements will find the closest point on the block to the center of the
+        // ball binding the point to within the perimeter of the block.
         closestPointToCircle[0] = Math
                 .max(blockLeft, Math.min(blockRight, closestPointToCircle[0]));
         closestPointToCircle[1] = Math
                 .max(blockTop, Math.min(blockBottom, closestPointToCircle[1]));
 
+        // Calculating overlap between closest point and ball center
         closestPointToCircle[0] -= ball.getCenterX();
         closestPointToCircle[1] -= ball.getCenterY();
 
@@ -298,6 +310,12 @@ public class Board {
         return circleToBoxLength <= Constants.getBallRadius();
     }
 
+    /**
+     * Checks if the ball is intersecting with the paddle. Does this by checking whether the point
+     * closest to the paddle is less than or equal to the ball's radius
+     *
+     * @return true if the ball intersects, else false
+     */
     private boolean ballIntersects() {
         double blockTop = paddleCoordinates[1];
         double blockBottom = paddleCoordinates[1] + Constants.getPaddleHeight();
@@ -307,12 +325,14 @@ public class Board {
         closestPointToCircle = new double[]{ballCoordinates[0] + Constants.getBallRadius(),
                 ballCoordinates[1] + Constants.getBallRadius()};
 
-        // The same as the if/else statements, but shorter.
+        // These max and min statements will find the closest point on the block to the center of the
+        // ball binding the point to within the perimeter of the block.
         closestPointToCircle[0] = Math
                 .max(blockLeft, Math.min(blockRight, closestPointToCircle[0]));
         closestPointToCircle[1] = Math
                 .max(blockTop, Math.min(blockBottom, closestPointToCircle[1]));
 
+        // Calculating overlap between closest point and ball center
         closestPointToCircle[0] -= ball.getCenterX();
         closestPointToCircle[1] -= ball.getCenterY();
 
@@ -323,6 +343,10 @@ public class Board {
         return circleToBoxLength <= Constants.getBallRadius();
     }
 
+    /**
+     * This method handles collisions between ball and block. Changes ball velocity based on the
+     * location of ball and block contact.
+     */
     private void ballAndBlockCollision() {
 
         double overlap = Constants.getBallRadius() - circleToBoxLength;

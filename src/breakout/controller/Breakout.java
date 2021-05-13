@@ -155,7 +155,8 @@ public class Breakout {
                 return ValveResponse.MISS;
             }
             EndGameMessage endGameMessage = (EndGameMessage) message;
-            view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle());
+            view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle(),
+                    endGameMessage.getLives());
             return ValveResponse.EXECUTED;
         }
     }

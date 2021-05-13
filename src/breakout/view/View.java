@@ -63,7 +63,7 @@ public class View extends JFrame {
     }
 
     public void resetGame(double[] startingBall, double startingPaddle, int lives) {
-        boardView.stopTimer();
+        boardView.stopTimer(false);
         boardView.setLivesCounter(lives);
         updateBoardView(startingBall);
         updateBoardView(startingPaddle);
@@ -72,8 +72,9 @@ public class View extends JFrame {
     /**
      * Adds a button to play again.
      */
-    public void endGame(double[] ballCoordinates, double[] paddleCoordinates) {
-        boardView.stopTimer();
+    public void endGame(double[] ballCoordinates, double[] paddleCoordinates, int lives) {
+        boardView.stopTimer(true);
+        boardView.setLivesCounter(lives);
         JButton endGameButton = new JButton("Play Again");
         endGameButton.addActionListener(actionListener -> {
             try {
