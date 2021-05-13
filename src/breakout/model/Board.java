@@ -43,8 +43,8 @@ public class Board {
     private final double[] startingBall;
     private final double[] startingPaddle;
     private int paddleVelocity;
-    private int livesCounter;
-    private Leaderboard scoreList;
+    private int blocksDestroyed;
+    private Life lives;
     private boolean gameFinished;
     private double circleToBoxLength;
     private double[] closestPointToCircle;
@@ -52,7 +52,8 @@ public class Board {
     private Random rgen = new Random();
 
     public Board(Insets frameInsets, BlockingQueue queue) {
-        livesCounter = 1;
+        blocksDestroyed = 0;
+        lives = new Life();
         this.frameInsets = frameInsets;
         this.queue = queue;
         blockCounter = ROWS * COLUMNS;
@@ -175,6 +176,10 @@ public class Board {
         return BLOCK_SEP;
     }
 
+    public int getLives() {
+        return lives.getLives();
+    }
+
     public void endGame() {
         try {
             queue.add(new EndGameMessage(startingBall, startingPaddle));
@@ -219,16 +224,16 @@ public class Board {
         // Actually if ball goes below it should end game, but there is no end game implementation
         // as of now.
         if (ballCoordinates[1] >= boardHeight - BALL_HEIGHT) {
-            if (livesCounter != 3) {
-                livesCounter++;
+            if (lives.isAlive()) {
+                lives.subtractLife();
                 gameFinished = false;
                 // Restart ball and paddle, but this isn't ending game or playing again
                 try {
-                    queue.add(new ResetMessage(startingBall.clone(), startingPaddle[0]));
+                    queue.add(new ResetMessage(startingBall.clone(), startingPaddle[0], lives.getLives()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (livesCounter == 3 && !gameFinished) {
+            } else if (!lives.isAlive() && !gameFinished) {
                 gameFinished = true;
                 endGame();
             }
@@ -251,18 +256,24 @@ public class Board {
                     ballAndBlockCollision();
                     block.destroy();
                     stop = true;
+                    blocksDestroyed++;
                 }
             }
         }
         ball.setBallVelocity(ballVelocity);
         ball.setBallCoordinates(ballCoordinates);
+
+        if (blocksDestroyed == Constants.getColumns() * Constants.getRows()) {
+            gameFinished = true;
+            endGame();
+        }
     }
 
     private boolean ballIntersects(Block block) {
         double blockTop = block.getY();
-        double blockBottom = block.getY() + Constants.getBlockHeight();
+        double blockBottom = block.getY() + block.getBlockHeight();
         double blockLeft = block.getX();
-        double blockRight = block.getX() + Constants.getBlockWidth();
+        double blockRight = block.getX() + block.getBlockWidth();
 
         closestPointToCircle = new double[]{ballCoordinates[0] + Constants.getBallRadius(),
                 ballCoordinates[1] + Constants.getBallRadius()};

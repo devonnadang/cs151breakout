@@ -34,8 +34,9 @@ public class View extends JFrame{
     /**
      * This method creates the board and repaints the main view to make the board visible.
      */
-    public void createBoardView(double[] ballCoordinates, double[] paddleCoordinates) {
+    public void createBoardView(double[] ballCoordinates, double[] paddleCoordinates, int lives) {
         boardView = new BoardView(queue, getInsets(), ballCoordinates, paddleCoordinates);
+        boardView.setLivesCounter(lives);
         add(boardView);
         revalidate();
         repaint();
@@ -55,11 +56,13 @@ public class View extends JFrame{
 
     public void updateBoardView(int row, int column) {
         boardView.setBlockDestroyed(row, column);
+        boardView.setFinalScore(boardView.getFinalScore() + 5);
         repaint();
     }
 
-    public void resetGame(double[] startingBall, double startingPaddle) {
+    public void resetGame(double[] startingBall, double startingPaddle, int lives) {
         boardView.stopTimer();
+        boardView.setLivesCounter(lives);
         updateBoardView(startingBall);
         updateBoardView(startingPaddle);
     }
@@ -75,13 +78,14 @@ public class View extends JFrame{
             }
         });
         boardView.add(endGameButton);
+        boardView.endGame();
         revalidate();
         repaint();
     }
 
-    public void playAgain(double[] ballCoordinates, double[] paddleCoordinates) {
+    public void playAgain(double[] ballCoordinates, double[] paddleCoordinates, int lives) {
         remove(boardView);
-        createBoardView(ballCoordinates, paddleCoordinates);
+        createBoardView(ballCoordinates, paddleCoordinates, lives);
     }
 
     public void updateLeaderboardView(Leaderboard scoreList) {

@@ -13,7 +13,6 @@ public class Breakout {
 
     private Board board;
     private View view;
-    private Life lives;
     private BlockingQueue<Message> queue;
 
     /**
@@ -28,9 +27,8 @@ public class Breakout {
      * Starts Breakout. Initializes Board and any other objects that need to be initialized.
      */
     public void startGame() {
-        lives = new Life();
         board = new Board(view.getInsets(), queue);
-        view.createBoardView(board.getBall().getBallCoordinates(), board.getPaddle().getPaddleCoordinates());
+        view.createBoardView(board.getBall().getBallCoordinates(), board.getPaddle().getPaddleCoordinates(), board.getLives());
 
         // While for the message system. I did not implement valves yet.
         while (view.isDisplayable()) {
@@ -80,7 +78,7 @@ public class Breakout {
             else if (message.getClass() == ResetMessage.class) {
                 ResetMessage resetMessage = (ResetMessage) message;
                 board.resetGame();
-                view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle());
+                view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle(), resetMessage.getLives());
             }
             // When game ends
             else if (message.getClass() == EndGameMessage.class) {
@@ -91,19 +89,8 @@ public class Breakout {
             else if (message.getClass() == PlayAgainMessage.class) {
                 PlayAgainMessage playAgainMessage = (PlayAgainMessage) message;
                 board = new Board(view.getInsets(), queue);
-                view.playAgain(playAgainMessage.getBallCoordinates(), playAgainMessage.getPaddleCoordinates());
+                view.playAgain(playAgainMessage.getBallCoordinates(), playAgainMessage.getPaddleCoordinates(), board.getLives());
             }
         }
-
-        // Calling endgame after while loop ends
-        endGame();
-    }
-
-    /**
-     * Ends Breakout when there are no lives left or when there are no blocks
-     * left.
-     */
-    public void endGame() {
-        // Go to leaderboard page
     }
 }

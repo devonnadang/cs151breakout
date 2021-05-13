@@ -125,11 +125,11 @@ public class Block {
 		return blockHeight;
 	}
 
-	public void setBlockWidth(int i) {
+	public void setBlockWidth(int blockWidth) {
 		this.blockWidth = blockWidth;
 	}
 
-	public void setBlockHeight(int i) {
+	public void setBlockHeight(int blockHeight) {
 	    this.blockHeight = blockHeight;
 	}
 }

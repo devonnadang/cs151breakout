@@ -14,7 +14,7 @@ public class App {
      * to see which lines to comment and which lines to uncomment.
      */
     public static void main(String[] args) {
-        BlockingQueue<Message> queue = new ArrayBlockingQueue<>(50);
+        BlockingQueue<Message> queue = new ArrayBlockingQueue<>(15);
         View view = new View(queue);
         Breakout breakout = new Breakout(view, queue);
         breakout.startGame();

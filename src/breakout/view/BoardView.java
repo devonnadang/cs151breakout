@@ -50,7 +50,7 @@ public class BoardView extends JPanel {
     private double[] paddleCoordinates;
     private Rectangle2D[][] blocks;
     private boolean[][] isDestroyed;
-    private int livesCounter = 1;
+    private int livesCounter;
     private Leaderboard scoreList;
     private int paddleVelocity;
     private JLabel livesLeftDisplay;
@@ -152,22 +152,15 @@ public class BoardView extends JPanel {
         
         livesLeftDisplay = new JLabel (" ");
         this.add(livesLeftDisplay);
-        livesLeftDisplay.setText("Lives Left: 3");
-        
+
         scoreDisplay = new JLabel (" ");
         this.add(scoreDisplay);
         scoreDisplay.setText("Score: " + finalScore);
     }
 
     public void endGame() {
-//        try {
-//            queue.add(new EndGameMessage());
-//        } catch (Exception exception) {
-//            exception.printStackTrace();
-//        }
-//        timer.stop();
-//        this.add(saveScoreButton);
-//        this.add(leaderboardButton);
+        this.add(saveScoreButton);
+        this.add(leaderboardButton);
     }
 
     @Override
@@ -220,7 +213,7 @@ public class BoardView extends JPanel {
 
     // Moves the ball and will handle collision between ball and paddle and the view.
     private void moveBall() {
-    	livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
+    	livesLeftDisplay.setText("Lives Left: " + livesCounter);
 
         // These two statements will make sure max velocity is 5 and min velocity is -5.
         ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
@@ -377,6 +370,10 @@ public class BoardView extends JPanel {
         }
     }
 
+    public int getFinalScore() {
+        return finalScore;
+    }
+
     /**
      * Sets the x coordinate of the paddle, since it only moves left and right.
      *
@@ -402,6 +399,14 @@ public class BoardView extends JPanel {
 
     public void setBlockDestroyed(int row, int column) {
         isDestroyed[row][column] = true;
+    }
+
+    public void setFinalScore(int finalScore) {
+        this.finalScore = finalScore;
+    }
+
+    public void setLivesCounter(int livesCounter) {
+        livesLeftDisplay.setText("Lives Left: " + livesCounter);
     }
 
     public void repaintBoard() {
