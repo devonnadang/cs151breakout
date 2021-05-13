@@ -77,10 +77,18 @@ public class Board {
         this.paddleCoordinates = paddle.getPaddleCoordinates();
     }
 
+    /**
+     * Gets the score.
+     * @return the leaderboard which should be holding the score.
+     */
     public Leaderboard getScore() {
         return leaderboard;
     }
 
+    /**
+     * Adds score to the leaderboard
+     * @param score score to add to leaderboard
+     */
     public void addScore(Score score) {
         leaderboard.addNewScore(score);
     }
@@ -136,6 +144,10 @@ public class Board {
         }
     }
 
+    /**
+     * When ball collides with a block, it destroys it.
+     * @param block the block that the ball collided with
+     */
     protected void ballCollide(Block block) {
         ball.destroyBlock(block);
         blockCounter--;

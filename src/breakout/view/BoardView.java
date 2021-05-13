@@ -28,6 +28,9 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 
+/**
+ * Represents a view of the board
+ */
 public class BoardView extends JPanel {
 
     public static final int BALL_WIDTH = Constants.getBallRadius() * 2;
@@ -70,7 +73,7 @@ public class BoardView extends JPanel {
     private int finalScore = 0;
 
     public BoardView(BlockingQueue<Message> queue, Insets frameInsets, double[] ballCoordinates, double[] paddleCoordinates) {
-        // This is the timer of the ball, but it shouldn't affect paddle movement. Every 50 ms, the ball will be moved and repainted.
+        // This is the timer of the ball, but it shouldn't affect paddle movement. Every 17 ms, the ball will be moved and repainted.
         // The moveBall() method also checks for collision.
         timer = new Timer(17, e -> {
 //            moveBall();
@@ -117,8 +120,8 @@ public class BoardView extends JPanel {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, true), "released.right");
 
         // Basically pressing keys will make paddle move and releasing keys will make paddle stop.
-        // Pressing left should make the paddle move -7 which means the paddle should move left.
-        // Pressing right should make the paddle move 7 which means the paddle should move right.
+        // Pressing left should make the paddle move -5 which means the paddle should move left.
+        // Pressing right should make the paddle move 5 which means the paddle should move right.
         // Whenever one of these keys are pressed or released they will call the actionPerformed method
         // in MoveAction.
         am.put("pressed.left", new MoveAction(Constants.getPaddleMoveLeftUnit()));
@@ -131,26 +134,24 @@ public class BoardView extends JPanel {
         saveScoreButton.addActionListener(e -> {
             SaveScoreView ssw = new SaveScoreView(queue, finalScore); //add actual score later
         });
-                
+
         // button to open new window to see leaderboard and scores
         scoreList = Leaderboard.getInstance();
-        
         leaderboardButton = new JButton("Leaderboard");
         leaderboardButton.addActionListener(e -> {
-        	try {
-            	LeaderboardMessage lw = new LeaderboardMessage();
-            	queue.put(lw);
-            	LeaderboardView leaderboard = new LeaderboardView(scoreList);
-			} catch (InterruptedException e1) {
-				// do nothing
-			}
+            try {
+                LeaderboardMessage lw = new LeaderboardMessage();
+                queue.put(lw);
+                LeaderboardView leaderboard = new LeaderboardView(scoreList);
+            } catch (InterruptedException e1) {
+                // do nothing
+            }
         });
-        
-        
+
         gameOver = new JLabel(" ");
         this.add(gameOver);
-        
-        livesLeftDisplay = new JLabel (" ");
+
+        livesLeftDisplay = new JLabel(" ");
         this.add(livesLeftDisplay);
 
         scoreDisplay = new JLabel (" ");
@@ -158,11 +159,19 @@ public class BoardView extends JPanel {
         scoreDisplay.setText("Score: " + finalScore);
     }
 
+    /**
+     * Once the game ends, two buttons appear: "Save Score" and "Leader/board"
+     */
     public void endGame() {
         this.add(saveScoreButton);
         this.add(leaderboardButton);
     }
 
+    /**
+     * Redraws the paddle, ball, and blocks according to the current game state.
+     *
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -211,13 +220,18 @@ public class BoardView extends JPanel {
         }
     }
 
-    // Moves the ball and will handle collision between ball and paddle and the view.
+    /**
+     * Moves the ball and will handle collision between the relation of ball with the paddle and the
+     * view. Ball can bounce off the paddle and off the top, left, and right of the panel.
+     */
     private void moveBall() {
     	livesLeftDisplay.setText("Lives Left: " + livesCounter);
 
         // These two statements will make sure max velocity is 5 and min velocity is -5.
-        ballVelocity[0] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
-        ballVelocity[1] = Math.max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
+        ballVelocity[0] = Math
+                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[0]));
+        ballVelocity[1] = Math
+                .max(-BALL_MAX_VELOCITY, Math.min(BALL_MAX_VELOCITY, ballVelocity[1]));
 
         if (ballVelocity[1] == 0) {
             ballVelocity[1] = BALL_MAX_VELOCITY;
@@ -263,9 +277,9 @@ public class BoardView extends JPanel {
         if (ballCoordinates[1] >= getHeight() - BALL_HEIGHT) {
             if (livesCounter != 3) {
                 livesCounter++;
-                livesLeftDisplay.setText("Lives Left: " + (3-livesCounter));
+                livesLeftDisplay.setText("Lives Left: " + (3 - livesCounter));
                 gameFinished = false;
-                repaintBoard();
+                resetBoard();
             } else if (livesCounter == 3) {
                 gameFinished = true;
                 gameOver.setText("GameOver!");
@@ -286,9 +300,9 @@ public class BoardView extends JPanel {
                 Rectangle2D block = blocks[i][j];
                 boolean ballIntersection = ballIntersects(block);
                 if (ballIntersection && stop) {
-                    ballAndBlockCollision(block);
+                    ballAndBlockCollision();
                 } else if (ballIntersection) {
-                    ballAndBlockCollision(block);
+                    ballAndBlockCollision();
                     isDestroyed[i][j] = true;
                     finalScore += 5;
                     stop = true;
@@ -297,6 +311,13 @@ public class BoardView extends JPanel {
         }
     }
 
+    /**
+     * Checks if the ball is intersecting with the block. Does this by checking whether the point
+     * closest the block is less than or equal to the ball's radius
+     *
+     * @param block the block to check
+     * @return true if the ball intersects, else false
+     */
     private boolean ballIntersects(Rectangle2D block) {
         double blockTop = block.getY();
         double blockBottom = block.getY() + block.getHeight();
@@ -305,29 +326,35 @@ public class BoardView extends JPanel {
 
         closestPointToCircle = new double[]{ball.getCenterX(), ball.getCenterY()};
 
-        // The same as the if/else statements, but shorter.
+        // These max and min statements will find the closest point on the block to the center of the
+        // ball binding the point to within the perimeter of the block.
         closestPointToCircle[0] = Math
                 .max(blockLeft, Math.min(blockRight, closestPointToCircle[0]));
         closestPointToCircle[1] = Math
                 .max(blockTop, Math.min(blockBottom, closestPointToCircle[1]));
 
+        // Calculating overlap between closest point and ball center
         closestPointToCircle[0] -= ball.getCenterX();
         closestPointToCircle[1] -= ball.getCenterY();
 
         circleToBoxLength = Math.hypot(closestPointToCircle[0], closestPointToCircle[1]);
 
         // If the length of the line from the center of the circle to the point on the box closest
-        // to the ball is less than or equal to the ball radius then there is collision.
+        // to the ball is less than or equal to the ball radius, then there is collision.
         return circleToBoxLength <= Constants.getBallRadius();
     }
 
-    private void ballAndBlockCollision(Rectangle2D block) {
+    /**
+     * This method handles collisions between ball and block. Changes ball velocity based on the
+     * location of ball and block contact.
+     */
+    private void ballAndBlockCollision() {
 
-        // Third try
         double overlap = Constants.getBallRadius() - circleToBoxLength;
         double collisionResolution1 = closestPointToCircle[0] / circleToBoxLength * overlap;
         double collisionResolution2 = closestPointToCircle[1] / circleToBoxLength * overlap;
 
+        // Moving the ball so that it isn't colliding with the block anymore.
         ballCoordinates[0] -= collisionResolution1;
         ballCoordinates[1] -= collisionResolution2;
 
@@ -341,11 +368,10 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * This method is for handling any collisions that happen between ball and paddle. This method
-     * shouldn't affect any other part of the program.
+     * This method is for handling any collisions that happen between ball and paddle.
      */
     private void ballAndPaddleCollision() {
-    	if (!gameFinished && ballVelocity[0] == 0) {
+        if (!gameFinished && ballVelocity[0] == 0) {
             ballVelocity[0] = -5;
         }
 
@@ -366,7 +392,7 @@ public class BoardView extends JPanel {
         } else {
             // If it hits side of paddle then just use ball and block collision, which also means
             // end of game when it hits the bottom of the board.
-            ballAndBlockCollision(paddle);
+            ballAndBlockCollision();
         }
     }
 
@@ -375,7 +401,7 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * Sets the x coordinate of the paddle, since it only moves left and right.
+     * Sets the x coordinate of the paddle, since it only moves left and right. Makes sure the paddle stays within the board.
      *
      * @param paddleCoordinates
      */
@@ -386,7 +412,7 @@ public class BoardView extends JPanel {
             paddleCoordinates = getWidth() - PADDLE_WIDTH;
         }
         this.paddleCoordinates[0] = paddleCoordinates;
- //       System.out.println("Front BoardView: " + this.paddleCoordinates[0]);
+        //       System.out.println("Front BoardView: " + this.paddleCoordinates[0]);
     }
 
     public void setPaddleVelocity(int paddleVelocity) {
@@ -409,7 +435,13 @@ public class BoardView extends JPanel {
         livesLeftDisplay.setText("Lives Left: " + livesCounter);
     }
 
-    public void repaintBoard() {
+
+    /**
+     * This method is called after when the ball falls past the paddle and the player still has
+     * lives left to continue playing. It resets the ball and paddle to the each respective reset
+     * position.
+     */
+    public void resetBoard() {
         // Coordinates for the ball: [0] = x coordinate and [1] = y coordinate.
         ballCoordinates = new double[2];
 
@@ -435,31 +467,39 @@ public class BoardView extends JPanel {
     }
 
     /**
-     * So basically, whenever a key is pressed or released it will call MoveAction's overrided
-     * actionPerformed method
+     * Whenever a key is pressed or released it will call MoveAction's overridden actionPerformed
+     * method.
      */
     private class MoveAction extends AbstractAction {
 
-        private int direction;
+        private int velocity;
 
-        public MoveAction(int direction) {
-            this.direction = direction;
+        public MoveAction(int velocity) {
+            this.velocity = velocity;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            // Starts the timer when it isn't run. Should only run at the beginning of the game.
+            // This allows the player to start the game at their input.
             if (!timer.isRunning() && !gameFinished) {
                 timer.start();
             }
 
+            // Putting MoveMessage into queue to move the paddle.
             try {
-                queue.put(new MovePaddleMessage(direction));
+                queue.put(new MovePaddleMessage(velocity));
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         }
     }
-    
+
+    /**
+     * Updates the score to display on Leaderboard.
+     *
+     * @param scoreList
+     */
     public void setScores(Leaderboard scoreList) {
 		this.scoreList = scoreList;
 	}

@@ -1,5 +1,6 @@
 package breakout.view;
 
+import breakout.model.Constants;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class LeaderboardView extends JFrame{
 
 
     /**
-     * Constructs the main view of Breakout.
+     * Displays at most 10 of the top saved scores.
      */
     public LeaderboardView(Leaderboard scoreList) {
     	
@@ -60,7 +61,7 @@ public class LeaderboardView extends JFrame{
 
         this.add(panel);
     	
-    	this.setPreferredSize(new Dimension(500, 600));
+    	this.setPreferredSize(new Dimension(Constants.getPanelWidth(), Constants.getPanelHeight()));
     	this.setResizable(true);
     	this.setTitle("Leaderboard");
     	this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

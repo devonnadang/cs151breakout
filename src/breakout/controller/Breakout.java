@@ -35,7 +35,8 @@ public class Breakout {
     }
 
     /**
-     * Starts Breakout. Initializes Board and any other objects that need to be initialized.
+     * Starts Breakout. Initializes Life, Board, and any other objects that need to be initialized.
+     * Calls on View's createBoardView() to create the graphics for the game.
      */
     public void startGame() {
         board = new Board(view.getInsets(), queue);

@@ -10,14 +10,15 @@ import javax.swing.JFrame;
 
 import breakout.model.Board;
 import breakout.model.Leaderboard;
+
 /**
  * Serves as the main view for Breakout. All other views will be within this one.
  */
-public class View extends JFrame{
+public class View extends JFrame {
+
     private BoardView boardView;
     private BlockingQueue<Message> queue;
 
-    //ViewPanel panel;
     /**
      * Constructs the main view of Breakout.
      */
@@ -67,6 +68,9 @@ public class View extends JFrame{
         updateBoardView(startingPaddle);
     }
 
+    /**
+     * Adds a button to play again.
+     */
     public void endGame(double[] ballCoordinates, double[] paddleCoordinates) {
         boardView.stopTimer();
         JButton endGameButton = new JButton("Play Again");
@@ -88,7 +92,12 @@ public class View extends JFrame{
         createBoardView(ballCoordinates, paddleCoordinates, lives);
     }
 
+    /**
+     * Updates the Leaderboard to include the newly added score
+     *
+     * @param scoreList
+     */
     public void updateLeaderboardView(Leaderboard scoreList) {
-    	boardView.setScores(scoreList);
+        boardView.setScores(scoreList);
     }
 }
