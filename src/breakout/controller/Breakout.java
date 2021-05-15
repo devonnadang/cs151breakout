@@ -106,6 +106,18 @@ public class Breakout {
         }
     }
 
+    private class DoEndGameMessageValve implements Valve {
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != EndGameMessage.class) {
+                return ValveResponse.MISS;
+            }
+            EndGameMessage endGameMessage = (EndGameMessage) message;
+            view.endGame();
+            return ValveResponse.EXECUTED;
+        }
+    }
+
     private interface Valve {
         /**
          * Performs certain action in response to message
