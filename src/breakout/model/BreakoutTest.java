@@ -14,7 +14,9 @@ import breakout.view.View;
 class BreakoutTest {
 
 
-    //All the blocks are cleared from board.
+    /**
+     * Check that all the blocks are cleared from board.
+     */
     @Test
     void winGameTest() {
         boolean expected = true;

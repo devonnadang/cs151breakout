@@ -110,6 +110,10 @@ public final class Ball {
         }
 	}
 
+	/**
+	 * Checks if ball falls below the view.
+	 * @return true if ball falls below the view, else false
+	 */
 	public boolean ballFallsBelow(){
 		if (y >= Constants.getPanelHeight() - (Constants.getBallRadius()*2)) {
             return true;
