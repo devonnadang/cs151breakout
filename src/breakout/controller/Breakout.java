@@ -1,5 +1,7 @@
 package breakout.controller;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,6 +20,7 @@ public class Breakout {
     private Board board;
     private View view;
     private BlockingQueue<Message> queue;
+    private List<Valve> valves = new LinkedList<Valve>();
 
     /**
      * Initializes Breakout and the main JFrame that will display everything.
@@ -26,6 +29,11 @@ public class Breakout {
         this.board = board;
         this.view = view;
         this.queue = queue;
+
+        //create one object of each kind of helper (valve)
+        valves.add(new DoMoveMessageValve());
+        valves.add(new DoSaveScoreMessageValve());
+        valves.add(new DoLeaderboardMessageValve());
     }
 
     /**
@@ -33,46 +41,23 @@ public class Breakout {
      * Calls on View's createBoardView() to create the graphics for the game.
      */
     public void startGame() {
-        // Also should probably add lives into Board constructor?
-        board = new Board();
         view.createBoardView();
-
-        // While for the message system. I did not implement valves yet.
-        while (view.isDisplayable()) {
-            // Take from queue
-            Message message = null;
+        ValveResponse response = ValveResponse.EXECUTED;
+        Message message = null;
+        while(response != ValveResponse.FINISH) {
             try {
                 message = queue.take();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // Figure out what message it is and do correct action
-            if (message.getClass() == MoveMessage.class) {
-                MoveMessage moveMessage = (MoveMessage) message;
-                board.getPaddle().move(moveMessage.getNewVelocity());
-                // The moveMessage will contain the new x coordinate for the paddle and give it to the
-                // main view for it to update the BoardView and for the BoardView to update the paddle.
-                view.updateBoardView(moveMessage.getNewVelocity());
-            }
-            // when save score button is pressed
-            // add a new score to board
-            else if (message.getClass() == SaveScoreMessage.class) {
-            	SaveScoreMessage saveUsernameMessage = (SaveScoreMessage) message;
-            	board.addScore(saveUsernameMessage.getScore());
-            }
-            
-            // when leaderboard button is pressed
-            // update leaderboard with all scores
-            else if(message.getClass() == LeaderboardMessage.class)
-            {
-            	LeaderboardMessage leaderboardMessage = (LeaderboardMessage) message;
-            	leaderboardMessage.addScores(board.getScore());
-            	view.updateLeaderboardView(leaderboardMessage.getScores());
-            }
-            // When game ends
-            else if (message.getClass() == EndGameMessage.class) {
-                EndGameMessage endGameMessage = (EndGameMessage) message;
-                view.endGame();
+
+            //Look for a Valve that can process a message 
+            for (Valve valve: valves) {
+                response = valve.execute(message);
+                //if sucessfully processed or game over, leave the loop
+                if (response != ValveResponse.MISS) {
+                    break;
+                }
             }
         }
     }
