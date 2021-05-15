@@ -83,7 +83,7 @@ class BreakoutTest {
     void startGameTest() {
         // GUI pops up for like a split second; Should I make the system wait? But it gave
         // some errors...
-        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()), new LinkedBlockingQueue<>());
+        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()), new Board(), new LinkedBlockingQueue<>());
         breakout.startGame();
 
         // How should I test this? Should this even be a test?

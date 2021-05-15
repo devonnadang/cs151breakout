@@ -17,13 +17,13 @@ public class Breakout {
 
     private Board board;
     private View view;
-    private Life lives;
     private BlockingQueue<Message> queue;
 
     /**
      * Initializes Breakout and the main JFrame that will display everything.
      */
-    public Breakout(View view, BlockingQueue<Message> queue) {
+    public Breakout(View view, Board board, BlockingQueue<Message> queue) {
+        this.board = board;
         this.view = view;
         this.queue = queue;
     }
@@ -33,7 +33,6 @@ public class Breakout {
      * Calls on View's createBoardView() to create the graphics for the game.
      */
     public void startGame() {
-        lives = new Life();
         // Also should probably add lives into Board constructor?
         board = new Board();
         view.createBoardView();
@@ -78,13 +77,66 @@ public class Breakout {
         }
     }
 
+    private class DoMoveMessageValve implements Valve {
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != MoveMessage.class) {
+                return ValveResponse.MISS;
+            }
+            //otherwise it means that it is a MoveMessage message
+            //actions in Model
+            //actions in View
+                //button updateStudentName was clicked
+            MoveMessage moveMessage = (MoveMessage) message; 
+            board.getPaddle().move(moveMessage.getNewVelocity());
+            view.updateBoardView(moveMessage.getNewVelocity());
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private class DoSaveScoreMessageValve implements Valve {
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != SaveScoreMessage.class) {
+                return ValveResponse.MISS;
+            }
+
+            SaveScoreMessage saveUsernameMessage = (SaveScoreMessage) message;
+            board.addScore(saveUsernameMessage.getScore());
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private class DoLeaderboardMessageValve implements Valve {
+        @Override 
+        public ValveResponse execute (Message message) {
+            if (message.getClass() != LeaderboardMessage.class) {
+                return ValveResponse.MISS;
+            }
+
+            LeaderboardMessage leaderboardMessage = (LeaderboardMessage) message;
+            leaderboardMessage.addScores(board.getScore());
+            view.updateLeaderboardView(leaderboardMessage.getScores());
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private interface Valve {
+        /**
+         * Performs certain action in response to message
+         */
+        public ValveResponse execute(Message message);
+    }
+
+
     /**
      * Initializes and starts Breakout.
      */
     public static void main(String[] args) {
         BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
         View view = new View(queue);
-        Breakout breakout = new Breakout(view, queue);
+        Board board = new Board();
+        Breakout breakout = new Breakout(view, board, queue);
         breakout.startGame();
     }
 }
