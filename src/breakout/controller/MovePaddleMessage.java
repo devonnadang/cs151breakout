@@ -1,8 +1,7 @@
 package breakout.controller;
 
 /**
- * This is called MoveMessage, but really it's just for moving the paddle along the x-axis as of
- * now.
+ * Moves the paddle along the x-axis.
  */
 public class MovePaddleMessage implements Message {
 

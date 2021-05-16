@@ -22,27 +22,18 @@ public class Board {
     private static final int COLUMNS = Constants.getColumns();
     private static final int WIDTH = Constants.getPanelWidth();
     private static final int HEIGHT = Constants.getPanelHeight();
-    private static final int BLOCK_START = WIDTH / 10; //30
     private static final int BLOCK_WIDTH = Constants.getBlockWidth();
     private static final int BLOCK_HEIGHT = Constants.getBlockHeight();
     private static final int BLOCK_SEP = Constants.getBlockSep();
-
-
-    public static final int BALL_WIDTH = Constants.getBallRadius() * 2;
     public static final int BALL_HEIGHT = Constants.getBallRadius() * 2;
     public static final int PADDLE_WIDTH = Constants.getPaddleWidth();
-    public static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
-    public static final int BOARD_WIDTH = Constants.getPanelWidth();
-    public static final int BOARD_HEIGHT = Constants.getPanelHeight();
     public static final int BALL_MAX_VELOCITY = Constants.getBallMaxVelocity();
-    public static final int BALL_MIN_VELOCITY = Constants.getBallMinVelocity();
 
     private double[] ballCoordinates;
     private double[] ballVelocity;
     private double[] paddleCoordinates;
     private final double[] startingBall;
     private final double[] startingPaddle;
-    private int paddleVelocity;
     private int blocksDestroyed;
     private Life lives;
     private boolean gameFinished;
@@ -51,6 +42,13 @@ public class Board {
     private Insets frameInsets;
     private Random rgen = new Random();
 
+    /**
+     * This is the constructor which initializes instance variables needed to aggregate ball, block
+     * and paddle.
+     *
+     * @param frameInsets the insets of the JFrame
+     * @param queue       the queue to add messages to
+     */
     public Board(Insets frameInsets, BlockingQueue queue) {
         blocksDestroyed = 0;
         lives = new Life();
@@ -107,15 +105,15 @@ public class Board {
         return blocks[i][j];
     }
 
+    /**
+     * Moves the paddle according to the paddle velocity.
+     *
+     * @param paddleVelocity the amount to move the paddle by
+     */
     public void movePaddle(double paddleVelocity) {
         paddle.setPaddleVelocity(paddleVelocity);
         paddle.move();
     }
-
-//    public void moveBall(double[] ballVelocity) {
-//        ball.setBallVelocity(ballVelocity);
-//        ball.move();
-//    }
 
     /**
      * @return the coordinates of each block in the Block[][] blocks
@@ -132,8 +130,8 @@ public class Board {
     }
 
     /**
-     * Creates a block set with 5 rows and 10 columns. Each block has a width of 10 and a height of
-     * 5. Around this block set is space of 30 pixels on the top, left, and right.
+     * Creates a block set with 5 rows and 8 columns. Each block has a width of 40 and a height of
+     * 20. Around this block set is space of 30 pixels on the top, left, and right.
      */
     private void createBlocks() {
         blocks = new Block[ROWS][COLUMNS];
@@ -147,54 +145,40 @@ public class Board {
     }
 
     /**
-     * When ball collides with a block, it destroys it.
+     * Checks if the blocks are all cleared.
      *
-     * @param block the block that the ball collided with
+     * @return if there are any bricks left
      */
-    protected void ballCollide(Block block) {
-        ball.destroyBlock(block);
-        blockCounter--;
+    public boolean blocksAreCleared() {
+        return blocksDestroyed == Constants.getRows() * Constants.getColumns();
     }
 
     /**
-     * @return if there are any bricks left
+     * Gets the board width using the insets of the Jframe to get the correct number.
+     *
+     * @return the board width
      */
-    public boolean bricksAreCleared() {
-        if (blockCounter == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static int getRows() {
-        return ROWS;
-    }
-
-    public static int getColumns() {
-        return COLUMNS;
-    }
-
     public int getBoardWidth() {
         return WIDTH - frameInsets.left - frameInsets.right;
     }
 
+    /**
+     * Gets the board height using the insets of the Jframe to get the correct number.
+     *
+     * @return the board height
+     */
     public int getBoardHeight() {
         return HEIGHT - frameInsets.top - frameInsets.bottom;
-    }
-
-    public int getBlockCounter() {
-        return blockCounter;
-    }
-
-    public static int getBlockSep() {
-        return BLOCK_SEP;
     }
 
     public int getLives() {
         return lives.getLives();
     }
 
+    /**
+     * Ends the game by sending an EndGameMessage with the starting ball and starting paddle
+     * coordinates and the lives remaining which should be 0.
+     */
     public void endGame() {
         try {
             queue.add(new EndGameMessage(startingBall, startingPaddle, lives.getLives()));
@@ -227,8 +211,6 @@ public class Board {
         ballVelocity = ball.getBallVelocity();
 
         // Handles collision between ball and bottom of the view.
-        // Actually if ball goes below it should end game, but there is no end game implementation
-        // as of now.
         if (ball.ballFallsBelow(getBoardHeight())) {
             lives.subtractLife();
             if (lives.isAlive()) {
@@ -252,7 +234,7 @@ public class Board {
         }
 
         boolean stop = false;
-        // If ball and block collide, call this method. PAUL
+        // If ball and block collide, call this method.
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
                 Block block = blocks[i][j];
@@ -267,10 +249,11 @@ public class Board {
                 }
             }
         }
+
         ball.setBallVelocity(ballVelocity);
         ball.setBallCoordinates(ballCoordinates);
 
-        if (blocksDestroyed == Constants.getColumns() * Constants.getRows()) {
+        if (blocksAreCleared()) {
             gameFinished = true;
             endGame();
         }
@@ -312,7 +295,7 @@ public class Board {
 
     /**
      * Checks if the ball is intersecting with the paddle. Does this by checking whether the point
-     * closest to the paddle is less than or equal to the ball's radius
+     * closest to the paddle is less than or equal to the ball's radius.
      *
      * @return true if the ball intersects, else false
      */

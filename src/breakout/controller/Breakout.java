@@ -19,19 +19,24 @@ public class Breakout {
 
     /**
      * Initializes Breakout and the main JFrame that will display everything.
+     *
+     * @param view  the main view of the game
+     * @param queue the queue to add messages to
      */
     public Breakout(View view, BlockingQueue<Message> queue) {
         this.view = view;
         this.queue = queue;
         valveList = new ArrayList<>();
-        valveList.add(new MovePaddleValve());
-        valveList.add(new MoveBallValve());
+
+        // Add all Message valve classes to valveList
         valveList.add(new DestroyBlockValve());
+        valveList.add(new EndGameValve());
+        valveList.add(new MoveBallValve());
+        valveList.add(new MovePaddleValve());
+        valveList.add(new PlayAgainValve());
+        valveList.add(new ResetGameValve());
         valveList.add(new SaveScoreValve());
         valveList.add(new UpdateLeaderboardValve());
-        valveList.add(new ResetGameValve());
-        valveList.add(new EndGameValve());
-        valveList.add(new PlayAgainValve());
     }
 
     /**
@@ -61,18 +66,29 @@ public class Breakout {
         }
     }
 
-    private class MovePaddleValve implements Valve {
+    private class DestroyBlockValve implements Valve {
 
         @Override
         public ValveResponse execute(Message message) {
-            if (message.getClass() != MovePaddleMessage.class) {
+            if (message.getClass() != BlockDestroyedMessage.class) {
                 return ValveResponse.MISS;
             }
-            MovePaddleMessage movePaddleMessage = (MovePaddleMessage) message;
-            board.movePaddle(movePaddleMessage.getNewVelocity());
-            // The moveMessage will contain the new x coordinate for the paddle and give it to the
-            // main view for it to update the BoardView and for the BoardView to update the paddle.
-            view.updateBoardView(board.getPaddle().getPaddleCoordinates()[0]);
+            BlockDestroyedMessage blockDestroyedMessage = (BlockDestroyedMessage) message;
+            view.updateBoardView(blockDestroyedMessage.getRow(), blockDestroyedMessage.getColumn());
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private class EndGameValve implements Valve {
+
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != EndGameMessage.class) {
+                return ValveResponse.MISS;
+            }
+            EndGameMessage endGameMessage = (EndGameMessage) message;
+            view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle(),
+                    endGameMessage.getLives());
             return ValveResponse.EXECUTED;
         }
     }
@@ -89,18 +105,50 @@ public class Breakout {
             view.updateBoardView(board.getBall().getBallCoordinates());
             return ValveResponse.EXECUTED;
         }
-
     }
 
-    private class DestroyBlockValve implements Valve {
+    private class MovePaddleValve implements Valve {
 
         @Override
         public ValveResponse execute(Message message) {
-            if (message.getClass() != BlockDestroyedMessage.class) {
+            if (message.getClass() != MovePaddleMessage.class) {
                 return ValveResponse.MISS;
             }
-            BlockDestroyedMessage blockDestroyedMessage = (BlockDestroyedMessage) message;
-            view.updateBoardView(blockDestroyedMessage.getRow(), blockDestroyedMessage.getColumn());
+            MovePaddleMessage movePaddleMessage = (MovePaddleMessage) message;
+            board.movePaddle(movePaddleMessage.getNewVelocity());
+            // The moveMessage will contain the new x coordinate for the paddle and give it to the
+            // main view for it to update the BoardView and for the BoardView to update the paddle.
+            view.updateBoardView(board.getPaddle().getPaddleCoordinates()[0]);
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private class PlayAgainValve implements Valve {
+
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != PlayAgainMessage.class) {
+                return ValveResponse.MISS;
+            }
+            PlayAgainMessage playAgainMessage = (PlayAgainMessage) message;
+            board = new Board(view.getInsets(), queue);
+            view.playAgain(playAgainMessage.getBallCoordinates(),
+                    playAgainMessage.getPaddleCoordinates(), board.getLives());
+            return ValveResponse.EXECUTED;
+        }
+    }
+
+    private class ResetGameValve implements Valve {
+
+        @Override
+        public ValveResponse execute(Message message) {
+            if (message.getClass() != ResetMessage.class) {
+                return ValveResponse.MISS;
+            }
+            ResetMessage resetMessage = (ResetMessage) message;
+            board.resetGame();
+            view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle(),
+                    resetMessage.getLives());
             return ValveResponse.EXECUTED;
         }
     }
@@ -128,50 +176,6 @@ public class Breakout {
             LeaderboardMessage leaderboardMessage = (LeaderboardMessage) message;
             leaderboardMessage.addScores(board.getScore());
             view.updateLeaderboardView(leaderboardMessage.getScores());
-            return ValveResponse.EXECUTED;
-        }
-    }
-
-    private class ResetGameValve implements Valve {
-
-        @Override
-        public ValveResponse execute(Message message) {
-            if (message.getClass() != ResetMessage.class) {
-                return ValveResponse.MISS;
-            }
-            ResetMessage resetMessage = (ResetMessage) message;
-            board.resetGame();
-            view.resetGame(resetMessage.getStartingBall(), resetMessage.getStartingPaddle(),
-                    resetMessage.getLives());
-            return ValveResponse.EXECUTED;
-        }
-    }
-
-    private class EndGameValve implements Valve {
-
-        @Override
-        public ValveResponse execute(Message message) {
-            if (message.getClass() != EndGameMessage.class) {
-                return ValveResponse.MISS;
-            }
-            EndGameMessage endGameMessage = (EndGameMessage) message;
-            view.endGame(endGameMessage.getStartingBall(), endGameMessage.getStartingPaddle(),
-                    endGameMessage.getLives());
-            return ValveResponse.EXECUTED;
-        }
-    }
-
-    private class PlayAgainValve implements Valve {
-
-        @Override
-        public ValveResponse execute(Message message) {
-            if (message.getClass() != PlayAgainMessage.class) {
-                return ValveResponse.MISS;
-            }
-            PlayAgainMessage playAgainMessage = (PlayAgainMessage) message;
-            board = new Board(view.getInsets(), queue);
-            view.playAgain(playAgainMessage.getBallCoordinates(),
-                    playAgainMessage.getPaddleCoordinates(), board.getLives());
             return ValveResponse.EXECUTED;
         }
     }

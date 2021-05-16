@@ -9,11 +9,6 @@ public final class Paddle {
 
     private double[] paddleCoordinates;
     private double paddleVelocity;
-
-    //dimensions of paddle
-    private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
-    private static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
-
     private static final Paddle INSTANCE = new Paddle();
 
     /**
@@ -44,28 +39,6 @@ public final class Paddle {
 
     public void setPaddleCoordinates(double[] paddleCoordinates) {
         this.paddleCoordinates = paddleCoordinates;
-    }
-
-//	/**
-//	 * Resets the position of the paddle
-//	 */
-//	public void reset()
-//	{
-//		setCoordinates(Constants.getPaddleXReset(),Constants.getPaddleYReset());
-//	}
-
-    /**
-     * Gets the width of the paddle
-     */
-    public int getPaddleWidth() {
-        return PADDLE_WIDTH;
-    }
-
-    /**
-     * Gets the height of the paddle
-     */
-    public int getPaddleHeight() {
-        return PADDLE_HEIGHT;
     }
 
 }

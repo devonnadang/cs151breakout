@@ -1,9 +1,5 @@
 package breakout.view;
 
-/**
- * This class opens a new save score window when initialized.
- */
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +12,10 @@ import javax.swing.JTextField;
 import breakout.controller.Message;
 import breakout.controller.SaveScoreMessage;
 
+/**
+ * Represents another view to save score. This class opens a new save score window when
+ * initialized.
+ */
 public class SaveScoreView extends JFrame {
 
     private BlockingQueue<Message> queue;
@@ -24,8 +24,14 @@ public class SaveScoreView extends JFrame {
     private JLabel theScore;
     private JLabel usernameLabel;
     private JTextField enterUsername;
-    private JButton save;
+    private JButton saveButton;
 
+    /**
+     * This is the constructor which creates the new score window.
+     *
+     * @param queue input BlockingQueue
+     * @param score the score input
+     */
     public SaveScoreView(BlockingQueue<Message> queue, int score) {
         this.queue = queue;
 
@@ -33,10 +39,10 @@ public class SaveScoreView extends JFrame {
         this.theScore = new JLabel(String.valueOf(score) + "."); // displays current score
 
         this.usernameLabel = new JLabel("Enter username: ");
-        this.enterUsername = new JTextField(10);
+        this.enterUsername = new JTextField(10); // takes user input of username
 
-        this.save = new JButton("Save Username");
-        save.addActionListener(e -> {
+        this.saveButton = new JButton("Save Username");
+        saveButton.addActionListener(e -> {
             try {
                 SaveScoreMessage ssm = new SaveScoreMessage(score, enterUsername.getText());
                 queue.put(ssm);
@@ -50,7 +56,7 @@ public class SaveScoreView extends JFrame {
         this.add(theScore);
         this.add(usernameLabel);
         this.add(enterUsername);
-        this.add(save);
+        this.add(saveButton);
 
         this.setPreferredSize(new Dimension(500, 600));
         this.setLayout(new FlowLayout());

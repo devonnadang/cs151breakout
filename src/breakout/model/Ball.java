@@ -21,7 +21,6 @@ public final class Ball {
         ballVelocity = new double[]{
                 Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2),
                 Constants.getBallMaxVelocity() - rgen.nextInt(Constants.getBallMaxVelocity() * 2)};
-//        ballVelocity = new double[] {-Constants.getBallMaxVelocity(), -Constants.getBallMaxVelocity()};
         ballCoordinates = new double[]{Constants.getBallXReset(), Constants.getBallYReset()};
     }
 
@@ -49,45 +48,17 @@ public final class Ball {
         return ballCoordinates[1] + Constants.getBallRadius();
     }
 
-    /**
-     * @return ball radius
-     */
-    public static int getBallRadius() {
-        return BALL_RADIUS;
-    }
-
     public void setBallCoordinates(double[] ballCoordinates) {
         this.ballCoordinates = ballCoordinates;
     }
 
     /**
      * In charge of the ball movement.
+     *
+     * @param boardWidth the width of the board
      */
     public void move(int boardWidth) {
-//		ballCoordinates[0] += ballVelocity[0];
-//		ballCoordinates[1] += ballVelocity[1];
-//
-//
-//        // Handles collision between ball and left and right side of the view.
-//        if (ballCoordinates[0] < 0 || ballCoordinates[0] > Constants.getPanelWidth()- (Constants.getBallRadius()*2)) {
-//            ballVelocity[0] *= -1;
-//        }
-//
-//        // Handles collision between ball and top of the view.
-//        if (ballCoordinates[1] < 0) {
-//            ballVelocity[1] *= -1;
-//        }
-//
-//        // Handles collision between ball and bottom of the view.
-//        // Actually if ball goes below it should end game, but there is no end game implementation
-//        // as of now.
-//        if (ballFallsBelow()) {
-//            ballVelocity[0] = 0;
-//			ballVelocity[1] = 0;
-////			reset();
-//        }
-
-        // These two statements will make sure max velocity is 5 and min velocity is -5.
+        // These two statements will make sure max velocity is 4 and min velocity is -4.
         ballVelocity[0] = Math
                 .max(-Constants.getBallMaxVelocity(),
                         Math.min(Constants.getBallMaxVelocity(), ballVelocity[0]));
@@ -156,14 +127,6 @@ public final class Ball {
     public void destroyBlock(Block block) {
         block.setDestroyed(true);
     }
-
-//	/**
-//	 * Resets the position of the ball
-//	 */
-//	public void reset()
-//	{
-//		setCoordinates(Constants.getBallXReset(), Constants.getBallYReset());
-//	}
 
     public int getHeight() {
         return Constants.getBallRadius() * 2;

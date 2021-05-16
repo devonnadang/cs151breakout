@@ -33,7 +33,7 @@ public class Score implements Comparable<Score> {
     /**
      * Sets int new score of this Score
      *
-     * @param int newScore to set as currentScore
+     * @param newScore to set as currentScore
      */
     public void setScore(int newScore) {
         currentScore = newScore;
@@ -81,15 +81,15 @@ public class Score implements Comparable<Score> {
      * @return a negative integer, zero, or a positive integer if this Score is greater than, equal to, or less than the specified Score
      */
     public int compareTo(Score other) {
-		if (this.getScore() > other.getScore()) // this.score is higher
-		{
-			return -1;
-		} else if (this.getScore() < other.getScore()) // this.score is lower
-		{
-			return 1;
-		} else {
-			return this.getUsername().compareTo(other.getUsername());
-		}
+        if (this.getScore() > other.getScore()) // this.score is higher
+        {
+            return -1;
+        } else if (this.getScore() < other.getScore()) // this.score is lower
+        {
+            return 1;
+        } else {
+            return this.getUsername().compareTo(other.getUsername());
+        }
     }
 
 

@@ -17,7 +17,6 @@ public class SaveScoreMessage implements Message {
      */
     public SaveScoreMessage(int score, String username) {
         this.score = new Score();
-
         this.score.setScore(score);
         this.score.setUsername(username);
     }

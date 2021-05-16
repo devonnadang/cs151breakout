@@ -4,7 +4,7 @@ import breakout.controller.BlockDestroyedMessage;
 import java.util.concurrent.BlockingQueue;
 
 /**
- * The Block class can be destroyed by the Ball.
+ * The Block class models a block that can be destroyed by Ball.
  */
 public class Block {
 
@@ -14,12 +14,19 @@ public class Block {
     private int row;
     private int column;
     private BlockingQueue queue;
-    //	private final static int BLOCK_HEIGHT = Constants.getBlockHeight();
-//	private final static int BLOCK_WIDTH = Constants.getBlockWidth();
     private int blockHeight;
     private int blockWidth;
 
-
+    /**
+     * Constructs Block with an x and y coordinate, row and column, and a queue to add a
+     * BlockDestroyedMessage when needed.
+     *
+     * @param x      the x coordinate
+     * @param y      the y coordinate
+     * @param row    the row of the block
+     * @param column the column of the block
+     * @param queue  the queue to add messages
+     */
     public Block(int x, int y, int row, int column, BlockingQueue queue) {
         this.x = x;
         this.y = y;
@@ -32,11 +39,15 @@ public class Block {
         this.blockWidth = Constants.getBlockWidth();
     }
 
+    /**
+     * Destroys the block by setting the destroyed boolean to true, setting the coordinates to x=0
+     * and y=0, and sending a BlockDestroyedMessage to update the views and models.
+     */
     public void destroy() {
         setDestroyed(true);
         setCoordinates(0, 0);
-        setBlockWidth(0);
-        setBlockHeight(0);
+        blockWidth = 0;
+        blockHeight = 0;
         try {
             queue.add(new BlockDestroyedMessage(row, column));
         } catch (Exception e) {
@@ -45,9 +56,9 @@ public class Block {
     }
 
     /**
-     * Indcate whether Block is destoryed or not
+     * Indicate whether Block is destroyed or not.
      *
-     * @param d ]
+     * @param d the boolean to set destroyed to
      */
     public void setDestroyed(boolean d) {
         destroyed = d;
@@ -64,52 +75,26 @@ public class Block {
         setY(y);
     }
 
-    /**
-     * @return x coordinate
-     */
     public int getXCoordinate() {
         return x;
     }
 
-    /**
-     * @return y coordinate
-     */
     public int getYCoordinate() {
         return y;
     }
 
-    /**
-     * Set the x coordinate
-     *
-     * @param x determines the x coordinate
-     */
     public void setX(int x) {
         this.x = x;
     }
 
-    /**
-     * Set the y coordinate
-     *
-     * @param y determines the x coordinate
-     */
     public void setY(int y) {
         this.y = y;
     }
 
-    /**
-     * Set the x coordinate
-     *
-     * @param x determines the x coordinate
-     */
     public int getX() {
         return x;
     }
 
-    /**
-     * Set the y coordinate
-     *
-     * @param y determines the x coordinate
-     */
     public int getY() {
         return y;
     }
@@ -118,20 +103,11 @@ public class Block {
         return destroyed;
     }
 
-
     public int getBlockWidth() {
         return blockWidth;
     }
 
     public int getBlockHeight() {
         return blockHeight;
-    }
-
-    public void setBlockWidth(int blockWidth) {
-        this.blockWidth = blockWidth;
-    }
-
-    public void setBlockHeight(int blockHeight) {
-        this.blockHeight = blockHeight;
     }
 }

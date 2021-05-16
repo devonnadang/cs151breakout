@@ -45,13 +45,19 @@ public class Leaderboard {
      * Adds a new Score object to ArrayList highScores, then sorts all Score objects from highest to
      * lowest.
      *
-     * @param Score object newScore to be added to ArrayList highScores.
+     * @param newScore object newScore to be added to ArrayList highScores.
      */
     public void addNewScore(Score newScore) {
         highScores.add(newScore);
         Collections.sort(highScores);
     }
 
+    /**
+     * Reset the leaderboard with an empty array list.
+     */
+    public void resetLeaderboard() {
+        highScores = new ArrayList<>();
+    }
 
     /**
      * Gets the 10 highest scores from ArrayList highScores.
@@ -60,9 +66,9 @@ public class Leaderboard {
      */
     public ArrayList<Score> getTop10Score() {
         ArrayList<Score> top10Score = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
-			top10Score.add(highScores.get(i));
-		}
+        for (int i = 0; i < 10; i++) {
+            top10Score.add(highScores.get(i));
+        }
         return top10Score;
     }
 }

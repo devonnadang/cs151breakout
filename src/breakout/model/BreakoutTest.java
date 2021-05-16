@@ -2,6 +2,7 @@ package breakout.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import breakout.view.BoardView;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,35 +23,22 @@ class BreakoutTest {
      * Check that all the blocks are cleared from board.
      */
     @Test
-    void winGameTest() {
+    void destroyBlocksTest() {
         boolean expected = true;
-        boolean actual = false;
+        boolean actual;
         Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
+        int destroyedBlocks = 0;
 
-        //set all blocks to destroyed
+        // set all blocks to destroyed
         for (int i = 0; i < Constants.getRows(); i++) {
             for (int j = 0; j < Constants.getColumns(); j++) {
-                board.ballCollide(board.getBlock(i, j));
+                board.getBlock(i, j).setDestroyed(true);
+                destroyedBlocks++;
             }
         }
-        actual = board.bricksAreCleared();
 
-        assertEquals(expected, actual);
-    }
+        actual = destroyedBlocks == Constants.getRows() * Constants.getColumns();
 
-    //User loses all lives
-    @Test
-    void loseGameTest() {
-        int expected = 0;
-        int actual;
-        Life lives = new Life();
-
-        // Subtracting all three lives
-        for (int i = 0; i < 3; i++) {
-            lives.subtractLife();
-        }
-
-        actual = lives.getLives();
         assertEquals(expected, actual);
     }
 
@@ -81,41 +69,10 @@ class BreakoutTest {
     }
 
     /**
-     * Checking if startGame() works correctly. It should not cause any errors or exceptions.
+     * Checking if Leaderboard returns the 10 highest score even when more scores are added.
      */
     @Test
-    void startGameTest() {
-        // GUI pops up for like a split second; Should I make the system wait? But it gave
-        // some errors...
-        Breakout breakout = new Breakout(new View(new LinkedBlockingQueue<>()),
-                new LinkedBlockingQueue<>());
-        breakout.startGame();
-
-        // How should I test this? Should this even be a test?
-        assertNotNull(breakout);
-    }
-
-    /**
-     * Checking if the game can restart correctly after having finished. There should be no errors
-     * or exceptions.
-     */
-    @Test
-    void resetGameTest() {
-
-    }
-
-    @Test
-        // get score based on how many blocks are left
-    void checkScoreTest() {
-        // Board boardTest = new Board();
-        // int blocksDestroyed = getRows() * getColumns() - getBlockCounter() = // how many blocks are out
-    }
-
-    /**
-     * Checking if Leaderboard returns the 10 highest score
-     */
-    @Test
-    void get10HighestScores() {
+    void getLeaderboards10HighestScores() {
         Score s1 = new Score();
         s1.setScore(65);
         s1.setUsername("A");
@@ -165,6 +122,8 @@ class BreakoutTest {
         s12.setUsername("L");
 
         Leaderboard scores = Leaderboard.getInstance();
+        // Because Leaderboard is Singleton we need to reset the Leaderboard
+        scores.resetLeaderboard();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
         scores.addNewScore(s3);
@@ -190,14 +149,18 @@ class BreakoutTest {
         expectedScores.add(s11);
         expectedScores.add(s8);
 
-        assertEquals(expectedScores, scores.getTop10Score());
+        ArrayList<Score> actualScores = scores.getTop10Score();
+        for (int i = 0; i < expectedScores.size(); i++) {
+            assertEquals(expectedScores.get(i).getScore(), actualScores.get(i).getScore());
+        }
     }
 
     /**
-     * Checking that all scores are added and in order
+     * Checking that all scores are added and in correct order according to Score's compareTo()
+     * method.
      */
     @Test
-    void addScoreTest() {
+    void addScoreToLeaderboardTest() {
         Score s1 = new Score();
         s1.setScore(65);
         s1.setUsername("A");
@@ -219,6 +182,8 @@ class BreakoutTest {
         s5.setUsername("E");
 
         Leaderboard scores = Leaderboard.getInstance();
+        // Because Leaderboard is Singleton we need to reset the Leaderboard
+        scores.resetLeaderboard();
         scores.addNewScore(s1);
         scores.addNewScore(s2);
         scores.addNewScore(s3);
@@ -232,15 +197,15 @@ class BreakoutTest {
         expectedScores.add(s4);
         expectedScores.add(s3);
 
-        assertEquals(expectedScores, scores.getHighScores());
+        ArrayList<Score> actualScores = scores.getHighScores();
+        for (int i = 0; i < expectedScores.size(); i++) {
+            assertEquals(expectedScores.get(i).getScore(), actualScores.get(i).getScore());
+        }
     }
 
-    @Test
-    void createBoardTest() {
-        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
-        System.out.println(board.toString());
-    }
-
+    /**
+     * Checks if the scores are being sorted correctly according to Score's compareTo() method.
+     */
     @Test
     void compareScoreTest() {
         ArrayList<Score> scores = new ArrayList<>();
@@ -271,34 +236,18 @@ class BreakoutTest {
         assertEquals(expectedScores, scores);
     }
 
-    @Test
-    void destroyBlockTest() {
-        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
-        int expectedBlockCounter =
-                Constants.getRows() * Constants.getColumns() + 1; //one block is destroyed
-        // TODO
-//        board.getBall().setCoordinates(30, 35);
-
-        Block testBlock = new Block(30, 30, 0, 0, new ArrayBlockingQueue(15));
-        // TODO
-//        if (board.checkClash()){
-//            board.getBall().destroyBlock(testBlock);
-//        }
-//        int actualBlockCounter = board.getBlockCounter();
-//        assertEquals(expectedBlockCounter, actualBlockCounter);
-    }
-
     /**
-     * Checking if board can reset properly. There should be no errors or exceptions.
+     * Checking to see whether blocks are being destroyed properly.
      */
     @Test
-    void resetBoardTest() {
-        // How to reset board? There no method to access Board's data except how many rows/columns
-        // it has.
-        Board board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
-        board = new Board(new Insets(0, 0, 0, 0), new ArrayBlockingQueue(15));
+    void destroyBlockTest() {
+        Block testBlock = new Block(0, 0, 0, 0, new ArrayBlockingQueue<>(15));
+        testBlock.setDestroyed(true);
 
-        assertNotNull(board);
+        boolean expected = true;
+        boolean actual = testBlock.getDestroyed();
+
+        assertEquals(expected, actual);
     }
 
     /**
@@ -308,27 +257,17 @@ class BreakoutTest {
     void ballMoveTest() {
         //make sure ball does not move indefinitely out of the border
         //check top, right, left border
-    }
+        Ball ball = Ball.getInstance();
+        ball.setBallCoordinates(new double[]{400, 0});
+        ball.setBallVelocity(new double[]{5, 5});
+        ball.move(500);
 
-    /**
-     * Checking if life is lost. Should give no errors or exception, and one life should be lost
-     * everytime subtractLife() is called.
-     */
-    @Test
-    void lifeLostTest() {
-        int expected = 3;
-        int actual;
-
-        Life lives = new Life();
-
-        // Subtracting all three lives and checking each time if life is subtracted correctly.
-        for (int i = 0; i < 3; i++) {
-            expected--;
-            lives.subtractLife();
-            actual = lives.getLives();
-
-            assertEquals(expected, actual);
+        double[] expectedCoordinates = new double[]{404, 4};
+        double[] actualCoordinates = ball.getBallCoordinates();
+        for (int i = 0; i < 2; i++) {
+            assertEquals(expectedCoordinates[i], actualCoordinates[i]);
         }
+
     }
 
     /**
@@ -337,13 +276,12 @@ class BreakoutTest {
     @Test
     void paddleMoveTest() {
         Paddle paddle = Paddle.getInstance();
-        // TODO
-//        paddle.moveLeft();
-//        paddle.moveLeft();
-//        int xExpected = Constants.getPaddleXReset() + Constants.getPaddleMoveLeftUnit() + Constants.getPaddleMoveLeftUnit();
-//        int xActual = paddle.getX();
-//        assertEquals(xExpected, xActual);
+        double expected = paddle.getPaddleCoordinates()[0] + 5;
+        paddle.setPaddleVelocity(5);
+        paddle.move();
+
+        double actual = paddle.getPaddleCoordinates()[0];
+
+        assertEquals(expected, actual);
     }
-
-
 }
