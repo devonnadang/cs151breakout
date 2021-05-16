@@ -14,11 +14,6 @@ public class Life {
         this.lives = 3;
     }
 
-    /**
-     * Gets lives.
-     *
-     * @return number of lives left
-     */
     public int getLives() {
         return lives;
     }
