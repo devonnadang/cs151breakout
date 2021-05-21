@@ -1,6 +1,10 @@
 package breakout.model;
 
+/**
+ * Holds all of the constants for the game.
+ */
 public class Constants {
+
     private static final int BALL_RADIUS = 8;
     private final static int BLOCK_HEIGHT = 20;
     private final static int BLOCK_WIDTH = 40;
@@ -14,34 +18,34 @@ public class Constants {
     private static final int PADDLE_OFFSET = 40;
     private static final int PADDLE_X_RESET = PANEL_WIDTH / 2 - PADDLE_WIDTH / 2;
     private static final int PADDLE_Y_RESET = PANEL_HEIGHT - PADDLE_HEIGHT - PADDLE_OFFSET;
-    private static final int BALL_X_RESET = PANEL_WIDTH / 2 - ((BALL_RADIUS*2)/2);
-    private static final int BALL_Y_RESET = PADDLE_Y_RESET - (BALL_RADIUS*2);
+    private static final int BALL_X_RESET = PANEL_WIDTH / 2 - ((BALL_RADIUS * 2) / 2);
+    private static final int BALL_Y_RESET = PADDLE_Y_RESET - (BALL_RADIUS * 2);
     private static final int PADDLE_MOVE_RIGHT_UNIT = 5;
     private static final int PADDLE_MOVE_LEFT_UNIT = -5;
     private static final int BALL_MAX_VELOCITY = 4;
     private static final int BALL_MIN_VELOCITY = 3;
 
-    public static int getBallRadius(){
+    public static int getBallRadius() {
         return BALL_RADIUS;
     }
 
-    public static int getBlockHeight(){
+    public static int getBlockHeight() {
         return BLOCK_HEIGHT;
     }
 
-    public static int getBlockWidth(){
+    public static int getBlockWidth() {
         return BLOCK_WIDTH;
     }
 
-    public static int getRows(){
+    public static int getRows() {
         return ROWS;
     }
 
-    public static int getColumns(){
+    public static int getColumns() {
         return COLUMNS;
     }
 
-    public static int getPanelWidth(){
+    public static int getPanelWidth() {
         return PANEL_WIDTH;
     }
 
@@ -53,18 +57,18 @@ public class Constants {
         return BLOCK_SEP;
     }
 
-    public static int getPaddleHeight(){
+    public static int getPaddleHeight() {
         return PADDLE_HEIGHT;
     }
 
-    public static int getPaddleWidth(){
+    public static int getPaddleWidth() {
         return PADDLE_WIDTH;
     }
-    
-    public static int getPaddleOffSet(){
+
+    public static int getPaddleOffSet() {
         return PADDLE_OFFSET;
     }
-    
+
     public static int getPaddleXReset() {
         return PADDLE_X_RESET;
     }
@@ -77,19 +81,19 @@ public class Constants {
         return BALL_X_RESET;
     }
 
-    public static int getBallYReset(){
+    public static int getBallYReset() {
         return BALL_Y_RESET;
     }
 
-    public static int getPaddleMoveRightUnit(){
+    public static int getPaddleMoveRightUnit() {
         return PADDLE_MOVE_RIGHT_UNIT;
     }
 
-    public static int getPaddleMoveLeftUnit(){
+    public static int getPaddleMoveLeftUnit() {
         return PADDLE_MOVE_LEFT_UNIT;
     }
 
-    public static int getBallMaxVelocity(){
+    public static int getBallMaxVelocity() {
         return BALL_MAX_VELOCITY;
     }
 

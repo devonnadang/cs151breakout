@@ -1,100 +1,113 @@
 package breakout.model;
 
+import breakout.controller.BlockDestroyedMessage;
+import java.util.concurrent.BlockingQueue;
+
 /**
- * The Block class can be destroyed by the Ball.
+ * The Block class models a block that can be destroyed by Ball.
  */
 public class Block {
-	private boolean destroyed;
-	private int x;
-	private int y;
-	private final static int BLOCK_HEIGHT = Constants.getBlockHeight();
-	private final static int BLOCK_WIDTH = Constants.getBlockWidth();
 
+    private boolean destroyed;
+    private int x;
+    private int y;
+    private int row;
+    private int column;
+    private BlockingQueue queue;
+    private int blockHeight;
+    private int blockWidth;
 
-	 public Block(int x, int y) {
-		setCoordinates(x, y);
-		destroyed = false;
-	}
-	 
-	/**
-	 * Indcate whether Block is destoryed or not
-	 * @param d ]
-	 */
-	public void setDestroyed(boolean d) {
-		destroyed = d;
-	}
+    /**
+     * Constructs Block with an x and y coordinate, row and column, and a queue to add a
+     * BlockDestroyedMessage when needed.
+     *
+     * @param x      the x coordinate
+     * @param y      the y coordinate
+     * @param row    the row of the block
+     * @param column the column of the block
+     * @param queue  the queue to add messages
+     */
+    public Block(int x, int y, int row, int column, BlockingQueue queue) {
+        this.x = x;
+        this.y = y;
+        this.row = row;
+        this.column = column;
+        this.queue = queue;
+        setCoordinates(x, y);
+        destroyed = false;
+        this.blockHeight = Constants.getBlockHeight();
+        this.blockWidth = Constants.getBlockWidth();
+    }
 
-	/**
-	 * Set the placement for Block.
-	 * @param x determines the x coordinate
-	 *  @param y determines the x coordinate
-	 */
-	public void setCoordinates(int x, int y){
-		setX(x);
-		setY(y);
-	}
+    /**
+     * Destroys the block by setting the destroyed boolean to true, setting the coordinates to x=0
+     * and y=0, and sending a BlockDestroyedMessage to update the views and models.
+     */
+    public void destroy() {
+        setDestroyed(true);
+        setCoordinates(0, 0);
+        blockWidth = 0;
+        blockHeight = 0;
+        try {
+            queue.add(new BlockDestroyedMessage(row, column));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * @return x coordinate
-	 */
-	public int getXCoordinate(){
-		return x;
-	}
+    /**
+     * Indicate whether Block is destroyed or not.
+     *
+     * @param d the boolean to set destroyed to
+     */
+    public void setDestroyed(boolean d) {
+        destroyed = d;
+    }
 
-	/**
-	 * @return y coordinate
-	 */
-	public int getYCoordinate(){
-		return y;
-	}
-	
-	/**
-	 * Set the x coordinate
-	 * @param x determines the x coordinate
-	 */
-	public void setX(int x)
-	{
-		this.x = x;
-	}
-	
-	/**
-	 * Set the y coordinate
-	 * @param y determines the x coordinate
-	 */
-	public void setY(int y)
-	{
-		this.y = y;
-	}
+    /**
+     * Set the placement for Block.
+     *
+     * @param x determines the x coordinate
+     * @param y determines the x coordinate
+     */
+    public void setCoordinates(int x, int y) {
+        setX(x);
+        setY(y);
+    }
 
-	/**
-	 * Set the x coordinate
-	 * @param x determines the x coordinate
-	 */
-	public int getX()
-	{
-		return x;
-	}
-	
-	/**
-	 * Set the y coordinate
-	 * @param y determines the x coordinate
-	 */
-	public int getY()
-	{
-		return y;
-	}
+    public int getXCoordinate() {
+        return x;
+    }
 
-	public boolean getDestroyed() {
-		return destroyed;
-	}
+    public int getYCoordinate() {
+        return y;
+    }
 
-	
-	public static int getBlockWidth() {
-		return BLOCK_WIDTH;
-	}
+    public void setX(int x) {
+        this.x = x;
+    }
 
-	public static int getBlockHeight() {
-		return BLOCK_HEIGHT;
-	}
-	
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public boolean getDestroyed() {
+        return destroyed;
+    }
+
+    public int getBlockWidth() {
+        return blockWidth;
+    }
+
+    public int getBlockHeight() {
+        return blockHeight;
+    }
 }

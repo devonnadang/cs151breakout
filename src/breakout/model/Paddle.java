@@ -2,107 +2,43 @@ package breakout.model;
 
 
 /**
- * Moves left and right using keyboard arrows. It will be used to keep ball in the air.
- * In charge of Paddle characteristics.
+ * Moves left and right using keyboard arrows. It will be used to keep ball in the air. In charge of
+ * Paddle characteristics.
  */
 public final class Paddle {
-	private int x; //x coordinate of the paddle object
-	private int y; //y coordinate of the paddle object
-	
-	//dimensions of paddle
-	private static final int PADDLE_WIDTH = Constants.getPaddleWidth();
-	private static final int PADDLE_HEIGHT = Constants.getPaddleHeight();
-	
-	private static final Paddle INSTANCE = new Paddle();
 
-	/**
-	 * This is the constructor which initializes paddle location.
-	 */
-	private Paddle()
-	{
-		//initialize paddle location
-		this.x = (Constants.getPanelWidth()/2) - (Constants.getPaddleWidth() / 2);
-		this.y = Constants.getPanelHeight() - Constants.getPaddleHeight() - Constants.getPaddleOffSet();
-	}
+    private double[] paddleCoordinates;
+    private double paddleVelocity;
+    private static final Paddle INSTANCE = new Paddle();
 
-	public static Paddle getInstance() {
-		return INSTANCE;
-	}
+    /**
+     * This is the constructor which initializes paddle location.
+     */
+    private Paddle() {
+        //initialize paddle location
+        this.paddleCoordinates = new double[]{Constants.getPaddleXReset(),
+                Constants.getPaddleYReset()};
+        this.paddleVelocity = 0;
+    }
 
-	public void setCoordinates(int x, int y){
-		setX(x);
-		setY(y);
-	}
+    public static Paddle getInstance() {
+        return INSTANCE;
+    }
 
-	/**
-	 * @param direction the new x coordinate for paddle
-	 */
-	public void move(double direction)
-	{
-		setX((int) direction);
-	}
+    public void move() {
+        paddleCoordinates[0] += paddleVelocity;
+    }
 
-	public void moveLeft(){
-		x += Constants.getPaddleMoveLeftUnit();
-	}
+    public double[] getPaddleCoordinates() {
+        return paddleCoordinates;
+    }
 
-	public void moveRight(){
-		x += Constants.getPaddleMoveRightUnit();
-	}
-	
-	/**
-	 * Resets the position of the paddle
-	 * @param r value indicating whether reset of ball should occur
-	 */
-	public void reset()
-	{
-		setCoordinates(Constants.getPaddleXReset(),Constants.getPaddleYReset());
-	}
-	public void setY(int y){
-		this.y = y;
-	}
-	
-	/**
-	 * Sets the x value of the paddle
-	 * @param x the new x coordinate
-	 */
-	public void setX(int x)
-	{
-		this.x = x;
-	}
+    public void setPaddleVelocity(double paddleVelocity) {
+        this.paddleVelocity = paddleVelocity;
+    }
 
-	/**
-	 * Gets the x value of the paddle
-	 * @param x the x coordinate
-	 */
-	public int getX()
-	{
-		return x;
-	}
-	
-	/**
-	 * Gets the y value of the paddle
-	 * @param y the y coordinate
-	 */
-	public int getY()
-	{
-		return y;
-	}
-
-	/**
-	 * Gets the width of the paddle
-	 */
-	public int getPaddleWidth()
-	{
-		return PADDLE_WIDTH;
-	}
-
-	/**
-	 * Gets the height of the paddle
-	 */
-	public int getPaddleHeight()
-	{
-		return PADDLE_HEIGHT;
-	}
+    public void setPaddleCoordinates(double[] paddleCoordinates) {
+        this.paddleCoordinates = paddleCoordinates;
+    }
 
 }
